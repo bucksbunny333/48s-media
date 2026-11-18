@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>48 Sekunden – Zwischenanalyse 18.11.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!--
+  Design: dashboard-design skill (tokens.md / components.md).
+  Abweichungen: kein Datumsfilter/Range-Picker (Momentaufnahme 18.11. 14:35); keine Sparklines (erst 1 Tag Daten);
+  ein kurzer Block "Regeln für morgen" ist bewusst Text – vom Nutzer als Analyse gewünscht.
+  Farben: accent = Aufrufe/Zuschauer, warn = Problem, down = schlechter Wert auf echter Basis.
+-->
+<style>
+:root{
+  --page:#f8f8f6;--card:#fff;--soft:#f1f1ef;--ink:#17171a;--ink2:#48484d;--muted:#66666d;
+  --line:rgb(0 0 0/.075);--line2:rgb(0 0 0/.14);--accent:#3e63dd;--up:#0f7f57;--down:#d23f45;--warn:#c98a00;--tip:#1f2530;--live:#12a150;
+  --tt:#e5484d;--ig:#c13584;--yt:#d23f45;
+}
+@media (prefers-color-scheme:dark){:root{
+  --page:#0b0b0d;--card:#141417;--soft:#1c1c20;--ink:#f3f3f5;--ink2:#c4c4ca;--muted:#8c8c95;
+  --line:rgb(255 255 255/.08);--line2:rgb(255 255 255/.16);--accent:#7b96ff;--up:#34c48b;--down:#ff6b70;--warn:#f6b100;--tip:#2a3548;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.45 Inter,system-ui,sans-serif;font-feature-settings:"tnum" 1,"cv11" 1}
+.wrap{max-width:1280px;margin:0 auto;padding:24px 20px 48px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between;margin-bottom:18px}
+h1{font-size:20px;font-weight:600;margin:0;letter-spacing:-.01em}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13px;color:var(--ink2);display:inline-flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--live)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 2px rgb(0 0 0/.04)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr)}
+.kpi{padding:16px 18px;border-right:1px solid var(--line)}
+.kpi:last-child{border-right:0}
+.lab{font-size:13px;color:var(--ink2);display:flex;justify-content:space-between;align-items:center}
+.val{font-size:30px;font-weight:600;letter-spacing:-.03em;margin:6px 0 2px}
+.sub{font-size:12px;color:var(--muted)}
+.chip{white-space:nowrap;font-size:12px;font-weight:500;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--ink2)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--ink)}
+.chip.down{background:color-mix(in srgb,var(--down) 14%,transparent);color:var(--down)}
+.chip.up{background:color-mix(in srgb,var(--up) 14%,transparent);color:var(--up)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.plat{padding:16px 18px}
+.plat h2{font-size:14px;font-weight:600;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.badge{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:11px;font-weight:600;color:#fff}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.mini div{background:var(--soft);border-radius:10px;padding:8px 10px}
+.mini b{display:block;font-size:20px;font-weight:600;letter-spacing:-.02em}
+.mini span{font-size:12px;color:var(--muted)}
+.row{position:relative;display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:8px 2px 11px;border-top:1px solid var(--line)}
+.row .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}
+.row .v{text-align:right;font-weight:500}
+.row .p{text-align:right;width:58px;color:var(--muted);font-size:12px}
+.track{position:absolute;left:2px;right:2px;bottom:3px;height:3px;border-radius:3px;background:var(--line)}
+.fill{height:3px;border-radius:3px;background:var(--accent);opacity:.75}
+.fill.warn{background:var(--warn)}
+section.wide{margin-top:16px;padding:16px 18px}
+section.wide h2{font-size:14px;font-weight:600;margin:0 0 4px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:12px;color:var(--muted);font-weight:500;text-align:right;padding:8px 8px;border-bottom:1px solid var(--line2);white-space:nowrap}
+th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+td.t{max-width:360px;overflow:hidden;text-overflow:ellipsis}
+.na{color:var(--muted)}
+.bar{display:inline-block;vertical-align:middle;width:70px;height:6px;border-radius:3px;background:var(--line);margin-left:8px;overflow:hidden}
+.bar i{display:block;height:6px;background:var(--accent)}
+.bar i.w{background:var(--warn)}
+.cols{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-top:16px}
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.fact{background:var(--soft);border-radius:10px;padding:8px 12px;font-size:13px}
+.fact b{font-weight:600}
+ol{margin:10px 0 0;padding-left:18px}
+ol li{margin:0 0 8px}
+.flag{border-left:3px solid var(--warn);padding:2px 0 2px 10px;margin-top:10px;font-size:13px}
+.tag{font-size:11px;color:var(--muted);margin-left:6px}
+@media (max-width:980px){.kpis{grid-template-columns:repeat(2,1fr)}.kpi:nth-child(2){border-right:0}.kpi:nth-child(-n+2){border-bottom:1px solid var(--line)}.grid3,.cols{grid-template-columns:1fr}}
+@media (max-width:520px){.kpis{grid-template-columns:1fr}.kpi{border-right:0;border-bottom:1px solid var(--line)}.wrap{padding:16px 12px}.val{font-size:26px}.tblwrap{overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>48 Sekunden · Zwischenanalyse</h1>
+  <div class="pills">
+    <span class="pill">Mi 18.11.2026 · 14:35</span>
+    <span class="pill">Seit Start (17.11.)</span>
+    <span class="pill"><span class="dot"></span>Live aus Studio + Insights</span>
+  </div>
+</header>
+
+<div class="card kpis">
+  <div class="kpi" title="TikTok + Instagram + YouTube, Aufrufe je Video seit Veröffentlichung addiert">
+    <div class="lab">Aufrufe gesamt<span class="chip">3 Plattformen</span></div>
+    <div class="val">2.817</div><div class="sub">YT 2.012 · IG 798 · TT 7</div>
+  </div>
+  <div class="kpi" title="YouTube: Abonnenten netto 28 Tage · TikTok: Follower gesamt · Instagram: Follower gesamt">
+    <div class="lab">Follower / Abos<span class="chip">neu</span></div>
+    <div class="val">+6</div><div class="sub">YT +4 · TT 2 · IG 0</div>
+  </div>
+  <div class="kpi" title="YouTube-Kennzahl „angesehen vs. weggewischt“, Kanal, 28 Tage. Richtwert laut Branchenquellen 70–80 %.">
+    <div class="lab">Angesehen (YT)<span class="chip warn">Ziel 70 %</span></div>
+    <div class="val">47,2 %</div><div class="sub">52,8 % weggewischt</div>
+  </div>
+  <div class="kpi" title="Instagram: Ø angesehener Anteil je Reel, gewichtet nach Aufrufen">
+    <div class="lab">Ø angesehen (IG)<span class="chip warn">niedrig</span></div>
+    <div class="val">25 %</div><div class="sub">Ø 12,4 s pro Aufruf</div>
+  </div>
+</div>
+
+<div class="grid3">
+  <div class="card plat">
+    <h2><span class="badge" style="background:var(--yt)">YT</span>YouTube Shorts</h2>
+    <div class="mini">
+      <div title="Summe seit Veröffentlichung"><b>2.012</b><span>Aufrufe</span></div>
+      <div title="Engaged Views, Kanal 28 Tage"><b>855</b><span>Engaged</span></div>
+      <div title="Kanal 28 Tage"><b>29</b><span>Likes</span></div>
+    </div>
+    <div class="row" title="55,9 % angesehen · 945 Aufrufe"><span class="n">14 Tage ohne Handy-Internet</span><span class="v">945</span><span class="p">55,9 %</span><div class="track"><div class="fill" style="width:56%"></div></div></div>
+    <div class="row" title="35,0 % angesehen · 565 Aufrufe"><span class="n">Die meisten wischen vor der 48 weg</span><span class="v">565</span><span class="p">35,0 %</span><div class="track"><div class="fill warn" style="width:35%"></div></div></div>
+    <div class="row" title="43,9 % angesehen · 455 Aufrufe"><span class="n">Du schaffst keine 47 Sekunden mehr</span><span class="v">455</span><span class="p">43,9 %</span><div class="track"><div class="fill warn" style="width:44%"></div></div></div>
+    <div class="row" title="41,5 % angesehen · 47 Aufrufe · seit 13:00"><span class="n">Dein Handy macht dich dümmer</span><span class="v">47</span><span class="p">41,5 %</span><div class="track"><div class="fill warn" style="width:42%"></div></div></div>
+    <div class="sub" style="margin-top:8px">Balken = angesehen statt weggewischt · 95,5 % aus dem Shorts-Feed</div>
+  </div>
+
+  <div class="card plat">
+    <h2><span class="badge" style="background:var(--ig)">IG</span>Instagram Reels</h2>
+    <div class="mini">
+      <div title="Summe der Reel-Aufrufe"><b>798</b><span>Aufrufe</span></div>
+      <div title="Erreichte Konten 16.–18.11."><b>631</b><span>Reichweite</span></div>
+      <div title="Interaktionen 16.–18.11.; Profilbesuche 0"><b>18</b><span>Interaktionen</span></div>
+    </div>
+    <div class="row" title="Ø 16,8 s · 25,5 % angesehen · Skip 30,7 % · 5 Likes · 3 Shares · 2 Saves"><span class="n">14 Tage ohne Handy-Internet</span><span class="v">257</span><span class="p">25,5 %</span><div class="track"><div class="fill" style="width:25.5%"></div></div></div>
+    <div class="row" title="Ø 10,8 s · 36,2 % angesehen · Skip 44,6 % · 1 Like"><span class="n">Die meisten wischen vor der 48 weg</span><span class="v">243</span><span class="p">36,2 %</span><div class="track"><div class="fill" style="width:36.2%"></div></div></div>
+    <div class="row" title="Ø 14,1 s · 22,4 % angesehen · Skip 53,5 % · 2 Saves"><span class="n">Du schaffst keine 47 Sekunden mehr</span><span class="v">148</span><span class="p">22,4 %</span><div class="track"><div class="fill warn" style="width:22.4%"></div></div></div>
+    <div class="row" title="Ø 6,0 s · 10,0 % angesehen · Skip 68,1 % · 1 Like"><span class="n">Dein Handy macht dich dümmer</span><span class="v">150</span><span class="p">10,0 %</span><div class="track"><div class="fill warn" style="width:10%"></div></div></div>
+    <div class="sub" style="margin-top:8px">Balken = Ø angesehener Anteil · 0 Follower · 0 Profilbesuche</div>
+  </div>
+
+  <div class="card plat">
+    <h2><span class="badge" style="background:#111">TT</span>TikTok</h2>
+    <div class="mini">
+      <div><b>7</b><span>Aufrufe</span></div>
+      <div><b>2</b><span>Follower</span></div>
+      <div><b>0</b><span>Likes</span></div>
+    </div>
+    <div class="row"><span class="n">14 Tage ohne Handy-Internet</span><span class="v">3</span><span class="p">—</span><div class="track"><div class="fill warn" style="width:3%"></div></div></div>
+    <div class="row"><span class="n">Du schaffst keine 47 Sekunden mehr</span><span class="v">2</span><span class="p">—</span><div class="track"><div class="fill warn" style="width:2%"></div></div></div>
+    <div class="row"><span class="n">Die meisten wischen vor der 48 weg</span><span class="v">1</span><span class="p">—</span><div class="track"><div class="fill warn" style="width:1%"></div></div></div>
+    <div class="row"><span class="n">Es liegt nur da (Ben-Akte 01)</span><span class="v">1</span><span class="p">—</span><div class="track"><div class="fill warn" style="width:1%"></div></div></div>
+    <div class="flag">Verteilung fast null · 5 Beiträge, 4 sichtbar</div>
+  </div>
+</div>
+
+<section class="card wide">
+  <h2>Alle Videos</h2>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Video</th><th>Hook-Art</th><th>Länge</th><th>YT Aufrufe</th><th>YT angesehen</th><th>YT Ø Wiedergabe</th><th>YT Abos</th><th>IG Aufrufe</th><th>IG Ø angesehen</th><th>IG Skip</th><th>TT Aufrufe</th></tr></thead>
+    <tbody>
+      <tr><td class="t">Folge 1 · 14 Tage ohne Handy-Internet</td><td>Story/Experiment</td><td>67 s</td><td>945</td><td>55,9 %<span class="bar"><i style="width:56%"></i></span></td><td>27,0 s</td><td>+1</td><td>257</td><td>25,5 %</td><td>30,7 %</td><td>3</td></tr>
+      <tr><td class="t">Test · Die meisten wischen vor der 48 weg</td><td>Ego-Angriff</td><td>31 s</td><td>565</td><td>35,0 %<span class="bar"><i class="w" style="width:35%"></i></span></td><td>8,3 s</td><td>+1</td><td>243</td><td>36,2 %</td><td>44,6 %</td><td>1</td></tr>
+      <tr><td class="t">Folge 2 · Du schaffst keine 47 Sekunden mehr</td><td>Ego-Angriff</td><td>64 s</td><td>455</td><td>43,9 %<span class="bar"><i class="w" style="width:44%"></i></span></td><td>21,4 s</td><td>+3</td><td>148</td><td>22,4 %</td><td>53,5 %</td><td>2</td></tr>
+      <tr><td class="t">Ben-Akte 01 · Handy macht dümmer <span class="tag">seit 13:00</span></td><td>Paradox</td><td>61 s</td><td>47</td><td>41,5 %<span class="bar"><i class="w" style="width:42%"></i></span></td><td>≈ 8 s</td><td>0</td><td>150</td><td>10,0 %</td><td>68,1 %</td><td>1</td></tr>
+      <tr><td class="t">Folge 3 · 15 Minuten Stille</td><td>Paradox</td><td>65 s</td><td colspan="8" class="na" style="text-align:left">geplant 18:00</td></tr>
+      <tr><td class="t">Ben-Akte 02 · Jeder Vierte</td><td>Zahl + Ego-Frage</td><td>59 s</td><td colspan="8" class="na" style="text-align:left">geplant 21:00</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<div class="cols">
+  <section class="card wide" style="margin-top:0">
+    <h2>Was die Zahlen sagen</h2>
+    <div class="facts">
+      <div class="fact" title="YouTube angesehen 55,9 % vs. 35–44 % bei den Ego-Hooks; Instagram niedrigste Skip-Rate 30,7 %">Bestes Video <b>Folge 1</b> · YT 55,9 % · IG Skip 30,7 %</div>
+      <div class="fact" title="„Du schaffst keine …“ / „Die meisten wischen weg“ verlieren gegen die Story-Folge">Ego-Angriff <b>35–44 %</b> vs. Story <b>56 %</b></div>
+      <div class="fact" title="Instagram Ø 6–17 s pro Aufruf; die 48-Sekunden-Belohnung erreicht nur ein kleiner Teil">Ø Wiedergabe IG <b>6–17 s</b> von 60 s</div>
+      <div class="fact" title="Folge 2 bringt pro Aufruf die meisten Abos">Abos/Aufruf bestes <b>Folge 2</b> · +3</div>
+      <div class="fact" title="Instagram: Folge 1 3 Shares + 2 Saves, Folge 2 2 Saves">Shares <b>3</b> · Saves <b>4</b> · nur Folge 1+2</div>
+    </div>
+    <div class="flag">TikTok verteilt fast nicht (7 Aufrufe gesamt) – Ursache noch offen</div>
+    <div class="flag">Paradox-Hook (Ben-Akte 01) erst 1,5 h alt, Basis klein – Urteil nach 3 Wiederholungen</div>
+  </section>
+  <section class="card wide" style="margin-top:0">
+    <h2>Regeln ab morgen</h2>
+    <ol>
+      <li><b>Story statt Angriff.</b> „Ben macht X für 14 Tage“ schlägt „Du schaffst es nicht“.</li>
+      <li><b>Wert in den ersten 10 s.</b> Die meisten sind nach 6–17 s weg – These + erstes Bild-Payoff vor Sekunde 10.</li>
+      <li><b>Kurzformat testen.</b> „Ben vs. …“ in 15–20 s (wie deine Favoriten), gegen die 60-s-Folgen.</li>
+      <li><b>TikTok prüfen.</b> Ein Video direkt in der App hochladen und vergleichen.</li>
+    </ol>
+  </section>
+</div>
+<p class="sub" style="margin-top:18px">Quellen: YouTube Studio (Kanal 28 Tage, Videos seit Veröffentlichung) · TikTok Studio · Instagram Insights über vidIQ · Stand 18.11.2026 14:35</p>
+</div>
+</body>
+</html>
