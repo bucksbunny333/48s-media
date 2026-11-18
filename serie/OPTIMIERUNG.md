@@ -32,3 +32,5 @@ Status: OFFEN → UMGESETZT (Datum + Video) → GEMESSEN (Ergebnis)
 ## Protokoll
 - 18.11. 14:40: Zwischenanalyse. M1–M6 angelegt.
 - 18.11. 14:45: Lukas übernimmt den TikTok-Upload nativ (M6). Die TikTok-Posts vom 18.11. 18:00 und 21:00 laufen noch über vidIQ und sind nicht stornierbar.
+
+- 18.11. 17:05: M4 (Kurzformat E1) und M5 (breite Themen) erstmals umgesetzt: „Motivation vs. Disziplin“ 19:30 und „9-mal gefallen“ 22:15. M7 per Erinnerung an jedem Slot. Auswertung am 19.11. um 22:00.

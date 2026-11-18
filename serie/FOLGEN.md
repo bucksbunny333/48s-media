@@ -35,3 +35,13 @@ Datenlage: Dashboard-Datensatz „performance“ noch leer (erste Nacht-Auswertu
 > 18.11. 12:30 – Lukas: Freigabe erteilt und Standing-Freigabe ab jetzt („du machst einfach“). Produktion veröffentlicht künftig selbst.
 
 > 18.11. 16:40: Folge 3 vorgezogen (YouTube in Studio auf Öffentlich, KI = Ja, nicht für Kinder; Instagram-Reel sofort). Eigene Kommentare (neu, Lukas' Wunsch) unter Folge 3 + Ben-Akte 01 auf YouTube und Instagram. TikTok-Web-Kommentar schlägt fehl („Es ist etwas schiefgelaufen“), daher kommentiert Lukas TikTok in der App. Das passt zur schwachen TikTok-Verteilung, beides wird geprüft.
+
+> 18.11. 17:05: Zusatzauftrag von Lukas: heute 3 Videos pro Plattform (Ben-Akte 02 um 21:00 plus 2 neue). ElevenLabs ist ausgefallen (Timeout/Bad Gateway), deshalb sind beide neuen Videos im **Kurzformat ohne Stimme** (Experiment E1 / M4). Umgesetzt wurden M1 (Story/These statt Angriff), M2 (Wert vor Sekunde 8), M3 (Ben bewegt sich ab Frame 0), M5 (breite Themen) und M7 (eigene Kommentare).
+| Slot | Video | Thema / Hook | Länge | Wege |
+|---|---|---|---|---|
+| 19:30 | Ben vs. Ben – Motivation vs. Disziplin | Gewohnheiten/Disziplin; Zwei-Figuren-Vergleich mit Labels, 30-Tage-Zeitraffer | 20 s | YT + TikTok via vidIQ (Post 39afef90), IG-Reel per Erinnerung 19:30 |
+| 21:00 | Ben-Akte 02 | Social Media (DAK-Zahl), Hook B | 48 s | wie geplant |
+| 22:15 | Ben vs. die Hürde – 9-mal gefallen | Scheitern; Underdog, Hook „9-MAL GEFALLEN. VOR ALLEN.“ im Frame 0 | 20 s | YT + TikTok via vidIQ (Post 551915a3), IG-Reel per Erinnerung 22:15 |
+- TikTok läuft heute ausnahmsweise über vidIQ, weil Lukas im Gym ist. Ab 19.11. lädt Lukas TikTok nativ hoch (E2).
+- E1-Auswertung: Kurzformat (20 s) gegen Langformat (48 s). Verglichen werden „angesehen vs. weggewischt“ und die Abschlussrate. Erst nach 3 Wiederholungen wird daraus eine Regel.
+- tmp/2026-11-18_1930.mp4 und _2215.mp4 werden nach dem 22:15-Slot aus dem Repo entfernt.
