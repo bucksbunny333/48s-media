@@ -39,3 +39,15 @@ Das ist mein eigenes Lernbuch. Jede Tagesproduktion liest es zuerst und ergänzt
 - 18.11. (Weiterbildung): **Paradox-Hook** – erster Satz klingt unmöglich + passendes Objekt/Zähler sofort im Bild („Diese Ratte verhungert, obwohl ihr Futter daneben liegt“). Beleg: @kernwerte, 2D-Animation, 98 Tsd. Aufrufe = 7,2× Median, 67 s, Bildwechsel alle 2,5–3,5 s, nahtloser Loop. → Heute angewendet in 12:00 („Es liegt nur da. Und macht dich dümmer.“) und 18:00 („Du nimmst lieber einen Stromschlag …“).
 - 18.11. (Weiterbildung): **Nummerierte Kapitel-Kopfzeile** oben („01 · …“, „02 · …“) – gibt Orientierung und ein unausgesprochenes „es kommt noch was“. Beleg: @hiddenmind.tv, Strichmännchen, 94 Tsd. Aufrufe = 126× Median, 71 s, Header in Großbuchstaben, Signalwörter rot. → Heute in allen 3 Videos (neues Element `#head` in der Engine).
 - 18.11. (Weiterbildung): Beide Ausreißer sind **länger als 60 s** (67 s / 71 s) – unsere 59–65 s passen. Ruhige, ernste Stimme + Moll-Pad + SFX auf jedem Bildwechsel.
+
+## Gespeichert-Analyse 18.11. (Lukas' TikTok-Favoriten, 6 von 7 analysiert)
+Videos: @dobeeofc „Der Typ aus der letzten Reihe“ (69 s, DE) · @abovethematerial „The kid who cheats…“ (86 s) · @gowcinematic „Perfectionist vs Action Taker“ (15 s, 7,6 Mio.) · @cryothum „The student who fails the most…“ (67 s) · @moneyinmono „Worker/Boss/Costs“ (21 s) · @calmlama0 „Der Schüler, der am meisten scheitert…“ (71 s, DE) · @psychoologie (nicht analysiert, vidIQ-Credits leer).
+**Muster (gilt ab sofort):**
+1. **Themen = Leben, Geld, Schule, Scheitern, System, Mindset** – nicht nur Handy. Was die Zuschauer hören WOLLEN (Bestätigung: „du bist nicht falsch“) und hören MÜSSEN (unbequeme Wahrheit).
+2. **Kontraintuitive These als Hook** in Satz 1: „Der Schüler, der am meisten scheitert, verdient später am meisten.“ Widerspricht Eltern/Lehrern → sofortige Dissonanz.
+3. **Underdog/Identifikation**: Der „Typ aus der letzten Reihe“, der Arbeiter, der Scheiternde – Zuschauer erkennt sich und wird aufgewertet.
+4. **Zwei-Figuren-Vergleich** (Perfektionist vs. Macher, Worker vs. Boss, 1er- vs. 6er-Schüler) mit Labels in Großbuchstaben, Spotlight, Zähler (#1…#15, $, FAILS: X).
+5. **Look**: Schwarz/Dark-Mode, Strichmännchen/Piktogramme, Glow, 1 Akzentfarbe (Gold/Lila), Labels statt langer Texte. Unser Look passt – Ben ist genau diese Figur.
+6. **Zwei Längen funktionieren**: 15–21 s ohne Stimme (nur Bild + Beat + Punchline, Loop) ODER 65–86 s Story mit ruhiger, tiefer Erzählstimme + Szenenwechsel alle 1–3 s.
+7. **Ende = merkbarer Satz/Formel** („SCHEITERN = LERNEN“, „Keep a coin. Build yours.“) → Saves/Shares.
+→ Neues Format testen: **„Ben vs. …“ (15–20 s, ohne Stimme)** zusätzlich zu den Story-Folgen.
