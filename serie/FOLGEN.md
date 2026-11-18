@@ -13,4 +13,13 @@ Nebenfolgen „Ben-Akte“: je ein Trend-Thema, Ben als Beispiel, endet mit Verw
 ## Themen-Vorschläge des Tages
 (wird jeden Morgen von der Tagesproduktion ergänzt: Datum, Thema, Begründung, Score)
 
+### 18.11.2026
+Datenlage: Dashboard-Datensatz „performance“ noch leer (erste Nacht-Auswertung steht aus) → Begründung aus vidIQ-Ausreißern DACH (letzte 30 Tage) + Websuche.
+| Slot | Thema | Begründung | Score |
+|---|---|---|---|
+| 18:00 Folge 3 | Tag 3: Lieber Stromschlag als 15 Min Stille (Wilson et al., Science 2014) | Löst Cliffhanger „Tag drei – Bens Kopf“ ein; Langeweile/Entzug läuft (@anxthony_lee 12× Median „Zu viele Reize…“); Paradox-Hook wie @kernwerte (7,2×) | 86 |
+| 12:00 Ben-Akte 01 | Das Handy auf dem Tisch macht dümmer (Ward et al. 2017, >500 Studenten) | Lern-/Konzentrationsthema läuft bei Schülern/Studis (@testotwins08 11× „Lernen unmöglich“); Handyverbot an Schulen ist DACH-Dauerthema (Spektrum 12/2025) | 82 |
+| 21:00 Ben-Akte 02 | Jeder Vierte (10–17) nutzt Social Media problematisch, 150 Min/Schultag (DAK/DZSKJ 2025) | Deutsche Zahl, direkt auf Zielgruppe; Ego-Frage „Bist du einer davon?“; Gegenstück zum Paradox-Hook (Hook-Test) | 78 |
+
+
 > Hinweis: Folge 2 ist bereits veröffentlicht. Die 18-Uhr-Hauptfolge am 18.11. ist Folge 3 („Tag drei“).

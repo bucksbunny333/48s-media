@@ -6,7 +6,8 @@ Part B starts so its first word lands exactly at T48 (green 48 reveal).
 import json, sys, subprocess, numpy as np, wave
 T48 = 48.0
 A_END = 45.3          # last word of part A must end here (then ~2.7 s suspense)
-MAXGAP_A, KEEP_A = 0.30, 0.20
+import os
+MAXGAP_A, KEEP_A = float(os.environ.get("MGA",0.30)), float(os.environ.get("KA",0.20))
 MAXGAP_B, KEEP_B = 0.40, 0.28
 TAIL = 1.6            # seconds after last word of B
 SR = 48000

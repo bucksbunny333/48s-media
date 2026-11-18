@@ -23,6 +23,9 @@ Das ist mein eigenes Lernbuch. Jede Tagesproduktion liest es zuerst und ergänzt
 ## Hook (erste Sekunde)
 - Großer Text-Hook im ersten Bild, Ego-Herausforderung. Kein Schwarz, kein „Das ist Ben“ als Einstieg.
 
+## Gespeichert-Analyse 18.11.
+- **Nicht möglich:** Lukas' Mac/Chrome war nicht erreichbar (Cloud-Lauf ohne Browser-Verbindung). Lukas um 08:10 benachrichtigt (Mac/Chrome an + bei TikTok eingeloggt, oder Links schicken). Ersatz heute: 2 vidIQ-Ausreißer (siehe „Gelernt“).
+
 ## Selbst-Weiterbildung (jeden Morgen, ~10 Min.)
 1. 2 aktuelle Ausreißer-Videos der Nische suchen (vidiq_instagram_tiktok_outlier_search) und mit vidiq_watch_shortform_content anschauen.
 2. Hook, Schnitt-Tempo, Text, Musik, Länge, Caption notieren → was davon passt zu uns?
@@ -33,3 +36,6 @@ Das ist mein eigenes Lernbuch. Jede Tagesproduktion liest es zuerst und ergänzt
 ## Gelernt
 - 18.11.: Virale Motivations-Captions sind kurz und kryptisch (TikTok) bzw. „Speicher dir das…“ + Du-Satz (Instagram); erklärende Texte mit Quellen wirken langweilig. (Beleg: @cluberich 8,4 Mio./4,6 Mio. Aufrufe; @dopaminreset)
 - 18.11.: Folge 1 auf YouTube: Ø 58,3 % angesehen bei 692 Aufrufen; Start aus Schwarz = schwacher Hook.
+- 18.11. (Weiterbildung): **Paradox-Hook** – erster Satz klingt unmöglich + passendes Objekt/Zähler sofort im Bild („Diese Ratte verhungert, obwohl ihr Futter daneben liegt“). Beleg: @kernwerte, 2D-Animation, 98 Tsd. Aufrufe = 7,2× Median, 67 s, Bildwechsel alle 2,5–3,5 s, nahtloser Loop. → Heute angewendet in 12:00 („Es liegt nur da. Und macht dich dümmer.“) und 18:00 („Du nimmst lieber einen Stromschlag …“).
+- 18.11. (Weiterbildung): **Nummerierte Kapitel-Kopfzeile** oben („01 · …“, „02 · …“) – gibt Orientierung und ein unausgesprochenes „es kommt noch was“. Beleg: @hiddenmind.tv, Strichmännchen, 94 Tsd. Aufrufe = 126× Median, 71 s, Header in Großbuchstaben, Signalwörter rot. → Heute in allen 3 Videos (neues Element `#head` in der Engine).
+- 18.11. (Weiterbildung): Beide Ausreißer sind **länger als 60 s** (67 s / 71 s) – unsere 59–65 s passen. Ruhige, ernste Stimme + Moll-Pad + SFX auf jedem Bildwechsel.

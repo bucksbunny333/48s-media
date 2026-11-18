@@ -1,0 +1,26 @@
+<html><head><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+#bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 42%,#161616 0%,#050505 60%,#000 100%)}
+#stage{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#vig{position:absolute;inset:0;box-shadow:inset 0 0 380px 110px #000;pointer-events:none}
+#hud{position:absolute;top:118px;right:104px;display:flex;align-items:center;gap:20px;transform-origin:100% 50%}
+#hudnum{font-weight:800;font-size:58px;font-variant-numeric:tabular-nums}
+#tag{position:absolute;top:136px;left:104px;font-weight:800;font-size:34px;letter-spacing:6px;color:#7a7a7a}
+#cap{position:absolute;left:70px;right:70px;top:1480px;text-align:center;font-weight:800;font-size:74px;line-height:1.12;letter-spacing:-1px}
+#cap span{display:inline-block;margin:0 9px}
+#head{position:absolute;left:60px;right:60px;top:228px;text-align:center;font-weight:900;font-size:50px;letter-spacing:5px;color:#9a9a9a}
+#src{position:absolute;left:0;right:0;top:1395px;text-align:center;font-size:28px;color:#6d6d6d;font-weight:500}
+#flash{position:absolute;inset:0;background:#30d158;opacity:0}
+#fade{position:absolute;inset:0;background:#000;opacity:0}
+</style></head><body>
+<div id="bg"></div>
+<svg id="stage" viewBox="0 0 1080 1920"></svg>
+<div id="vig"></div>
+<div id="tag">BEN-AKTE · 02</div>
+<div id="head"></div><div id="src"></div>
+<div id="cap"></div>
+<div id="hud"><svg width="80" height="80" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#262626" stroke-width="10"/><circle id="arc" cx="50" cy="50" r="40" fill="none" stroke="#e5484d" stroke-width="10" stroke-linecap="round" transform="rotate(-90 50 50)" stroke-dasharray="0 251.3"/></svg><div id="hudnum">00</div></div>
+<div id="fade"></div>
+<div id="flash"></div>
+<script src="../../rig.js"></script><script src="../../poses.js"></script><script src="words.js"></script><script src="scenes.js"></script><script src="../../common.js"></script></body></html>
