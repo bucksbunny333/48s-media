@@ -25,7 +25,8 @@ Status: OFFEN → UMGESETZT (Datum + Video) → GEMESSEN (Ergebnis)
 - [ ] **M3 Bewegung ab Frame 0:** Ben steht im ersten Bild schon in Aktion, kein statisches Textbild. Text erscheint auf einem bewegten Bild. Beleg: Ben-Akte 01 mit statischem Textstart hat IG Ø 6 s.
 - [ ] **M4 Kurzformat-Test (E1):** jeden Tag ein Video mit 15–25 s im Format „Ben vs. …“, ohne Stimme. Vergleich mit den 60-s-Folgen über Ø angesehen % und Shares. Beleg: gespeicherte Favoriten, 15–21 s erreichen 7,6 Mio.
 - [ ] **M5 Breite Themen:** mindestens 1 von 3 Videos ohne Handy-Bezug (Scheitern, Schule vs. Leben, Geld, Perfektionismus). Messen, ob Themen außerhalb des Handys besser laufen.
-- [ ] **M6 TikTok-Verteilung (E2):** Nur 7 Aufrufe auf 4 Videos. Lukas lädt ein Video nativ in der App hoch, vidIQ-Upload als Gegenprobe. Zusätzlich die Caption mit Keyword vorn (z. B. „motivation“, „disziplin“) und das Hashtag-Set wechseln. Erst danach über weitere Maßnahmen entscheiden.
+- [ ] **M6 TikTok-Verteilung (E2):** Bisher 7 Aufrufe auf 4 Videos über den vidIQ-Upload. Ab 19.11. lädt Lukas TikTok NATIV in der App hoch. Er bekommt zur Slot-Uhrzeit eine Nachricht mit Video, Text und Einstellungen und lädt parallel zum Instagram/YouTube-Upload hoch. Gemessen werden die TikTok-Aufrufe nach 24 h, nativ gegen vidIQ (18.11.). Bleibt es auch nativ unter 50, wird das Konto geprüft.
 
 ## Protokoll
 - 18.11. 14:40: Zwischenanalyse. M1–M6 angelegt.
+- 18.11. 14:45: Lukas übernimmt den TikTok-Upload nativ (M6). Die TikTok-Posts vom 18.11. 18:00 und 21:00 laufen noch über vidIQ und sind nicht stornierbar.
