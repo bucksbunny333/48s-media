@@ -51,3 +51,7 @@ Videos: @dobeeofc „Der Typ aus der letzten Reihe“ (69 s, DE) · @abovethemat
 6. **Zwei Längen funktionieren**: 15–21 s ohne Stimme (nur Bild + Beat + Punchline, Loop) ODER 65–86 s Story mit ruhiger, tiefer Erzählstimme + Szenenwechsel alle 1–3 s.
 7. **Ende = merkbarer Satz/Formel** („SCHEITERN = LERNEN“, „Keep a coin. Build yours.“) → Saves/Shares.
 → Neues Format testen: **„Ben vs. …“ (15–20 s, ohne Stimme)** zusätzlich zu den Story-Folgen.
+
+## Vorgaben Lukas (18.11.)
+- Länge: Großteil 45–60 s, Kurzformat nur gelegentlich.
+- Eigener Kommentar unter jedem Video auf jeder Plattform. Ohne Kommentar gilt ein Slot nicht als fertig.

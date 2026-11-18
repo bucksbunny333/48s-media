@@ -34,3 +34,5 @@ Status: OFFEN → UMGESETZT (Datum + Video) → GEMESSEN (Ergebnis)
 - 18.11. 14:45: Lukas übernimmt den TikTok-Upload nativ (M6). Die TikTok-Posts vom 18.11. 18:00 und 21:00 laufen noch über vidIQ und sind nicht stornierbar.
 
 - 18.11. 17:05: M4 (Kurzformat E1) und M5 (breite Themen) erstmals umgesetzt: „Motivation vs. Disziplin“ 19:30 und „9-mal gefallen“ 22:15. M7 per Erinnerung an jedem Slot. Auswertung am 19.11. um 22:00.
+
+- 18.11. 17:25 – VORGABE LUKAS: Großteil der Videos 45–60 s. Kurzformat (M4/E1) nur noch „mal“ (max. 1–2/Woche, nie 2 Tage hintereinander). Die Elemente aus den Kurzformat-Tests (Zwei-Figuren-Vergleich, Underdog-Zähler, Hook-Text in Frame 0) kommen ins 45–60-s-Format. Eigene Kommentare (M7) sind Pflicht; ein Slot ist erst fertig, wenn sie sichtbar sind.
