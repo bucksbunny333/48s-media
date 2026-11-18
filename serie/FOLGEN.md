@@ -5,6 +5,9 @@
 | 1 | 18.11.2026 | 00:42 | Ben schaltet 14 Tage das Handy-Internet ab (Castelo et al. 2025) | „Tag eins. Heute.“ | live TikTok |
 | T | 18.11.2026 | 00:45 | Testvideo 30 s „Die meisten wischen nach 47 Sekunden weg“ | – | live TikTok |
 | 2 | 18.11.2026 | ~01:30 (sofort, auf Wunsch von Lukas) | Was das Handy mit deinem Kopf macht (Gloria Mark: 2,5 min → 75 s → 47 s; ~25 min zurück) | „Morgen: Tag drei. Was in Bens Kopf passiert ist.“ | live auf TikTok, YouTube, Instagram |
+| 3 | 18.11.2026 | 18:00 | Tag 3: Lieber Stromschlag als 15 Min Stille (Wilson et al., Science 2014) – löst „Tag drei“ ein | „Morgen: Tag vier. Was er aufgeschrieben hat.“ | Entwurf vidIQ 2fdece4d (TikTok+YouTube), wartet auf Freigabe |
+| A1 | 18.11.2026 | 12:00 | Ben-Akte 01: Handy auf dem Tisch macht dümmer (Ward et al. 2017) | „Was dann in seinem Kopf passiert ist: heute 18 Uhr“ | Entwurf vidIQ 0c2a9675, wartet auf Freigabe |
+| A2 | 18.11.2026 | 21:00 | Ben-Akte 02: Jeder Vierte nutzt Social Media problematisch (DAK/DZSKJ 2025) | „Ob er durchhält: morgen 18 Uhr“ | Entwurf vidIQ 3ef03d3f, wartet auf Freigabe |
 
 ## Story-Bogen (14 Tage Experiment)
 Tag 1 Entzug/Daumen sucht Handy · Tag 3 Langeweile kaum auszuhalten · Tag 5 erste Ideen in der Langeweile · Tag 7 liest ein Buch · Tag 10 Rückfall-Versuchung · Tag 14 Ergebnis.
@@ -23,3 +26,7 @@ Datenlage: Dashboard-Datensatz „performance“ noch leer (erste Nacht-Auswertu
 
 
 > Hinweis: Folge 2 ist bereits veröffentlicht. Die 18-Uhr-Hauptfolge am 18.11. ist Folge 3 („Tag drei“).
+
+## Hook-Test (experimentation) – läuft ab 18.11.
+- Variable: Hook-Typ. A = Paradox-Hook (unmöglich klingender Satz + Objekt im Bild): 12:00 + 18:00. B = Zahl + Ego-Frage („Jeder Vierte. Bist du einer davon?“): 21:00.
+- Primäre Kennzahl: YouTube „angesehen vs. weggewischt“. Entscheidungsregel (vorab): Gewinner, wenn ≥ 5 Prozentpunkte besser und Ø % angesehen nicht schlechter. 3 Wiederholungen, bevor es Regel wird. Daten: 23:59-Dashboard.
