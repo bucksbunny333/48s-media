@@ -5,7 +5,7 @@
 | 1 | 18.11.2026 | 00:42 | Ben schaltet 14 Tage das Handy-Internet ab (Castelo et al. 2025) | „Tag eins. Heute.“ | live TikTok |
 | T | 18.11.2026 | 00:45 | Testvideo 30 s „Die meisten wischen nach 47 Sekunden weg“ | – | live TikTok |
 | 2 | 18.11.2026 | ~01:30 (sofort, auf Wunsch von Lukas) | Was das Handy mit deinem Kopf macht (Gloria Mark: 2,5 min → 75 s → 47 s; ~25 min zurück) | „Morgen: Tag drei. Was in Bens Kopf passiert ist.“ | live auf TikTok, YouTube, Instagram |
-| 3 | 18.11.2026 | 18:00 | Tag 3: Lieber Stromschlag als 15 Min Stille (Wilson et al., Science 2014) – löst „Tag drei“ ein | „Morgen: Tag vier. Was er aufgeschrieben hat.“ | eingeplant 18:00 TikTok+YouTube (vidIQ 2fdece4d), Instagram 18:00 per Reel |
+| 3 | 18.11.2026 | 18:00 | Tag 3: Lieber Stromschlag als 15 Min Stille (Wilson et al., Science 2014) – löst „Tag drei“ ein | „Morgen: Tag vier. Was er aufgeschrieben hat.“ | auf Wunsch von Lukas vorgezogen: live 16:40 YouTube JfRjwIkkPAc + Instagram Df41wX5EnbY; TikTok bleibt 18:00 (vidIQ, nicht verschiebbar) |
 | A1 | 18.11.2026 | 12:00 | Ben-Akte 01: Handy auf dem Tisch macht dümmer (Ward et al. 2017) | „Was dann in seinem Kopf passiert ist: heute 18 Uhr“ | live 13:00: YouTube N8EpVa1Pfko, Instagram Df4dONvgHj1 (KI-Label), TikTok via vidIQ |
 | A2 | 18.11.2026 | 21:00 | Ben-Akte 02: Jeder Vierte nutzt Social Media problematisch (DAK/DZSKJ 2025) | „Ob er durchhält: morgen 18 Uhr“ | eingeplant 21:00 TikTok+YouTube (vidIQ 3ef03d3f), Instagram 21:00 |
 
@@ -33,3 +33,5 @@ Datenlage: Dashboard-Datensatz „performance“ noch leer (erste Nacht-Auswertu
 
 
 > 18.11. 12:30 – Lukas: Freigabe erteilt und Standing-Freigabe ab jetzt („du machst einfach“). Produktion veröffentlicht künftig selbst.
+
+> 18.11. 16:40: Folge 3 vorgezogen (YouTube in Studio auf Öffentlich, KI = Ja, nicht für Kinder; Instagram-Reel sofort). Eigene Kommentare (neu, Lukas' Wunsch) unter Folge 3 + Ben-Akte 01 auf YouTube und Instagram. TikTok-Web-Kommentar schlägt fehl („Es ist etwas schiefgelaufen“), daher kommentiert Lukas TikTok in der App. Das passt zur schwachen TikTok-Verteilung, beides wird geprüft.

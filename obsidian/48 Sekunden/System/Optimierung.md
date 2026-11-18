@@ -27,6 +27,8 @@ Status: OFFEN → UMGESETZT (Datum + Video) → GEMESSEN (Ergebnis)
 - [ ] **M5 Breite Themen:** mindestens 1 von 3 Videos ohne Handy-Bezug (Scheitern, Schule vs. Leben, Geld, Perfektionismus). Messen, ob Themen außerhalb des Handys besser laufen.
 - [ ] **M6 TikTok-Verteilung (E2):** Bisher 7 Aufrufe auf 4 Videos über den vidIQ-Upload. Ab 19.11. lädt Lukas TikTok NATIV in der App hoch. Er bekommt zur Slot-Uhrzeit eine Nachricht mit Video, Text und Einstellungen und lädt parallel zum Instagram/YouTube-Upload hoch. Gemessen werden die TikTok-Aufrufe nach 24 h, nativ gegen vidIQ (18.11.). Bleibt es auch nativ unter 50, wird das Konto geprüft.
 
+- [ ] **M7 Eigener Kommentar unter jedem Video (Lukas, 18.11.):** direkt nach Veröffentlichung eine Frage oder ein Mini-Auftrag, der zum Antworten einlädt, auf jeder Plattform anders formuliert. YouTube und Instagram mache ich über Chrome, TikTok kommentiert Lukas in der App. Gemessen werden die Kommentare pro 100 Aufrufe.
+
 ## Protokoll
 - 18.11. 14:40: Zwischenanalyse. M1–M6 angelegt.
 - 18.11. 14:45: Lukas übernimmt den TikTok-Upload nativ (M6). Die TikTok-Posts vom 18.11. 18:00 und 21:00 laufen noch über vidIQ und sind nicht stornierbar.
