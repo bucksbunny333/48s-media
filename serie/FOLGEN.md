@@ -45,3 +45,5 @@ Datenlage: Dashboard-Datensatz „performance“ noch leer (erste Nacht-Auswertu
 - TikTok läuft heute ausnahmsweise über vidIQ, weil Lukas im Gym ist. Ab 19.11. lädt Lukas TikTok nativ hoch (E2).
 - E1-Auswertung: Kurzformat (20 s) gegen Langformat (48 s). Verglichen werden „angesehen vs. weggewischt“ und die Abschlussrate. Erst nach 3 Wiederholungen wird daraus eine Regel.
 - tmp/2026-11-18_1930.mp4 und _2215.mp4 werden nach dem 22:15-Slot aus dem Repo entfernt.
+
+> 18.11. 17:20: Auf Lukas' Wunsch beide Zusatzvideos sofort veröffentlicht, nicht erst 19:30/22:15. YouTube steht in Studio auf Öffentlich (nicht für Kinder, KI = Ja): Motivation vs. Disziplin = mNjup6dlAgo, 9-mal gefallen = mtSMXUiaZdI. Instagram-Reels mit KI-Label: Df451VnnMLp und Df451cIjf5D. Eigene Kommentare stehen auf YouTube und Instagram. TikTok bleibt wie bei vidIQ geplant (19:30 / 22:15), weil sich eingeplante Posts dort nicht ändern lassen. Ben-Akte 02 bleibt bei 21:00. Die Erinnerungen für 19:30 und 22:15 wurden auf „nur prüfen, nichts erneut posten“ umgeschrieben.
