@@ -1,0 +1,160 @@
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+canvas,svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#flash{position:absolute;inset:0;background:#30d158;opacity:0}
+</style></head><body>
+<canvas id="cv" width="1080" height="1920"></canvas>
+<svg id="stage" viewBox="0 0 1080 1920"></svg><div id="flash"></div>
+<script src="rig.js"></script><script src="poses.js"></script><script src="kit.js"></script>
+<script>
+window.DUR=59;
+// ---------- Daten (echte Rechnung) ----------
+const COLS=52, ROWS=80, N=COLS*ROWS;          // 4.160 Wochen
+const AGE=19, PAST=AGE*52;                     // 988
+const REM=N-PAST;                              // 3.172
+const SLEEP=Math.round(REM/3);                 // 1.057  (8 h/Tag)
+const WORK=Math.round(47*52*40/168);           // 582    (40 h/Woche, 20–67)
+const DAILY=Math.round(REM*3/24);              // 397    (3 h/Tag Alltag)
+const PHONE=Math.round(REM*2.5/24);            // 330    (2,5 h/Tag Social Media)
+const FREE=REM-SLEEP-WORK-DAILY-PHONE;         // 806
+const BACK=Math.round(REM*1/24);               // 132    (1 h/Tag zurück)
+// Kategorie je Punkt: 0 Vergangenheit,1 Schlaf,2 Arbeit,3 Alltag,4 Handy,5 frei ; Reihenfolge innerhalb = Rang
+let seed=48;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const idx=[];for(let i=PAST;i<N;i++)idx.push(i);
+for(let i=idx.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]];}
+const cat=new Int8Array(N),rank=new Float32Array(N);
+for(let i=0;i<PAST;i++){cat[i]=0;rank[i]=i/PAST;}
+let pool=idx.slice();
+function take(n,filter,c){const out=[],rest=[];for(const i of pool){if(out.length<n&&(!filter||filter(i)))out.push(i);else rest.push(i);}pool=rest;out.forEach((i,k)=>{cat[i]=c;rank[i]=k/n;});return out;}
+take(SLEEP,null,1);take(WORK,i=>{const r=Math.floor(i/COLS);return r>=20&&r<67},2);take(DAILY,null,3);
+const phoneIdx=take(PHONE,null,4);pool.forEach((i,k)=>{cat[i]=5;rank[i]=k/pool.length});
+const backSet=new Set(phoneIdx.slice(0,BACK));
+const BEN=PAST; // erste Woche der Zukunft = Woche 989
+// ---------- Zeitplan ----------
+const T={past:4.6,sleep:9.0,work:13.2,daily:17.0,phone:22.0,dim:26.5,zoom:33.0,zoomOut:38.6,back:48.0};
+const DURS={past:1.1,sleep:1.3,work:1.2,daily:1.1,phone:1.6,back:0.7};
+const COL={0:'#262626',1:'#2c4f86',2:'#8a6a1f',3:'#5b4a78',4:'#e5484d',5:'#f2f2f2',6:'#30d158'};
+// Geometrie
+const P0=14.6, GX=(1080-COLS*P0)/2+P0/2, GY=470;
+const pos=i=>[GX+(i%COLS)*P0, GY+Math.floor(i/COLS)*P0];
+// Zustand eines Punktes zur Zeit t: Farbe + Helligkeit
+function state(i,t){
+ const c=cat[i],r=rank[i];
+ const on=(start,d)=>t>=start+r*d;
+ if(c===0) return on(T.past,DURS.past)?0:5;
+ if(c===1) return on(T.sleep,DURS.sleep)?1:5;
+ if(c===2) return on(T.work,DURS.work)?2:5;
+ if(c===3) return on(T.daily,DURS.daily)?3:5;
+ if(c===4){ if(backSet.has(i)&&t>=T.back+r*DURS.back*2.5) return 6; return on(T.phone,DURS.phone)?4:5;}
+ return 5;
+}
+// Zähler (übrig)
+function remaining(t){
+ const f=(s,d)=>cl((t-s)/d);
+ return Math.round(N-PAST*f(T.past,DURS.past)-SLEEP*f(T.sleep,DURS.sleep)-WORK*f(T.work,DURS.work)-DAILY*f(T.daily,DURS.daily)-PHONE*f(T.phone,DURS.phone)+BACK*f(T.back,DURS.back*1.4));
+}
+const fmt=n=>n.toLocaleString('de-DE');
+// Kamera: Zoom auf Ben
+function cam(t){const k=1+2.6*eio((t-T.zoom)/2.2)*(1-eio((t-T.zoomOut)/1.8));const[bx,by]=pos(BEN);return {k,bx,by,cx:540,cy:1020};}
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+window.SFXC=()=>{const c=[[0,'boom'],[0.05,'whoosh']];
+ const batch=(s,d,n)=>{for(let k=0;k<n;k++)c.push([s+d*k/n,'tick'])};
+ c.push([T.past-0.6,'whoosh']);batch(T.past,DURS.past,10);
+ c.push([T.sleep-0.5,'whoosh']);batch(T.sleep,DURS.sleep,10);
+ c.push([T.work-0.5,'whoosh']);batch(T.work,DURS.work,9);
+ c.push([T.daily-0.5,'whoosh']);batch(T.daily,DURS.daily,8);
+ c.push([T.phone-2.2,'buzz'],[T.phone,'boom']);batch(T.phone,DURS.phone,14);
+ c.push([T.dim,'boom'],[T.dim+2.2,'ding'],[T.zoom,'whoosh'],[T.zoom+2.4,'pop'],[T.zoomOut,'whoosh'],[41.0,'pop'],[44.0,'whoosh']);
+ for(let k=0;k<8;k++)c.push([45.2+k*0.33,'tick']);
+ c.push([T.back,'boom'],[T.back+0.05,'ding'],[50.8,'pop'],[53.6,'whoosh'],[56.2,'pop']);return c;};
+// Text-Helfer mit Ein-/Ausblenden
+function line(t,a,b,y,s,size,col,w=900,ls=0){const o=env(t,a,b,0.18,0.25);if(o<=0)return'';const sc=0.92+0.08*eb((t-a)/0.35);const bk=y>1500?`<rect x="${-s.length*size*0.36}" y="${-size*1.05}" width="${s.length*size*0.72}" height="${size*1.6}" rx="${size*0.5}" fill="#000" opacity="0.8"/>`:'';return `<g opacity="${o}" transform="translate(540,${y}) scale(${sc})">${bk}${txt(0,0,s,size,col,w,1,'middle',ls)}</g>`;}
+function phoneIcon(x,y,s,op){return `<g opacity="${op}" transform="translate(${x},${y}) scale(${s})"><rect x="-60" y="-110" width="120" height="220" rx="22" fill="none" stroke="${RED}" stroke-width="12"/><line x1="-18" y1="-88" x2="18" y2="-88" stroke="${RED}" stroke-width="8" stroke-linecap="round"/><circle cx="0" cy="86" r="8" fill="${RED}"/></g>`}
+window.render=function(t){
+ // ---- Canvas: Gitter ----
+ ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#000';ctx.fillRect(0,0,1080,1920);
+ const g=ctx.createRadialGradient(540,1000,100,540,1000,1100);g.addColorStop(0,'#151515');g.addColorStop(1,'#000');ctx.fillStyle=g;ctx.fillRect(0,0,1080,1920);
+ const C=cam(t);ctx.setTransform(C.k,0,0,C.k,C.cx-C.bx*C.k+(C.bx-C.cx)*0*(C.k-1)/(C.k)*0, C.cy-C.by*C.k);
+ if(C.k<1.001)ctx.setTransform(1,0,0,1,0,0);
+ else{const m=eio((t-T.zoom)/2.2)*(1-eio((t-T.zoomOut)/1.8));const tx=(C.cx-C.bx*C.k)*m+(1-m)*(540-540*C.k), ty=(C.cy-C.by*C.k)*m+(1-m)*(1020-1020*C.k);ctx.setTransform(C.k,0,0,C.k,tx,ty);}
+ const intro=t*1.25; // Gitter baut sich in 1,25 s auf (zeilenweise), ab Frame 0 sichtbar
+ const dim=Math.max(env(t,T.dim,T.zoomOut+1.4,0.6,0.8),0.6*cl((t-T.back-0.8)/1.2)); // nicht-freie Punkte abdunkeln
+ const flashGreen=env(t,T.back,T.back+2.5,0.05,1.6);
+ for(let i=0;i<N;i++){
+  const row=Math.floor(i/COLS);const ap=cl(intro*ROWS/1.0-row+ (i%COLS)/COLS*2,0,1);if(ap<=0)continue;
+  let s=state(i,t);const [x,y]=pos(i);let a=ap,r=5.2;
+  if(s!==5&&s!==6) a*=1-0.82*dim;
+  if(s===6){r=5.2+2.2*flashGreen*(0.6+0.4*Math.sin(i));}
+  if(s===4&&t>44&&t<T.back){a*=0.55+0.45*Math.abs(Math.sin(t*9+i));}
+  if(i===BEN&&t>T.dim-0.5){const pl=0.5+0.5*Math.sin(t*6);ctx.globalAlpha=0.35*pl;ctx.fillStyle='#ffd60a';ctx.beginPath();ctx.arc(x,y,r*2.3,0,7);ctx.fill();s=7;}
+  ctx.globalAlpha=a;ctx.fillStyle=s===7?'#ffd60a':COL[s];ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
+ }
+ ctx.globalAlpha=1;ctx.setTransform(1,0,0,1,0,0);
+ // ---- SVG: Texte, Ben ----
+ let s='';
+ // Kopfzeile + Zähler
+ const rem=remaining(t);
+ const headOp=1-env(t,T.dim+0.1,T.zoomOut+0.8,0.4,0.6);
+ s+=`<g opacity="${headOp}">`;
+ s+=txt(540,410,fmt(rem)+' WOCHEN',52,t>T.back+0.1?GREEN:(t>T.phone+0.2&&t<T.back?'#ff8a8f':WHITE),900,1,'middle',3);
+ s+=`</g>`;
+ // Hook (Frame 0)
+ s+=line(t,-1,4.2,230,'DAS IST DEIN LEBEN.',84,WHITE);
+ s+=line(t,0.9,4.2,318,'1 PUNKT = 1 WOCHE · 80 JAHRE',38,'#9a9a9a',800,3);
+ // Vergangenheit
+ s+=line(t,4.2,8.6,230,'DU BIST 19?',84,WHITE);
+ s+=line(t,5.3,8.6,318,'988 WOCHEN SIND SCHON WEG.',42,'#8a8a8a',800,2);
+ // Schlaf
+ s+=line(t,8.6,12.8,230,'SCHLAF.',84,'#6f9be0');
+ s+=line(t,9.0,12.8,318,'8 STUNDEN AM TAG = −'+fmt(SLEEP),40,'#6f9be0',800,2);
+ // Arbeit
+ s+=line(t,12.8,16.6,230,'ARBEIT & SCHULE.',80,'#d9a83a');
+ s+=line(t,13.2,16.6,318,'40 STD./WOCHE BIS 67 = −'+fmt(WORK),40,'#d9a83a',800,2);
+ // Alltag
+ s+=line(t,16.6,19.8,230,'ALLTAG.',84,'#a58fd0');
+ s+=line(t,17.0,19.8,318,'ESSEN, WEGE, HAUSHALT = −'+fmt(DAILY),40,'#a58fd0',800,2);
+ // Handy
+ const ph=env(t,19.8,26.2,0.2,0.3);
+ if(ph>0){s+=line(t,19.8,26.2,230,'UND DAS HIER.',84,RED);
+  s+=phoneIcon(965,215,0.42*(0.9+0.1*eb((t-19.8)/0.4)),ph);}
+ s+=line(t,21.4,26.2,318,'2,5 STD. SOCIAL MEDIA/TAG = −'+fmt(PHONE),38,'#ff8a8f',800,1);
+ s+=line(t,22.8,26.2,1720,'WENN DU SO WEITERMACHST.',40,'#ff8a8f',800,3);
+ // Quelle
+ const qo=env(t,20.5,26.2,0.3,0.3);
+ if(qo>0)s+=txt(540,1622,'Rechnung: 80 J. · Schlaf 8 h · 40 h/Woche (20–67) · Alltag 3 h/Tag',22,'#6a6a6a',500,qo)+txt(540,1652,'Social Media Ø 157 Min./Wochentag (DAK/UKE-Studie 2025)',22,'#6a6a6a',500,qo);
+ // Das bleibt
+ const big=env(t,T.dim+0.3,T.zoom+0.2,0.35,0.4);
+ if(big>0){s+=`<rect x="0" y="0" width="1080" height="1920" fill="#000" opacity="${0.0}"/>`;
+  const sc=0.9+0.1*eb((t-T.dim-0.3)/0.5);
+  s+=`<g opacity="${big}" transform="translate(540,960) scale(${sc})"><rect x="-470" y="-250" width="940" height="660" rx="40" fill="#000" opacity="0.72"/>${txt(0,-40,fmt(FREE),230,WHITE,900,1,'middle',-6)}${txt(0,70,'WOCHEN.',64,WHITE,900,1,'middle',8)}</g>`;
+  s+=`<g opacity="${env(t,T.dim+2.2,T.zoom+0.2,0.3,0.4)}">${txt(540,1230,'DAS IST ALLES, WAS WIRKLICH DIR GEHÖRT.',44,WHITE,900,1,'middle',1)}${txt(540,1300,'≈ 15 JAHRE.',44,'#9a9a9a',800,1,'middle',3)}</g>`;
+ }
+ // Zoom auf Ben
+ const C2=cam(t);const zo=env(t,T.zoom+1.6,T.zoomOut+0.2,0.4,0.3);
+ if(t>T.zoom-0.1&&t<T.zoomOut+1.2){
+  let bx,by;{const m=eio((t-T.zoom)/2.2)*(1-eio((t-T.zoomOut)/1.8));const [px,py]=pos(BEN);const tx=(C2.cx-px*C2.k)*m+(1-m)*(540-540*C2.k), ty=(C2.cy-py*C2.k)*m+(1-m)*(1020-1020*C2.k);bx=px*C2.k+tx;by=py*C2.k+ty;}
+  const bo=env(t,T.zoom+1.2,T.zoomOut+0.6,0.4,0.4);const w=Math.floor(t*3)%2?P.walkA:P.walkB;
+  s+=fig(t<T.zoom+2.4?P.stand:w,bx-18,by-20,0.42,'#ffd60a',true,bo);
+ }
+ s+=line(t,T.zoom+1.8,T.zoomOut,330,'DU STEHST HIER.',84,'#ffd60a');
+ s+=line(t,T.zoom+2.8,T.zoomOut,1650,'WOCHE 989. SIE LÄUFT GERADE.',46,WHITE,900,2);
+ // Gute Nachricht
+ s+=line(t,T.zoomOut+0.6,43.8,230,'DIE GUTE NACHRICHT:',72,WHITE);
+ s+=line(t,40.6,43.8,318,'DIE ROTEN KANNST DU DIR ZURÜCKHOLEN.',40,'#ff8a8f',800,1);
+ s+=line(t,43.8,T.back-0.05,230,'NUR 1 STUNDE',90,WHITE);
+ s+=line(t,44.6,T.back-0.05,318,'WENIGER AM HANDY. JEDEN TAG.',42,WHITE,800,2);
+ // 48 – Drop
+ if(t>=T.back){const k=eb((t-T.back)/0.45);
+  s+=`<g opacity="${env(t,T.back,53.2,0.05,0.3)}" transform="translate(540,250) scale(${0.6+0.4*k})">${txt(0,0,'+'+BACK+' WOCHEN.',104,GREEN,900,1,'middle',-1)}</g>`;
+  s+=line(t,49.6,53.2,1680,'= 2,5 JAHRE LEBEN. GESCHENKT.',50,GREEN,900,1);}
+ s+=line(t,53.2,59.5,230,'WOCHE 989',96,'#ffd60a');
+ s+=line(t,53.7,59.5,318,'FÄNGT JETZT AN.',56,WHITE,900,4);
+ if(t>55.6){const o=env(t,55.6,59.5,0.25,0.4),sc=0.85+0.15*eb((t-55.6)/0.4);s+=pill(540,1690,'SCHICK DAS JEMANDEM, DER ES SEHEN MUSS.',WHITE,'#000',34,o,sc);}
+ // Marke
+ s+=txt(540,120,'4 8  S E K U N D E N',26,'#555',800,1);
+ document.getElementById('stage').innerHTML=s;
+ document.getElementById('flash').style.opacity=0.32*env(t,T.back,T.back+0.6,0.03,0.55);
+};
+render(0);
+</script></body></html>
