@@ -1,0 +1,10 @@
+# Zwischendateien der Tagesproduktion (aus Quellen reproduzierbar)
+engine/folgen/20*/raw.mp4
+engine/folgen/20*/*.tmp.mp4
+engine/folgen/20*/*.wav
+engine/folgen/20*/raw_*.mp3
+engine/folgen/20*/vo_[0-9][0-9].mp3
+engine/folgen/20*/serien_musik.mp3
+engine/folgen/20*/render.log
+engine/folgen/20*/qc/f_*.png
+engine/folgen/20*/qc/h*_*.png
