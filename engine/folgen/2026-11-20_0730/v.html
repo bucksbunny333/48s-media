@@ -1,0 +1,171 @@
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 2px,transparent 2px 6px);pointer-events:none}
+#flash{position:absolute;inset:0;opacity:0}
+</style></head><body>
+<svg id="stage" viewBox="0 0 1080 1920"></svg><div id="scan"></div><div id="flash"></div>
+<script src="rig.js"></script><script src="poses.js"></script><script src="kit.js"></script><script src="timing.js"></script>
+<script>
+// „Kein Game Over“ – Gewohnheit als Videospiel. Quelle: Lally et al. 2010 (UCL), Maltz 1960.
+window.DUR=60.3; const PAY=48.5; const H=(location.hash||'#A').slice(1);
+const GOLD='#ffd60a', YEL='#ffd60a', BG1='#0b0f1e', BG2='#1b1036';
+const K=Math.log(20)/66; const AUTO=d=>1-Math.exp(-K*Math.max(0,d)); // 95 % bei Tag 66 (Median)
+const lerp=(a,b,k)=>a+(b-a)*cl(k);
+// ---- Tag im Spiel ----
+function day(t){
+ if(H==='B'&&t<1.0) return 1+2*eo(t/1.0);
+ if(t<S[1]+1.2) return 3;
+ if(t<S[1]+2.5) return lerp(3,7,(t-S[1]-1.2)/0.3);
+ if(t<S[3]) return lerp(7,21,(t-S[1]-2.5)/0.35);
+ if(t<S[4]) return 1;
+ if(t<S[5]) return lerp(1,9,eio((t-S[4])/(E[4]-S[4])));
+ if(t<S[6]) return lerp(9,21,eio((t-S[5])/(S[6]-S[5]-0.2)));
+ if(t<S[9]) return 21;
+ if(t<S[10]) return lerp(21,25,(t-S[9])/(E[9]-S[9]));
+ if(t<PAY) return 25;
+ if(t<S[13]) return 25+eo((t-PAY)/1.5)*0.0;
+ return lerp(1,1.6,(t-S[13]-0.3)/4);
+}
+const MISS=23; // verpasster Tag
+function auto(t){let a=AUTO(Math.min(day(t),25));
+ if(t>S[9]+0.8&&t<S[10]) a-=0.02*env(t,S[9]+0.8,S[10],0.2,0.6);
+ const wk=env(t,S[10]+2.6,PAY,0.4,0.4); a-=0.16*wk;
+ if(t>=PAY) a=lerp(a,1,eo((t-PAY)/1.2)); if(t>=S[13]) a=AUTO(day(t));
+ return cl(a);}
+function motiv(t){
+ if(t<S[3]) return H==='B'&&t<1.0?1-t:0.02;
+ if(t<S[4]) return 1; if(t<E[4]) return lerp(1,0.06,eio((t-S[4]-0.4)/(E[4]-S[4]-0.4)));
+ if(t<S[13]) return 0.06; return lerp(0.06,1,eo((t-S[13])/1.2));}
+// ---- Text-Helfer (Safe Zone: x 45–1031, y 120–1540) ----
+function L(t,a,b,y,s,size,col,w=900,cx=540,maxw=940){const o=env(t,a,b,0.15,0.22);if(o<=0)return'';size=Math.min(size,Math.floor(maxw/(s.length*0.6)));const sc=0.9+0.1*eb((t-a)/0.32);return `<g opacity="${o}" transform="translate(${cx},${y}) scale(${sc})">${txt(0,0,s,size,col,w,1,'middle',1)}</g>`}
+function LOW(t,a,b,s,col,size=44){const o=env(t,a,b,0.15,0.22);if(o<=0)return'';size=Math.min(size,Math.floor(780/(s.length*0.6)));return `<g opacity="${o}" transform="translate(465,1430)"><rect x="${-Math.min(800,s.length*size*0.62+60)/2}" y="${-size*1.05}" width="${Math.min(800,s.length*size*0.62+60)}" height="${size*1.6}" rx="${size*0.5}" fill="#000" opacity="0.78"/>${txt(0,0,s,size,col,900,1,'middle',1)}</g>`}
+const SRC=(t,a,b,l1,l2)=>{const o=env(t,a,b,0.3,0.3);return o>0?txt(465,1500,l1,22,'#8a8aa0',600,o)+(l2?txt(465,1528,l2,22,'#8a8aa0',600,o):''):''};
+function bar(x,y,w,h,v,col,lab,op=1,blink=1){return `<g opacity="${op}">${txt(x,y-14,lab,24,'#c9c9d6',800,1,'start',3)}<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="#000" stroke="#ffffff" stroke-opacity=".5" stroke-width="3"/><rect x="${x+4}" y="${y+4}" width="${Math.max(0,(w-8)*v)}" height="${h-8}" rx="3" fill="${col}" opacity="${blink}"/></g>`}
+function heart(x,y,s,col){return `<path transform="translate(${x},${y}) scale(${s})" d="M0,8 C-14,-10 -34,4 0,30 C34,4 14,-10 0,8Z" fill="${col}"/>`}
+function trophy(x,y,s){return `<g transform="translate(${x},${y}) scale(${s})" fill="${GOLD}"><path d="M-40,-50 L40,-50 L34,0 Q0,30 -34,0Z"/><rect x="-8" y="14" width="16" height="26"/><rect x="-30" y="38" width="60" height="12" rx="3"/><path d="M-40,-44 Q-70,-44 -58,-14 Q-50,0 -34,-4" fill="none" stroke="${GOLD}" stroke-width="8"/><path d="M40,-44 Q70,-44 58,-14 Q50,0 34,-4" fill="none" stroke="${GOLD}" stroke-width="8"/></g>`}
+function gameOver(t,t0,y,big=130){const k=eb((t-t0)/0.28);if(t<t0)return'';const sc=1.15-0.15*eo((t-t0)/0.25);const j=(Math.random()-0.5)*8*env(t,t0,t0+0.6,0.001,0.4);
+ return `<g transform="translate(${540+j},${y}) scale(${sc})"><text x="5" y="7" text-anchor="middle" font-family="Inter" font-weight="900" font-size="${big}" fill="#3a0006" letter-spacing="6">GAME OVER</text><text x="-4" y="0" text-anchor="middle" font-family="Inter" font-weight="900" font-size="${big}" fill="#00e5ff" opacity=".35" letter-spacing="6">GAME OVER</text><text x="0" y="0" text-anchor="middle" font-family="Inter" font-weight="900" font-size="${big}" fill="${RED}" letter-spacing="6">GAME OVER</text></g>`}
+// ---- Welt ----
+const GY=1400, BX=360, PX=120;
+function world(t,d,dim){let s='';const cam=d*PX-BX;
+ // Himmel + Sterne + Berge (Parallaxe)
+ s+=`<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${BG1}"/><stop offset="1" stop-color="${BG2}"/></linearGradient></defs><rect width="1080" height="1920" fill="url(#sky)"/>`;
+ for(let i=0;i<60;i++){const x=((i*137+11)%1080-cam*0.05%1080+1080)%1080,y=(i*251)%900+130;s+=`<rect x="${x}" y="${y}" width="4" height="4" fill="#fff" opacity="${0.25+0.5*((i*7)%5)/5}"/>`;}
+ const mt=(off,col,hgt,sp)=>{let p=`M0,${GY} `;for(let x=-200;x<=1300;x+=sp){const wx=x+((cam*off)%sp);p+=`L${wx},${GY-hgt-((Math.floor((x+cam*off)/sp)*97)%120)} L${wx+sp/2},${GY} `;}return `<path d="${p} L1080,${GY}Z" fill="${col}"/>`};
+ s+=mt(0.15,'#1d1a44',380,320)+mt(0.35,'#2a1f55',220,220);
+ // Boden mit Tageskacheln
+ s+=`<rect x="0" y="${GY}" width="1080" height="740" fill="#140d2a"/>`;
+ const i0=Math.floor(cam/PX)-1;
+ for(let i=i0;i<i0+12;i++){const x=i*PX-cam;if(i<0)continue;const past=i<Math.floor(d);const miss=i===MISS&&t>S[9]+0.8&&t<S[13];
+  s+=`<rect x="${x+3}" y="${GY}" width="${PX-6}" height="34" rx="4" fill="${miss?'#5a1018':past?'#3d2c7a':'#2a2050'}"/><rect x="${x+3}" y="${GY+38}" width="${PX-6}" height="22" rx="4" fill="#1f1640"/>`;
+  if(x+PX/2>70&&x+PX/2<850&&i>0) s+=txt(x+PX/2,GY+27,String(i),24,past?'#9d8cff':'#5a4f86',800);
+  if(i===21||i===66){if(x>-40&&x<1100){s+=`<line x1="${x+PX/2}" y1="${GY}" x2="${x+PX/2}" y2="${GY-300}" stroke="#ddd" stroke-width="6"/><path d="M${x+PX/2},${GY-300} l90,30 l-90,30Z" fill="${i===21?RED:GOLD}"/>`;}}
+ }
+ if(dim>0)s+=`<rect width="1080" height="1920" fill="#000" opacity="${dim}"/>`;
+ return s;}
+function ben(t,d){let pose=P.stand,y=GY-174,col=YEL,rot='';
+ const speed=(day(t+0.05)-day(t-0.05))/0.1;
+ if(t<S[1]+3.8&&!(H==='B'&&t<1.0)){ // Hook: liegt
+  pose=P.lie;y=GY-24;}
+ else if(t>=PAY&&t<S[13]){pose=Math.floor(t*4)%2?P.cheer:FIG.mix(P.cheer,P.stand,0.3);}
+ else if(speed>0.4){const ph=Math.sin(t*(speed>2?22:11));pose=FIG.mix(P.walkA,P.walkB,(ph+1)/2);}
+ if(t>S[9]+0.6&&t<S[9]+1.6){pose=P.lie;y=GY-24;} // stolpert am Fehltag
+ if(H==='B'&&t>=0.95&&t<2.5){pose=P.lie;y=GY-24;}
+ const bo=1-env(t,S[3]-0.1,S[4],0.1,0.3);return `<g opacity="${bo}">`+fig(pose,BX,y,1.0,col,true)+'</g>';}
+// ---- Overlays ----
+function grid96(t){const a=S[3],b=S[4];const o=env(t,a,b,0.2,0.3);if(o<=0)return'';let s=`<g opacity="${o}">`;
+ for(let i=0;i<96;i++){const c=i%12,r=Math.floor(i/12);const x=221+c*58,y=700+r*34;const ap=cl((t-a-0.5-i*0.022)/0.15);if(ap<=0)continue;
+  s+=`<g opacity="${ap}" transform="translate(${x},${y}) scale(${0.6+0.4*eb(ap)})"><circle cx="0" cy="-10" r="7" fill="none" stroke="${i===40?YEL:'#d6d6ff'}" stroke-width="3"/><line x1="0" y1="-3" x2="0" y2="12" stroke="${i===40?YEL:'#d6d6ff'}" stroke-width="3"/></g>`;}
+ const n=Math.round(96*cl((t-a-0.5)/(96*0.022)));
+ s+=txt(540,1040,n+' MENSCHEN',58,WHITE,900,1,'middle',3);
+ return s+'</g>';}
+function map(t){const a=S[7],b=S[8]+0.4;const o=env(t,a,b,0.3,0.3);if(o<=0)return'';const X=d=>100+d/254*880;let s=`<g opacity="${o}">`;
+ s+=`<rect x="70" y="640" width="940" height="300" rx="28" fill="#000" opacity=".72" stroke="#5a4f86" stroke-width="3"/>`;
+ s+=txt(540,700,'LEVEL-KARTE · TAGE BIS AUTOMATISCH',28,'#b9b0ff',800,1,'middle',3);
+ const g=cl((t-a-0.3)/1.2);s+=`<line x1="100" y1="800" x2="${100+880*g}" y2="800" stroke="#5a4f86" stroke-width="10" stroke-linecap="round"/>`;
+ const mk=(d,c,lab,t0,dy=0)=>{const q=cl((t-t0)/0.3);if(q<=0)return'';return `<g opacity="${q}"><circle cx="${X(d)}" cy="800" r="${16*eb(q)}" fill="${c}"/>${txt(X(d),860+dy,lab,30,c,900)}</g>`};
+ s+=mk(21,YEL,'DU · 21',a+0.6,40)+mk(66,GOLD,'Ø 66',a+1.0)+mk(18,GREEN,'18',a+3.1,-110)+mk(254,'#9a9a9a','254',a+4.6,-110);
+ return s+'</g>';}
+function calendar(t){const a=S[9],b=S[11]+0.1;const o=env(t,a,b,0.3,0.25);if(o<=0)return'';let s=`<g opacity="${o}">`;const D=['MO','DI','MI','DO','FR','SA','SO'];
+ for(let i=0;i<7;i++){const x=150+i*112,y=700;const week=cl((t-S[10]-2.6-i*0.1)/0.2);const miss=(i===2&&t>S[9]+0.8)||week>0;const ok=!miss&&t>a+0.3+i*0.25;
+  s+=`<rect x="${x}" y="${y}" width="96" height="110" rx="14" fill="${miss?'#3a0a10':'#14102a'}" stroke="${miss?RED:ok?GREEN:'#5a4f86'}" stroke-width="5"/>`+txt(x+48,y+36,D[i],24,'#b9b0ff',800);
+  if(miss) s+=xmark(x+48,y+74,20,1); else if(ok) s+=`<path d="M${x+28},${y+74} l14,14 l28,-30" fill="none" stroke="${GREEN}" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>`;}
+ return s+'</g>';}
+// ---- SFX ----
+window.SFXC=()=>{const c=[[0,'boom'],[0.02,'buzz']];if(H==='B'){c.length=0;c.push([0,'whoosh'],[1.0,'boom'],[1.02,'buzz']);}
+ c.push([S[1]+1.2,'whoosh'],[S[1]+2.5,'whoosh'],[S[2],'pop'],[S[2]+2.9,'boom'],[S[3]-0.1,'whoosh'],[S[3],'buzz']);
+ for(let i=0;i<96;i+=6)c.push([S[3]+0.5+i*0.022,'tick']);
+ let last=1;for(let t=S[4];t<S[6];t+=1/30){const d=Math.floor(day(t));if(d!==last){c.push([t,'tick']);last=d;}}
+ c.push([S[5],'pop'],[S[6],'ding'],[S[7],'whoosh'],[S[7]+1.0,'pop'],[S[7]+3.1,'pop'],[S[7]+4.6,'pop'],[S[8],'whoosh'],[S[9]+0.7,'buzz']);
+ for(let i=0;i<7;i++)if(i!==2)c.push([S[9]+0.3+i*0.25,'tick']);
+ c.push([S[10],'pop']);for(let i=0;i<7;i++)c.push([S[10]+2.6+i*0.1,'buzz']);
+ c.push([S[11],'boom'],[S[11]+0.02,'buzz'],[PAY,'boom'],[PAY+0.05,'ding'],[S[12],'whoosh'],[S[12]+1.3,'pop'],[S[13],'ding'],[S[13]+1.5,'pop'],[S[14],'pop']);return c;};
+window.render=function(t){
+ const d=day(t);let s='';
+ // Kamera-Wackeln bei Knallern
+ const sh=Math.max(env(t,0,0.5,0.001,0.4),env(t,S[11],S[11]+0.5,0.001,0.4),env(t,PAY,PAY+0.6,0.001,0.5),H==='B'?env(t,1.0,1.5,0.001,0.4):0)*(H==='B'&&t<1?0:1);
+ const jx=Math.sin(t*93)*16*sh,jy=Math.cos(t*71)*12*sh;
+ const zoomC=(H==='C')?(1+1.6*(1-eo(t/0.6))):1;
+ s+=`<g transform="translate(${jx+BX*(1-zoomC)},${jy+(GY-200)*(1-zoomC)}) scale(${zoomC})">`;
+ const dim=Math.max(0.55*env(t,S[2],S[3],0.3,0.2),0.6*env(t,S[3],S[4],0.05,0.3),0.6*env(t,S[7],S[8]+0.4,0.3,0.3),0.45*env(t,S[9],PAY,0.3,0.3));
+ s+=world(t,d,dim)+ben(t,d)+'</g>';
+ // HUD
+ const hud=1-env(t,S[3]-0.05,S[4],0.05,0.3);
+ const mv=motiv(t),mb=mv<0.1?0.45+0.55*Math.abs(Math.sin(t*8)):1;
+ s+=bar(90,470,430,34,mv,mv<0.3?RED:GREEN,'MOTIVATION',hud,mb);
+ s+=bar(560,470,430,34,auto(t),t>=PAY?GREEN:YEL,'AUTOMATIK',hud*cl((t-S[4])/0.4+ (t<S[3]?1:0)));
+ for(let i=0;i<3;i++)s+=heart(108+i*44,560,0.9,(t<S[3]&&t<S[1]+3.8)?'#3a1a22':RED);
+ // Tag-Zähler
+ const showDay=(t<S[1]||t>=S[4])&&!(t>S[7]&&t<S[8]+0.4)&&!(t>S[9]&&t<PAY)&&!(t>=PAY&&t<S[13]);
+ const big=(t>=S[4]&&t<S[6])||(t>=S[8]&&t<S[9])||t>=S[13];
+ if(big){const dd=t>=S[13]?'1 / 66':String(Math.floor(d));const o=Math.min(env(t,S[4],S[7],0.2,0.2)+env(t,S[8],S[9],0.2,0.2)+env(t,S[13],DUR+1,0.2,0.2),1);const pulse=1+0.06*Math.max(0,1-((d%1)*6));
+  s+=`<g opacity="${o}" transform="translate(540,880) scale(${t>=S[13]?1:pulse})">${txt(0,-150,'TAG',40,'#b9b0ff',900,1,'middle',8)}${txt(0,0,dd,170,t>=S[13]?GREEN:WHITE,900,1,'middle',2)}</g>`;}
+ // Hook
+ if(t<S[1]+0.1) s+=gameOver(t,H==='B'?1.0:0,780);
+ s+=L(t,-1,S[1],300,'AN WELCHEM TAG',84,WHITE)+L(t,-1,S[1],378,'GIBST DU NORMALERWEISE AUF?',46,'#ffb3b6',900);
+ s+=L(t,S[1],S[1]+1.2,300,'TAG 3?',120,WHITE)+L(t,S[1]+1.2,S[1]+2.5,300,'TAG 7?',120,WHITE)+L(t,S[1]+2.5,S[2],300,'TAG 21?',120,WHITE);
+ // Mythos
+ s+=L(t,S[2],S[3]-0.1,300,'21 TAGE',120,WHITE)+L(t,S[2]+0.5,S[3]-0.1,378,'KENNT JEDER. STAMMT AUS EINEM RATGEBER VON 1960.',34,'#c9c9d6',800);
+ {const q=cl((t-S[2]-2.9)/0.2),o=env(t,S[2]+2.9,S[3]-0.1,0.02,0.2);if(o>0)s+=`<g opacity="${o}" transform="translate(540,760) rotate(-12) scale(${2-1*q})"><rect x="-330" y="-95" width="660" height="170" rx="18" fill="none" stroke="${RED}" stroke-width="14"/>${txt(0,40,'MYTHOS',140,RED,900,1,'middle',10)}</g>`;}
+ s+=SRC(t,S[2]+0.5,S[3]-0.1,'„Mindestens 21 Tage“ – Maxwell Maltz, Psycho-Cybernetics (1960)');
+ // Neustart + Studie
+ {const g=env(t,S[3]-0.1,S[3]+0.9,0.05,0.3);if(g>0){s+=`<g opacity="${g}"><text x="${535}" y="830" text-anchor="middle" font-family="Inter" font-weight="900" font-size="110" fill="#00e5ff" opacity=".6">◀◀ NEUSTART</text><text x="${547}" y="826" text-anchor="middle" font-family="Inter" font-weight="900" font-size="110" fill="${RED}" opacity=".6">◀◀ NEUSTART</text>${txt(540,828,'◀◀ NEUSTART',110,WHITE,900)}</g>`;for(let i=0;i<8;i++)s+=`<rect x="0" y="${(i*233+t*2000)%1920}" width="1080" height="${6+i%3*5}" fill="#fff" opacity="${0.12*g}"/>`;}}
+ s+=L(t,S[3]+0.6,S[4],300,'DAS ECHTE EXPERIMENT',76,WHITE)+L(t,S[3]+1.2,S[4],378,'JEDER: 1 NEUE GEWOHNHEIT. JEDEN TAG.',40,'#c9c9d6',800);
+ s+=grid96(t)+SRC(t,S[3]+0.8,S[4],'Lally et al. (2010), European Journal of Social Psychology','University College London · 96 Teilnehmende');
+ // Motivation
+ s+=L(t,S[4],S[4]+2.1,300,'TAG 1: MOTIVATION VOLL',70,GREEN)+L(t,S[4]+2.1,S[5],300,'…NACH PAAR TAGEN: LEER.',70,RED);
+ s+=L(t,S[5],S[6],300,'HIER HÖREN VIELE AUF.',76,RED)+L(t,S[5]+1.6,S[6],378,'WEIL ES SICH NOCH NICHT AUTOMATISCH ANFÜHLT.',36,'#ffb3b6',800);
+ s+=L(t,S[6],S[7],300,'TAG 21',120,WHITE)+L(t,S[6]+0.9,S[7],378,'NOCH LANGE NICHT AUTOMATISCH.',44,YEL,900);
+ s+=LOW(t,S[6]+0.9,S[7],'AUTOMATIK-BALKEN: NICHT MAL ⅔',YEL,40);
+ // Karte
+ s+=L(t,S[7],S[8],300,'IM SCHNITT: 66 TAGE',80,GOLD)+L(t,S[7]+3.0,S[8],378,'MANCHE 18 · MANCHE 254',46,WHITE,900);
+ s+=map(t)+SRC(t,S[7]+0.5,S[8],'Median bis 95 % Automatik: 66 Tage (Spanne 18–254)','Lally et al. 2010');
+ // Wichtigste
+ s+=L(t,S[8],S[9],300,'ABER:',130,WHITE)+L(t,S[8]+0.3,S[9],378,'JETZT KOMMT DAS WICHTIGSTE.',46,YEL,900);
+ s+=calendar(t);
+ s+=L(t,S[9],S[10],300,'SIE HABEN TAGE VERPASST.',72,WHITE)+L(t,S[9]+2.1,S[10],378,'UND? FAST KEIN UNTERSCHIED.',48,GREEN,900);
+ s+=LOW(t,S[9]+2.1,S[10],'1 FEHLTAG = KAUM EIN EFFEKT',GREEN,42);
+ s+=L(t,S[10],S[11],300,'1 TAG VERPASST',84,WHITE)+L(t,S[10]+0.9,S[11],378,'≠ GAME OVER',60,GREEN,900);
+ s+=LOW(t,S[10]+2.6,S[11],'GEFÄHRLICH: 1 GANZE WOCHE PAUSE',RED,40);
+ s+=SRC(t,S[9]+0.5,S[11],'Ein verpasster Tag: kein wesentlicher Effekt auf die Gewohnheit','Lally et al. 2010');
+ // Game Over 2 + Payoff
+ if(t>=S[11]&&t<PAY){s+=gameOver(t,S[11],780);}
+ if(t>=PAY&&t<PAY+0.9){const k=(t-PAY)/0.9;for(let i=0;i<14;i++){const ang=i*2.4,r=k*700;s+=`<rect x="${540+Math.cos(ang)*r-40}" y="${780+Math.sin(ang)*r-30+k*k*500}" width="80" height="60" fill="${RED}" opacity="${1-k}" transform="rotate(${k*360*(i%2?1:-1)} ${540+Math.cos(ang)*r} ${780+Math.sin(ang)*r})"/>`;}}
+ s+=L(t,S[11],PAY,300,'DAS GAME OVER',90,WHITE)+L(t,S[11]+0.3,PAY,378,'IN DEINEM KOPF?',56,'#ffb3b6',900);
+ s+=L(t,PAY,S[12],300,'GIBT ES NICHT.',100,GREEN);
+ {const o=env(t,PAY+0.15,S[13],0.2,0.3);if(o>0){const sc=0.7+0.3*eb((t-PAY-0.15)/0.4);s+=`<g opacity="${o}" transform="translate(540,800) scale(${sc})"><rect x="-450" y="-140" width="900" height="280" rx="34" fill="#0d1a10" stroke="${GOLD}" stroke-width="8"/>${trophy(-330,0,1.3)}${txt(60,-40,'ACHIEVEMENT',54,GOLD,900,1,'middle',4)}${txt(60,15,'FREIGESCHALTET',54,GOLD,900,1,'middle',4)}${txt(60,90,'1 FEHLTAG ≠ GAME OVER',40,WHITE,900,1,'middle',1)}</g>`;}}
+ s+=L(t,S[12],S[13],300,'DU HAST NICHT VERLOREN.',72,WHITE)+L(t,S[12]+1.3,S[13],378,'DU HAST NUR AUFGEHÖRT.',52,YEL,900);
+ s+=L(t,S[13],DUR+1,300,'HEUTE: TAG 1',110,GREEN)+L(t,S[13]+1.5,DUR+1,378,'BIS TAG 66.',60,WHITE,900);
+ if(t>S[14]-0.1){const o=env(t,S[14]-0.1,DUR+1,0.25,0.3),sc=0.85+0.15*eb((t-S[14]+0.1)/0.4);s+=pill(465,1440,'SCHREIB, WAS DU 66 TAGE DURCHZIEHST.',WHITE,'#000',34,o,sc);}
+ // Marke
+ s+=txt(176,176,'48 SEKUNDEN',22,'#8a8aa0',800,1,'middle',4);
+ document.getElementById('stage').innerHTML=s;
+ const fl=document.getElementById('flash');
+ const red=Math.max(env(t,H==='B'?1.0:-0.1,(H==='B'?1.0:0)+0.5,0.001,0.45),env(t,S[11],S[11]+0.4,0.001,0.35));
+ const gr=env(t,PAY,PAY+0.7,0.03,0.6);
+ fl.style.background=gr>red?GREEN:RED;fl.style.opacity=0.38*Math.max(red,gr);
+};
+render(0);
+</script></body></html>

@@ -36,7 +36,7 @@ const T={past:4.6,sleep:9.0,work:13.2,daily:17.0,phone:22.0,dim:26.5,zoom:33.0,z
 const DURS={past:1.1,sleep:1.3,work:1.2,daily:1.1,phone:1.6,back:0.7};
 const COL={0:'#262626',1:'#2c4f86',2:'#8a6a1f',3:'#5b4a78',4:'#e5484d',5:'#f2f2f2',6:'#30d158'};
 // Geometrie
-const P0=14.6, GX=(1080-COLS*P0)/2+P0/2, GY=470;
+const P0=12, GX=(1080-COLS*P0)/2+P0/2, GY=526;
 const pos=i=>[GX+(i%COLS)*P0, GY+Math.floor(i/COLS)*P0];
 // Zustand eines Punktes zur Zeit t: Farbe + Helligkeit
 function state(i,t){
@@ -56,7 +56,7 @@ function remaining(t){
 }
 const fmt=n=>n.toLocaleString('de-DE');
 // Kamera: Zoom auf Ben
-function cam(t){const k=1+2.6*eio((t-T.zoom)/2.2)*(1-eio((t-T.zoomOut)/1.8));const[bx,by]=pos(BEN);return {k,bx,by,cx:540,cy:1020};}
+function cam(t){const k=1+2.6*eio((t-T.zoom)/2.2)*(1-eio((t-T.zoomOut)/1.8));const[bx,by]=pos(BEN);return {k,bx,by,cx:465,cy:760};}
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 window.SFXC=()=>{const c=[[0,'boom'],[0.05,'whoosh']];
  const batch=(s,d,n)=>{for(let k=0;k<n;k++)c.push([s+d*k/n,'tick'])};
@@ -69,7 +69,7 @@ window.SFXC=()=>{const c=[[0,'boom'],[0.05,'whoosh']];
  for(let k=0;k<8;k++)c.push([45.2+k*0.33,'tick']);
  c.push([T.back,'boom'],[T.back+0.05,'ding'],[50.8,'pop'],[53.6,'whoosh'],[56.2,'pop']);return c;};
 // Text-Helfer mit Ein-/Ausblenden
-function line(t,a,b,y,s,size,col,w=900,ls=0){const o=env(t,a,b,0.18,0.25);if(o<=0)return'';const sc=0.92+0.08*eb((t-a)/0.35);const bk=y>1500?`<rect x="${-s.length*size*0.36}" y="${-size*1.05}" width="${s.length*size*0.72}" height="${size*1.6}" rx="${size*0.5}" fill="#000" opacity="0.8"/>`:'';return `<g opacity="${o}" transform="translate(540,${y}) scale(${sc})">${bk}${txt(0,0,s,size,col,w,1,'middle',ls)}</g>`;}
+function line(t,a,b,y,s,size,col,w=900,ls=0){const o=env(t,a,b,0.18,0.25);if(o<=0)return'';let cx=540;if(y===230)y=300;else if(y===318)y=378;else if(y>1500){y=1430;cx=465;size=Math.min(size,Math.floor(800/(s.length*0.62)));}const sc=0.92+0.08*eb((t-a)/0.35);const bk=y>1400?`<rect x="${-s.length*size*0.36}" y="${-size*1.05}" width="${s.length*size*0.72}" height="${size*1.6}" rx="${size*0.5}" fill="#000" opacity="0.8"/>`:'';return `<g opacity="${o}" transform="translate(${cx},${y}) scale(${sc})">${bk}${txt(0,0,s,size,col,w,1,'middle',ls)}</g>`;}
 function phoneIcon(x,y,s,op){return `<g opacity="${op}" transform="translate(${x},${y}) scale(${s})"><rect x="-60" y="-110" width="120" height="220" rx="22" fill="none" stroke="${RED}" stroke-width="12"/><line x1="-18" y1="-88" x2="18" y2="-88" stroke="${RED}" stroke-width="8" stroke-linecap="round"/><circle cx="0" cy="86" r="8" fill="${RED}"/></g>`}
 window.render=function(t){
  // ---- Canvas: Gitter ----
@@ -77,15 +77,15 @@ window.render=function(t){
  const g=ctx.createRadialGradient(540,1000,100,540,1000,1100);g.addColorStop(0,'#151515');g.addColorStop(1,'#000');ctx.fillStyle=g;ctx.fillRect(0,0,1080,1920);
  const C=cam(t);ctx.setTransform(C.k,0,0,C.k,C.cx-C.bx*C.k+(C.bx-C.cx)*0*(C.k-1)/(C.k)*0, C.cy-C.by*C.k);
  if(C.k<1.001)ctx.setTransform(1,0,0,1,0,0);
- else{const m=eio((t-T.zoom)/2.2)*(1-eio((t-T.zoomOut)/1.8));const tx=(C.cx-C.bx*C.k)*m+(1-m)*(540-540*C.k), ty=(C.cy-C.by*C.k)*m+(1-m)*(1020-1020*C.k);ctx.setTransform(C.k,0,0,C.k,tx,ty);}
+ else{const m=eio((t-T.zoom)/2.2)*(1-eio((t-T.zoomOut)/1.8));const tx=(C.cx-C.bx*C.k)*m+(1-m)*(540-540*C.k), ty=(C.cy-C.by*C.k)*m+(1-m)*(1000-1000*C.k);ctx.setTransform(C.k,0,0,C.k,tx,ty);}
  const intro=t*1.25; // Gitter baut sich in 1,25 s auf (zeilenweise), ab Frame 0 sichtbar
  const dim=Math.max(env(t,T.dim,T.zoomOut+1.4,0.6,0.8),0.6*cl((t-T.back-0.8)/1.2)); // nicht-freie Punkte abdunkeln
  const flashGreen=env(t,T.back,T.back+2.5,0.05,1.6);
  for(let i=0;i<N;i++){
   const row=Math.floor(i/COLS);const ap=cl(intro*ROWS/1.0-row+ (i%COLS)/COLS*2,0,1);if(ap<=0)continue;
-  let s=state(i,t);const [x,y]=pos(i);let a=ap,r=5.2;
+  let s=state(i,t);const [x,y]=pos(i);let a=ap,r=4.4;
   if(s!==5&&s!==6) a*=1-0.82*dim;
-  if(s===6){r=5.2+2.2*flashGreen*(0.6+0.4*Math.sin(i));}
+  if(s===6){r=4.4+1.9*flashGreen*(0.6+0.4*Math.sin(i));}
   if(s===4&&t>44&&t<T.back){a*=0.55+0.45*Math.abs(Math.sin(t*9+i));}
   if(i===BEN&&t>T.dim-0.5){const pl=0.5+0.5*Math.sin(t*6);ctx.globalAlpha=0.35*pl;ctx.fillStyle='#ffd60a';ctx.beginPath();ctx.arc(x,y,r*2.3,0,7);ctx.fill();s=7;}
   ctx.globalAlpha=a;ctx.fillStyle=s===7?'#ffd60a':COL[s];ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
@@ -97,7 +97,7 @@ window.render=function(t){
  const rem=remaining(t);
  const headOp=1-env(t,T.dim+0.1,T.zoomOut+0.8,0.4,0.6);
  s+=`<g opacity="${headOp}">`;
- s+=txt(540,410,fmt(rem)+' WOCHEN',52,t>T.back+0.1?GREEN:(t>T.phone+0.2&&t<T.back?'#ff8a8f':WHITE),900,1,'middle',3);
+ s+=txt(540,468,fmt(rem)+' WOCHEN',50,t>T.back+0.1?GREEN:(t>T.phone+0.2&&t<T.back?'#ff8a8f':WHITE),900,1,'middle',3);
  s+=`</g>`;
  // Hook (Frame 0)
  s+=line(t,-1,4.2,230,'DAS IST DEIN LEBEN.',84,WHITE);
@@ -122,18 +122,18 @@ window.render=function(t){
  s+=line(t,22.8,26.2,1720,'WENN DU SO WEITERMACHST.',40,'#ff8a8f',800,3);
  // Quelle
  const qo=env(t,20.5,26.2,0.3,0.3);
- if(qo>0)s+=txt(540,1622,'Rechnung: 80 J. · Schlaf 8 h · 40 h/Woche (20–67) · Alltag 3 h/Tag',22,'#6a6a6a',500,qo)+txt(540,1652,'Social Media Ø 157 Min./Wochentag (DAK/UKE-Studie 2025)',22,'#6a6a6a',500,qo);
+ if(qo>0)s+=txt(465,1508,'Rechnung: 80 J. · Schlaf 8 h · 40 h/Woche (20–67) · Alltag 3 h/Tag',22,'#6a6a6a',500,qo)+txt(465,1534,'Social Media Ø 157 Min./Wochentag (DAK/UKE-Studie 2025)',22,'#6a6a6a',500,qo);
  // Das bleibt
  const big=env(t,T.dim+0.3,T.zoom+0.2,0.35,0.4);
  if(big>0){s+=`<rect x="0" y="0" width="1080" height="1920" fill="#000" opacity="${0.0}"/>`;
   const sc=0.9+0.1*eb((t-T.dim-0.3)/0.5);
-  s+=`<g opacity="${big}" transform="translate(540,960) scale(${sc})"><rect x="-470" y="-250" width="940" height="660" rx="40" fill="#000" opacity="0.72"/>${txt(0,-40,fmt(FREE),230,WHITE,900,1,'middle',-6)}${txt(0,70,'WOCHEN.',64,WHITE,900,1,'middle',8)}</g>`;
-  s+=`<g opacity="${env(t,T.dim+2.2,T.zoom+0.2,0.3,0.4)}">${txt(540,1230,'DAS IST ALLES, WAS WIRKLICH DIR GEHÖRT.',44,WHITE,900,1,'middle',1)}${txt(540,1300,'≈ 15 JAHRE.',44,'#9a9a9a',800,1,'middle',3)}</g>`;
+  s+=`<g opacity="${big}" transform="translate(540,690) scale(${sc})"><rect x="-440" y="-250" width="880" height="560" rx="40" fill="#000" opacity="0.72"/>${txt(0,-40,fmt(FREE),230,WHITE,900,1,'middle',-6)}${txt(0,70,'WOCHEN.',64,WHITE,900,1,'middle',8)}</g>`;
+  s+=`<g opacity="${env(t,T.dim+2.2,T.zoom+0.2,0.3,0.4)}">${txt(540,880,'DAS IST ALLES, WAS WIRKLICH DIR GEHÖRT.',40,WHITE,900,1,'middle',1)}${txt(540,945,'≈ 15 JAHRE.',44,'#9a9a9a',800,1,'middle',3)}</g>`;
  }
  // Zoom auf Ben
  const C2=cam(t);const zo=env(t,T.zoom+1.6,T.zoomOut+0.2,0.4,0.3);
  if(t>T.zoom-0.1&&t<T.zoomOut+1.2){
-  let bx,by;{const m=eio((t-T.zoom)/2.2)*(1-eio((t-T.zoomOut)/1.8));const [px,py]=pos(BEN);const tx=(C2.cx-px*C2.k)*m+(1-m)*(540-540*C2.k), ty=(C2.cy-py*C2.k)*m+(1-m)*(1020-1020*C2.k);bx=px*C2.k+tx;by=py*C2.k+ty;}
+  let bx,by;{const m=eio((t-T.zoom)/2.2)*(1-eio((t-T.zoomOut)/1.8));const [px,py]=pos(BEN);const tx=(C2.cx-px*C2.k)*m+(1-m)*(540-540*C2.k), ty=(C2.cy-py*C2.k)*m+(1-m)*(1000-1000*C2.k);bx=px*C2.k+tx;by=py*C2.k+ty;}
   const bo=env(t,T.zoom+1.2,T.zoomOut+0.6,0.4,0.4);const w=Math.floor(t*3)%2?P.walkA:P.walkB;
   s+=fig(t<T.zoom+2.4?P.stand:w,bx-18,by-20,0.42,'#ffd60a',true,bo);
  }
@@ -146,13 +146,13 @@ window.render=function(t){
  s+=line(t,44.6,T.back-0.05,318,'WENIGER AM HANDY. JEDEN TAG.',42,WHITE,800,2);
  // 48 – Drop
  if(t>=T.back){const k=eb((t-T.back)/0.45);
-  s+=`<g opacity="${env(t,T.back,53.2,0.05,0.3)}" transform="translate(540,250) scale(${0.6+0.4*k})">${txt(0,0,'+'+BACK+' WOCHEN.',104,GREEN,900,1,'middle',-1)}</g>`;
+  s+=`<g opacity="${env(t,T.back,53.2,0.05,0.3)}" transform="translate(540,320) scale(${0.6+0.4*k})">${txt(0,0,'+'+BACK+' WOCHEN.',104,GREEN,900,1,'middle',-1)}</g>`;
   s+=line(t,49.6,53.2,1680,'= 2,5 JAHRE LEBEN. GESCHENKT.',50,GREEN,900,1);}
  s+=line(t,53.2,59.5,230,'WOCHE 989',96,'#ffd60a');
  s+=line(t,53.7,59.5,318,'FÄNGT JETZT AN.',56,WHITE,900,4);
- if(t>55.6){const o=env(t,55.6,59.5,0.25,0.4),sc=0.85+0.15*eb((t-55.6)/0.4);s+=pill(540,1690,'SCHICK DAS JEMANDEM, DER ES SEHEN MUSS.',WHITE,'#000',34,o,sc);}
+ if(t>55.6){const o=env(t,55.6,59.5,0.25,0.4),sc=0.85+0.15*eb((t-55.6)/0.4);s+=pill(465,1440,'SCHICK DAS JEMANDEM, DER ES SEHEN MUSS.',WHITE,'#000',30,o,sc);}
  // Marke
- s+=txt(540,120,'4 8  S E K U N D E N',26,'#555',800,1);
+ s+=txt(176,176,'48 SEKUNDEN',22,'#555',800,1,'middle',4);
  document.getElementById('stage').innerHTML=s;
  document.getElementById('flash').style.opacity=0.32*env(t,T.back,T.back+0.6,0.03,0.55);
 };
