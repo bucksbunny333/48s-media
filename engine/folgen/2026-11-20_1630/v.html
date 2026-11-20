@@ -1,0 +1,177 @@
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#flash{position:absolute;inset:0;opacity:0}
+</style></head><body>
+<svg id="stage" viewBox="0 0 1080 1920"></svg><div id="flash"></div>
+<script src="rig.js"></script><script src="poses.js"></script><script src="kit.js"></script><script src="timing.js"></script>
+<script>
+// „Die Brücke“ – Freundschaft braucht Stunden. Hall (2018/2019), Journal of Social and Personal Relationships.
+window.DUR=60.4; const PAY=S[13]; const H=(location.hash||'#A').slice(1);
+const YEL='#ffd60a', CYAN='#64d2ff', GOLD='#f5c451', ROPE='#a0703c', WOOD='#8a5a33', STONE='#9aa3ad';
+const GY=1060, X0=190, X1=890, NP=21, PW=(X1-X0)/NP;
+let seed=11;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const PR=[...Array(NP)].map(()=>({r:rnd(),q:rnd()}));
+const STARS=[...Array(70)].map(()=>({x:rnd()*1080,y:rnd()*820+80,r:rnd()*2+0.6,p:rnd()*6}));
+// ---- Text-Helfer (Safe Zone) ----
+function L(t,a,b,y,s,size,col,w=900,cx=540,maxw=940){const o=env(t,a,b,0.15,0.22);if(o<=0)return'';size=Math.min(size,Math.floor(maxw/(s.length*0.6)));const sc=0.9+0.1*eb((t-a)/0.32);return `<g opacity="${o}" transform="translate(${cx},${y}) scale(${sc})">${txt(0,0,s,size,col,w,1,'middle',1)}</g>`}
+function LH(t,a,b,y,s,size,col){const o=env(t,a,b,0.001,0.22);if(o<=0)return'';size=Math.min(size,Math.floor(940/(s.length*0.6)));return `<g opacity="${o}" transform="translate(540,${y})">${txt(0,0,s,size,col,900,1,'middle',1)}</g>`}
+function LOW(t,a,b,s,col,size=44,y=1480){const o=env(t,a,b,0.15,0.22);if(o<=0)return'';size=Math.min(size,Math.floor(740/(s.length*0.6)));const w=Math.min(800,s.length*size*0.62+60);return `<g opacity="${o}" transform="translate(465,${y})"><rect x="${-w/2}" y="${-size*1.05}" width="${w}" height="${size*1.6}" rx="${size*0.5}" fill="#000" opacity="0.8"/>${txt(0,0,s,size,col,900,1,'middle',1)}</g>`}
+const SRC=(t,a,b,l1,l2)=>{const o=env(t,a,b,0.3,0.3);return o>0?txt(465,1532-(l2?28:0),l1,22,'#a9a2b8',600,o)+(l2?txt(465,1532,l2,22,'#a9a2b8',600,o):''):''};
+// ---- Brücken-Zustand ----
+// n = sichtbare Planken (0..NP), m = Material 0 Seil / 1 Holz / 2 Stein, fall = Einsturz-Startzeit
+function bstate(t){
+ const k=(a,b)=>cl((t-a)/(b-a));
+ if(t<S[1]) return {n:NP,m:0.6,fall:-0.12,hook:1};
+ if(t<S[3]) return {n:4*k(S[1]+0.5,S[1]+1.6),m:0,fall:S[2]+0.1};
+ if(t<S[4]) return {n:9*k(S[3]+0.2,S[3]+2.4),m:0};
+ if(t<S[5]) return {n:9+5*k(S[4]+0.1,S[4]+1.9),m:k(S[4]+0.1,S[4]+1.4)};
+ if(t<S[6]) return {n:14+7*k(S[5]+0.1,S[5]+2.6),m:1+k(S[5]+0.4,S[5]+2.6)};
+ if(t<S[9]) return {n:NP,m:2,fall:S[6]+0.05};
+ if(t<S[10]) return {n:13*k(S[9]+0.3,S[9]+4.6),m:k(S[9]+0.6,S[9]+4.6)};
+ if(t<S[11]) return {n:13+8*k(S[10]+1,S[10]+4.8),m:1+k(S[10]+1,S[10]+4.8)};
+ if(t<PAY) return {n:t<S[12]+2.6?0:0,m:0};
+ return {n:NP*k(PAY,PAY+0.35),m:2,glow:k(PAY,PAY+0.3)};
+}
+function bridge(t){const b=bstate(t);let s='';const m=b.m;const sag=m<1?90-50*m:40-40*(m-1);
+ const col=m<1?ROPE:(m<2?WOOD:STONE);const th=16+10*m;
+ const yOf=u=>GY+sag*Math.sin(Math.PI*u);
+ // Seile
+ if(b.n>0&&!(b.fall!==undefined&&t>b.fall+0.05)&&m<1.6){const o=cl(b.n/2)*(1-cl((m-1)/0.6));let d=`M${X0},${GY-60}`;for(let i=0;i<=20;i++){const u=i/20;d+=` L${X0+u*(X1-X0)},${yOf(u)-60}`;}s+=`<path d="${d}" stroke="${ROPE}" stroke-width="5" fill="none" opacity="${o}"/>`;}
+ for(let k=0;k<NP;k++){let vis=cl(b.n-k);if(vis<=0)continue;const u=(k+0.5)/NP;let x=X0+k*PW+1,y=yOf(u)-th/2,rot=0;
+  if(b.fall!==undefined&&t>b.fall){const ft=t-b.fall-(b.hook?Math.abs(u-0.5)*0.9+PR[k].r*0.08:PR[k].r*0.25);if(ft>0){y+=900*ft*ft;rot=(PR[k].q-0.5)*400*ft;x+=(PR[k].q-0.5)*80*ft;}}
+  const fy=y-(1-vis)*120;
+  const c=b.glow?`rgb(${Math.round(154-106*b.glow)},${Math.round(163+46*b.glow)},${Math.round(173-85*b.glow)})`:col;
+  s+=`<rect x="${x}" y="${fy}" width="${PW-2}" height="${th}" rx="3" fill="${c}" stroke="#1a1208" stroke-width="2" opacity="${vis}" transform="rotate(${rot} ${x+PW/2} ${fy+th/2})"/>`;}
+ if(m>=1.6&&b.n>=NP-0.1&&!(b.fall!==undefined&&t>b.fall)){const o=cl((m-1.6)/0.4);const gl=b.glow||0;
+  s+=`<path d="M${X0},${GY+th/2} Q${(X0+X1)/2},${GY+150} ${X1},${GY+th/2}" stroke="${gl?GREEN:STONE}" stroke-width="16" fill="none" opacity="${o}"/>`;
+  for(let i=1;i<6;i++){const x=X0+i*(X1-X0)/6;const yb=GY+th/2+ (150-40)*Math.sin(Math.PI*i/6)*0.5;s+=`<line x1="${x}" y1="${GY+th/2}" x2="${x}" y2="${yb}" stroke="${gl?GREEN:STONE}" stroke-width="8" opacity="${o}"/>`;}}
+ if(b.glow)s+=`<rect x="${X0-20}" y="${GY-40}" width="${X1-X0+40}" height="80" fill="${GREEN}" opacity="${0.25*b.glow*(1-cl((t-PAY-0.4)/1.5))}" rx="40"/>`;
+ return s;}
+function world(t){const cold=env(t,S[11],PAY,0.6,0.3);
+ let s=`<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1026"/><stop offset=".55" stop-color="#3a1f4d"/><stop offset=".78" stop-color="#c2553a"/><stop offset="1" stop-color="#f0a14a"/></linearGradient>
+ <linearGradient id="abyss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b0f18"/><stop offset="1" stop-color="#000"/></linearGradient></defs>
+ <rect width="1080" height="1920" fill="url(#sky)"/>`;
+ STARS.forEach(st=>{s+=`<circle cx="${st.x}" cy="${st.y}" r="${st.r}" fill="#fff" opacity="${0.35+0.35*Math.sin(t*2+st.p)}"/>`});
+ s+=`<circle cx="540" cy="${GY+20}" r="260" fill="#ff9a4a" opacity=".18"/><circle cx="540" cy="${GY+20}" r="170" fill="#ffcf7a" opacity=".6"/>`;
+ for(const [x0,h0] of [[-40,170],[700,140]])s+=`<path d="M${x0},${GY} L${x0+120},${GY-h0} L${x0+260},${GY-h0*0.6} L${x0+420},${GY}Z" fill="#2c1730" opacity=".55"/>`;
+ s+=`<rect x="0" y="${GY}" width="1080" height="900" fill="url(#abyss)"/>`;
+ // Klippen
+ s+=`<path d="M0,${GY} L${X0},${GY} L${X0-30},${GY+120} L${X0-10},${GY+260} L${X0-60},${GY+420} L${X0-40},1920 L0,1920Z" fill="#20141f" stroke="#4a2f45" stroke-width="6"/>`;
+ s+=`<path d="M1080,${GY} L${X1},${GY} L${X1+40},${GY+140} L${X1+15},${GY+300} L${X1+70},${GY+460} L${X1+50},1920 L1080,1920Z" fill="#20141f" stroke="#4a2f45" stroke-width="6"/>`;
+ s+=`<rect x="0" y="${GY-4}" width="${X0}" height="10" fill="#6b4a5e"/><rect x="${X1}" y="${GY-4}" width="${1080-X1}" height="10" fill="#6b4a5e"/>`;
+ // Nebel
+ for(let i=0;i<4;i++)s+=`<ellipse cx="${540+Math.sin(t*0.4+i)*60}" cy="${GY+260+i*90}" rx="260" ry="40" fill="#fff" opacity=".05"/>`;
+ if(cold>0)s+=`<rect width="1080" height="1920" fill="#0a1a3a" opacity="${0.5*cold}"/>`;
+ return s;}
+// ---- Figuren ----
+const LEGS=s=>(88+86)*s;
+function people(t){let s='';const sc=0.7;
+ let bx=125,fx=955,bp=P.stand,fp=P.stand,by=GY-LEGS(sc),fy=by;
+ if(t<S[1]){fp=P.reach;const j=cl((t+0.25)/0.95);bx=540-415*eo(j);by-=40*Math.sin(Math.PI*j);bp=j<1?(Math.sin(t*14)>0?P.walkA:P.walkB):P.reach;if(j<0.6)bp=P.cheer;}
+ if(t>=S[3]&&t<S[6]){bp=P.reach;fp=P.reach;}
+ if(t>=S[11]&&t<S[12]){bp=P.slump;}
+ if(t>=S[12]&&t<PAY){bp=blend(P.stand,P.reach,(t-S[12]-2)/0.8);}
+ if(t>=PAY){const w=cl((t-PAY-0.5)/2.8);bx=165+305*eio(w);fx=955-345*eio(w);const ph=Math.sin(t*9)>0;
+  bp=w>0&&w<1?(ph?P.walkA:P.walkB):(t>S[14]+0.8?P.cheer:P.stand);fp=w>0&&w<1?(ph?P.walkB:P.walkA):(t>S[14]+0.8?P.cheer:P.stand);}
+ if(t>=S[11]&&t<PAY){fx=985;bx=165;}
+ const hideF=t>=S[6]&&t<S[9];
+ if(!hideF){s+=fig(bp,bx,by,sc,WHITE,true);s+=fig(fp,fx,fy,sc,CYAN,false);}
+ // Planke in Bens Hand vor dem Payoff
+ if(t>=S[12]+2.2&&t<PAY+0.2){const o=env(t,S[12]+2.2,PAY+0.2,0.3,0.1);s+=`<rect x="${bx+40}" y="${by-60}" width="22" height="90" rx="4" fill="${STONE}" opacity="${o}" transform="rotate(${-20+40*cl((t-PAY+0.3)/0.3)} ${bx+50} ${by-15})"/>`;}
+ // DU-Label
+ const od=Math.max(env(t,-1,S[2],0.1,0.3),env(t,S[11],S[12],0.3,0.3));if(od>0&&!hideF)s+=txt(bx,by-205,'DU',34,YEL,900,od,'middle',3)+`<path d="M${bx-10},${by-188} L${bx+10},${by-188} L${bx},${by-175}Z" fill="${YEL}" opacity="${od}"/>`;
+ return s;}
+// ---- Zähler ----
+function counter(t){let str='',col=WHITE,o=0,lab='STUNDEN ZUSAMMEN',sz=150;
+ const lin=(a,b,v0,v1)=>Math.round(v0+(v1-v0)*eio(cl((t-a)/(b-a))));
+ if(t<S[1]){o=1;str='0 h';col=RED;if(t>0.9){str=(Math.floor(t*23)%9===0?'??':String(Math.floor(5+((t*997)%1)*240)))+' h';col='#ffb3b6';lab='BIS ZUM BESTEN FREUND?';}}
+ else if(t<S[2]){o=env(t,S[1]+0.4,S[2],0.1,0.2);str=t<S[1]+1.3?'10 h?':'20 h?';col='#ff8a8a';lab='DEINE SCHÄTZUNG';}
+ else if(t<S[3]){o=env(t,S[2],S[3]+1,0.2,0.2);str='0 h';}
+ else if(t<S[4]){o=1;str=lin(S[3]+0.2,S[3]+2.4,0,50)+' h';col=t>S[3]+2.4?GOLD:WHITE;}
+ else if(t<S[5]){o=1;str=lin(S[4]+0.1,S[4]+1.9,50,90)+' h';col=t>S[4]+1.9?GOLD:WHITE;}
+ else if(t<S[6]){o=env(t,S[5],S[6],0.1,0.2);const v=lin(S[5]+0.1,S[5]+2.6,90,200);str=(v>=200?'200+':v)+' h';col=v>=200?GOLD:WHITE;}
+ else if(t>=S[9]&&t<S[10]){o=env(t,S[9]+0.3,S[10],0.2,0.2);str=lin(S[9]+0.3,S[9]+4.6,0,90)+' h';lab='FREIWILLIG ZUSAMMEN';}
+ else if(t>=S[14]){o=env(t,S[14],DUR+1,0.2,0.3);str='+1 h';col=GREEN;lab='DIESE WOCHE';}
+ if(o<=0)return'';
+ const shk=t<0.6?Math.sin(t*80)*10*(1-t/0.6):0;
+ return `<g opacity="${o}" transform="translate(${540+shk},560)">${txt(0,0,str,sz,col,900,1,'middle',2)}${txt(0,58,lab,30,'#d9cfe6',800,1,'middle',6)}</g>`;}
+// Stufen-Pills unter der Brücke
+function stages(t){const o=env(t,S[3],S[6],0.3,0.3);if(o<=0)return'';let s='';
+ const st=[[S[3]+2.4,'50 h · LOCKERER KUMPEL',ROPE],[S[4]+1.9,'90 h · FREUND',WOOD],[S[5]+2.6,'200+ h · ENGER FREUND',GOLD]];
+ st.forEach(([a,w,c],i)=>{const on=cl((t-a)/0.25);const y=1250+i*86;const sz=36,wd=Math.min(800,w.length*sz*0.62+70);
+  s+=`<g opacity="${o*(0.35+0.65*on)}" transform="translate(465,${y}) scale(${0.95+0.05*eb(on)})"><rect x="${-wd/2}" y="-40" width="${wd}" height="62" rx="31" fill="${on>0?c:'#2a2030'}" opacity=".95"/>${txt(0,4,w,sz,on>0?'#111':'#9a8fa8',900)}</g>`;});
+ return s;}
+// Schreibtisch-Szene (Schule/Arbeit)
+function desks(t){const o=env(t,S[7],S[9],0.35,0.35);if(o<=0)return'';const sp=t-S[7];
+ let s=`<g opacity="${o}"><rect x="90" y="760" width="900" height="460" rx="28" fill="#141824" stroke="#39425a" stroke-width="6"/>`;
+ // Uhr rast
+ const a1=sp*720,a2=sp*60;s+=`<g transform="translate(540,860)"><circle r="62" fill="#0b0d14" stroke="#cfd6e6" stroke-width="6"/><line x1="0" y1="0" x2="${44*Math.sin(a1*Math.PI/180)}" y2="${-44*Math.cos(a1*Math.PI/180)}" stroke="#cfd6e6" stroke-width="5" stroke-linecap="round"/><line x1="0" y1="0" x2="${30*Math.sin(a2*Math.PI/180)}" y2="${-30*Math.cos(a2*Math.PI/180)}" stroke="${YEL}" stroke-width="7" stroke-linecap="round"/></g>`;
+ for(const [x,c,fl] of [[380,WHITE,true],[700,CYAN,false]]){s+=`<rect x="${x-110}" y="1080" width="220" height="18" rx="6" fill="#6b5a4a"/><rect x="${x-95}" y="1098" width="12" height="90" fill="#6b5a4a"/><rect x="${x+83}" y="1098" width="12" height="90" fill="#6b5a4a"/>`;s+=fig(P.sitPhone,x+(fl?-40:40),1110,0.42,c,fl);}
+ const xo=cl((t-S[8])/0.25);if(xo>0)s+=xmark(540,1050,90,xo);
+ return s+'</g>';}
+// Aktivitäten-Labels (freiwillig)
+function acts(t){let s='';const L3=[[S[9]+2.5,'RUMHÄNGEN',380],[S[9]+3.4,'LACHEN',560],[S[9]+4.2,'ZOCKEN',720]];
+ L3.forEach(([a,w,x])=>{const o=env(t,a,S[10]+0.2,0.12,0.3);if(o<=0)return;const sc=0.7+0.3*eb((t-a)/0.3);const sz=34,wd=w.length*sz*0.64+50;const xx=cl(x,wd/2+60,870-wd/2);
+  s+=`<g opacity="${o}" transform="translate(${xx},${GY-250}) scale(${sc})"><rect x="${-wd/2}" y="-36" width="${wd}" height="56" rx="28" fill="${GOLD}"/>${txt(0,4,w,sz,'#111',900)}</g>`;});
+ return s;}
+// Wochen-Raster (Hochrechnung)
+function weeks(t){const o=env(t,S[10]+0.2,S[11]+0.2,0.3,0.3);if(o<=0)return'';let s=`<g opacity="${o}">`;const f=cl((t-S[10]-1)/3.8);
+ for(let i=0;i<52;i++){const c=i%13,r=Math.floor(i/13);const x=75+c*60,y=455+r*62;const on=f*52>i;
+  s+=`<rect x="${x}" y="${y}" width="50" height="50" rx="8" fill="${on?GOLD:'#2a2233'}" stroke="${on?'#fff3c0':'#4a3a55'}" stroke-width="2"/>`;if(on)s+=txt(x+25,y+33,'4h',20,'#111',900);}
+ s+=txt(540,750,`≈ 4 h × ${Math.round(f*52)} WOCHEN = ${Math.round(f*52*3.85)} h`,40,f>=1?GOLD:WHITE,900);
+ return s+'</g>';}
+// Geister-Brücke + Plankenstapel (Warten-Phase)
+function ghost(t){let s='';const o=env(t,S[11]+0.6,PAY,0.4,0.15);if(o>0){let d='';for(let k=0;k<NP;k++){d+=`<rect x="${X0+k*PW+1}" y="${GY-13}" width="${PW-2}" height="26" rx="3" fill="none" stroke="#9fb4d9" stroke-width="2" stroke-dasharray="6 5"/>`;}
+ s+=`<g opacity="${0.8*o}">${d}</g>`+txt(540,GY-40,'200 h FEHLEN',34,'#9fb4d9',900,o,'middle',4);}
+ const o2=env(t,S[12]+0.2,PAY+0.3,0.3,0.2);if(o2>0){const n=Math.max(0,6-Math.floor(cl((t-S[12]-2.2)/0.4)));for(let i=0;i<6;i++){const ap=cl((t-S[12]-0.2-i*0.12)/0.2);if(ap<=0||i>=n)continue;s+=`<rect x="${12+(i%2)*6}" y="${GY-14-i*15}" width="96" height="13" rx="3" fill="${STONE}" stroke="#1a1208" stroke-width="2" opacity="${o2*ap}"/>`;}
+  s+=txt(102,GY-120,'BRETTER',18,'#cfd6e6',900,o2*cl((t-S[12]-1)/0.3),'middle',3);}
+ if(t>PAY){for(let i=0;i<26;i++){const a=(i*137.5)%360*Math.PI/180,sp=(t-PAY)*(60+(i*37)%90);const o3=cl(1-(t-PAY)/6)*0.9;s+=`<circle cx="${540+Math.cos(a)*sp*2}" cy="${GY-60+Math.sin(a)*sp-((t-PAY)*30)}" r="${3+(i%3)}" fill="${i%2?GREEN:GOLD}" opacity="${o3}"/>`;}}
+ return s;}
+window.SFXC=()=>{const c=[];
+ if(H==='B'){for(let k=0;k<14;k++)c.push([k*0.065,'tick']);c.push([0.95,'boom'],[1.0,'whoosh']);}
+ else c.push([0,'boom'],[0.03,'whoosh']);
+ for(let k=0;k<10;k++)c.push([0.1+k*0.07,'pop']);for(let k=0;k<20;k++)c.push([0.95+k*0.15,'tick']);
+ c.push([S[1]+0.4,'buzz'],[S[1]+1.3,'buzz'],[S[2],'whoosh'],[S[2]+0.15,'boom']);
+ for(let k=0;k<9;k++)c.push([S[3]+0.3+k*0.24,'tick']);c.push([S[3]+2.4,'ding']);
+ for(let k=0;k<6;k++)c.push([S[4]+0.2+k*0.28,'tick']);c.push([S[4]+1.9,'ding']);
+ for(let k=0;k<10;k++)c.push([S[5]+0.2+k*0.24,'tick']);c.push([S[5]+2.6,'ding']);
+ c.push([S[6],'whoosh'],[S[6]+0.05,'boom'],[S[7],'pop']);for(let k=0;k<10;k++)c.push([S[7]+0.2+k*0.25,'tick']);
+ c.push([S[8],'buzz'],[S[9],'whoosh'],[S[9]+2.5,'pop'],[S[9]+3.4,'pop'],[S[9]+4.2,'pop']);
+ c.push([S[10],'whoosh']);for(let k=0;k<13;k++)c.push([S[10]+1+k*0.29,'tick']);c.push([S[10]+4.8,'ding']);
+ c.push([S[11],'whoosh'],[S[11]+0.6,'pop'],[S[11]+2.6,'buzz'],[S[12],'pop']);for(let i=0;i<6;i++)c.push([S[12]+0.2+i*0.12,'tick']);c.push([S[12]+2.2,'whoosh']);
+ c.push([PAY,'boom'],[PAY+0.05,'ding']);for(let k=0;k<8;k++)c.push([PAY+0.6+k*0.35,'tick']);
+ c.push([S[14],'pop'],[S[14]+0.8,'ding'],[S[15],'pop']);return c;};
+window.render=function(t){let s='';
+ const shake=Math.max(H==='B'?env(t,0.9,1.4,0.001,0.4):env(t,-0.1,0.6,0.001,0.5),env(t,PAY,PAY+0.6,0.001,0.5),env(t,S[6],S[6]+0.4,0.001,0.3));
+ const jx=Math.sin(t*91)*18*shake,jy=Math.cos(t*67)*14*shake;
+ const zC=1+0.25*(1-eio(t/1.2));
+ s+=`<g transform="translate(${jx+540*(1-zC)},${jy+(GY-120)*(1-zC)}) scale(${zC})">`+world(t)+bridge(t)+ghost(t)+people(t)+'</g>';
+ s+=desks(t)+acts(t)+weeks(t)+counter(t)+stages(t);
+ // Kopfzeilen
+ s+=`<rect x="0" y="222" width="1080" height="190" fill="#000" opacity="${0.35}"/>`;
+ s+=LH(t,-1,S[1],300,'WIE VIELE STUNDEN',92,WHITE)+LH(t,-1,S[1],378,'BIS ZUM BESTEN FREUND?',56,YEL);
+ s+=L(t,S[1],S[2],300,'SCHÄTZ MAL.',100,WHITE);
+ s+=L(t,S[2],S[3],300,'DIE STUDIE',96,WHITE)+L(t,S[2]+0.4,S[3],378,'ÜBER 400 MENSCHEN BEFRAGT',48,YEL);
+ s+=SRC(t,S[2]+0.4,S[6],'Hall (2018), Journal of Social and Personal Relationships','355 + 112 Befragte · Stunden bis zur nächsten Stufe');
+ s+=L(t,S[3],S[4],300,'~50 STUNDEN',100,WHITE)+L(t,S[3]+0.3,S[4],378,'LOCKERER KUMPEL',56,ROPE);
+ s+=L(t,S[4],S[5],300,'~90 STUNDEN',100,WHITE)+L(t,S[4]+0.3,S[5],378,'FREUND',60,'#c98a55');
+ s+=L(t,S[5],S[6],300,'200+ STUNDEN',100,WHITE)+L(t,S[5]+0.3,S[6],378,'ENGER FREUND',60,GOLD);
+ s+=L(t,S[6],S[7],300,"ABER JETZT KOMMT'S.",88,WHITE);
+ s+=L(t,S[7],S[8],300,'SCHULE & ARBEIT',92,WHITE)+L(t,S[7]+0.5,S[8],378,'ZÄHLEN KAUM.',60,RED);
+ s+=L(t,S[8],S[9],300,'NEBENEINANDER SITZEN',76,WHITE)+L(t,S[8]+0.3,S[9],378,'IST KEINE BRÜCKE.',60,RED);
+ s+=L(t,S[9],S[10],300,'ES ZÄHLT NUR',92,WHITE)+L(t,S[9]+0.4,S[10],378,'FREIWILLIGE ZEIT ZUSAMMEN.',50,GOLD);
+ s+=L(t,S[10],S[11],300,'200 STUNDEN =',96,WHITE)+L(t,S[10]+0.6,S[11],378,'KNAPP 4 H PRO WOCHE. 1 JAHR.',48,GOLD);
+ s+=L(t,S[11],S[12],300,'ES LIEGT NICHT AN DIR.',76,WHITE)+L(t,S[11]+2.6,S[12],378,'ES FEHLT ZEIT.',64,CYAN);
+ s+=L(t,S[12],PAY,300,'HÖR AUF ZU WARTEN,',84,WHITE)+L(t,S[12]+0.8,PAY,378,'DASS ES EINFACH PASSIERT.',50,'#bdbdbd');
+ if(t>=PAY){const o=env(t,PAY,S[14],0.001,0.25),sc=1.6-0.6*eb((t-PAY)/0.35);s+=`<g opacity="${o}" transform="translate(540,330) scale(${sc})">${txt(0,0,'BAU SIE.',150,GREEN,900,1,'middle',2)}</g>`;}
+ s+=L(t,S[14],DUR+1,300,'1 STUNDE. DIESE WOCHE.',76,WHITE)+L(t,S[14]+1.4,DUR+1,378,'MIT EINEM MENSCHEN, DEN DU MAGST.',44,GREEN);
+ if(t>S[15]-0.1){const o=env(t,S[15]-0.1,DUR+1,0.25,0.3),sc=0.85+0.15*eb((t-S[15]+0.1)/0.4);s+=pill(465,1490,'SCHICK DAS DEM MENSCHEN MIT 200 STUNDEN.',WHITE,'#000',27,o,sc);}
+ s+=txt(176,176,'48 SEKUNDEN',22,'#c9bcd6',800,1,'middle',4);
+ document.getElementById('stage').innerHTML=s;
+ const fl=document.getElementById('flash');const w=env(t,-0.1,0.3,0.001,0.25),g=env(t,PAY,PAY+0.7,0.001,0.6);
+ fl.style.background=g>0?GREEN:'#fff';fl.style.opacity=Math.max(0.14*w,0.38*g);
+};
+render(0);
+</script></body></html>

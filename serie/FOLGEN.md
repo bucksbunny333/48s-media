@@ -84,3 +84,23 @@ QC gegen Referenzen („Wochen“, „150 €“, Hook-Niveau „1 neue Nachrich
 - Ton: Tom Magic, eleven_v3, 1 Take/Satz, Starts aus gemessenen Dauern (fit.py), 07:30 atempo 1,08, 12:30 1,0; −14 LUFS; Musik Sidechain; SFX auf jedem Wechsel.
 
 > 20.11. 07:31: „Kein Game Over“ live – YouTube w__HowlcmAQ · TikTok 7710137155439349025 · Instagram Df9BPgvlKAZ (KI-Label, gepostet 07:32). Kommentare an Lukas geschickt (kein Chrome).
+
+## 20.11.2026 – Lauf 10:31 (Slots 16:30 + 21:00; 18:30 = Probevideo, bereits über vidIQ eingeplant → nichts produziert)
+vidIQ-Check 10:31: Post b761bd26 (TikTok 18:30 geplant, YouTube 4nVgWAR7J74) existiert → 18:30 nicht angefasst.
+Konzept-Auswahl (je 3, 0–100, Neuheit am Markt ×2):
+- 16:30: **Die Brücke (Freundschaft = Stunden, Hall 2018) 88** · Kontostand „Freundschafts-Konto“ (Kontakt-Einzahlungen) 72 · Ladebalken „Selbstwert lädt…“ 66.
+- 21:00: **Abgestürzt (Scheitern als Börsenchart, Wang/Jones/Wang 2019) 87** · Lebenslauf der Absagen (Rowling & Co.) 64 – zu bekannt · Waage Talent vs. Übung 61.
+- Markt-Check (Websuche): „200 Stunden bis zum besten Freund“ als Artikel bekannt, aber nicht als Mini-Welt-Brücke im DE-Motivations-Content; „knapp gescheitert = später besser“ (near miss) im DE-Kurzvideo praktisch nicht vorhanden, Börsenchart als Lebens-Metapher ohne Treffer.
+
+| Slot | Video | Thema | Visuelle Mechanik | Twist-Art | Hook (gewählt aus 3) | Länge |
+|---|---|---|---|---|---|---|
+| 16:30 | **Die Brücke** | Freundschaft/Beziehungen (kein Handy) | Mini-Welt: zwei Klippen, Brücke wächst Brett für Brett live mit dem Stundenzähler (Seil → Holz → Stein), Schreibtisch-Szene, 52-Wochen-Raster, Geister-Brücke, Payoff: Brücke leuchtet grün, beide laufen aufeinander zu | Umdeutung („nicht deine Persönlichkeit – Zeit“) + Gegenüberstellung (Schule/Arbeit zählt kaum) + Hochrechnung (≈ 4 h/Woche × 52) | A+C kombiniert: Frame 0 = Brücke bricht in der Mitte, Ben springt zurück, Zoom-out, roter Zähler „0 h“, Frage bei 0,1 s; ab 0,9 s rattert der Zähler (Spielautomat). B (Zeitraffer bis 200 h) verrät die Antwort vor der Frage → raus. C (Zoom auf Hände) schneidet Figuren ab → nur der Zoom übernommen | 60,4 s |
+| 21:00 | **Abgestürzt** | Scheitern & Mut (kein Handy) | Börsen-Terminal: „DEIN KURS“-Ticker, Linie stürzt ab, Förder-Grenze, 48 Sparklines (1.184 Forscher), Zwillings-Linien, Absturz, 8 Figuren (1 fällt), Volltreffer-Sterne, Balken 16,1 vs 13,3 %, Überholen, dann DEIN Chart mit „HEUTE“, „ENDE?“ → grüner Anstieg | Umdeutung + Überholmanöver (die Gescheiterten liegen vorne) | B: Frame 0 = „ABGELEHNT“-Stempel knallt auf crashenden roten Chart, Ben fällt, rote Vignette + Wackeln, Frage bei 0,1 s. A (nur Crash) schwächer, C („−38 %“) wäre eine erfundene Zahl → raus | 60,2 s |
+
+Quellen im Bild: Hall (2018/2019), Journal of Social and Personal Relationships, 355 + 112 Befragte (~50 h Kumpel, ~90 h Freund, 200+ h enger Freund; gemeinsame Arbeitszeit zählt kaum) · Wang, Jones & Wang (2019), Nature Communications (NIH-Anträge 1990–2005; 623 knapp verpasst, 561 knapp bekommen; 12,6 % verschwinden; Volltreffer 16,1 % vs. 13,3 % in 5 Jahren; Effekt bleibt ohne Aussteiger). Eigene Rechnungen: 200/52 = 3,85 h/Woche („knapp 4“); 16,1/13,3 = 1,21 („rund ein Fünftel mehr“); 12,6 % ≈ jeder Achte.
+
+QC gegen Referenzen („Wochen“, „150 €“, Hook-Niveau „1 neue Nachricht“):
+- **Die Brücke – besser weil:** Frame 0 ist mitten im Einsturz (Bretter fallen, Ben springt, roter 0-h-Zähler) statt Text auf Schwarz; die Live-Rechnung baut sich als physisches Objekt (Brücke) auf statt als Raster; Bildwechsel ≤ 2,5 s; zweiter Kipppunkt (Schule/Arbeit zählt kaum) + Hochrechnung; Payoff „BAU SIE.“ bei 47,7 s mit Grün/Boom; stärkster Teil-Auslöser der Serie („Schick das dem Menschen mit 200 Stunden“). Schwächer als „150 €“: keine Euro-Zahl – dafür direkter Personenbezug (ein konkreter Mensch).
+- **Abgestürzt – besser weil:** stärkster Kontrast in Frame 0 (Stempel + Crash + Rot), echte Kontrollgruppe statt Einzelanekdote, Überholmanöver als sichtbarer Twist, persönlicher Chart mit „HEUTE“ macht die Studie zur eigenen Lage; Payoff „TIEFPUNKT VOR DEM ANSTIEG“ bei 47,8 s. Risiko: 9–15 s erklärt das Studiendesign → Sparklines + Zwillings-Linien als Zwischen-Payoffs.
+- Safe Zone: je 16–17 Standbilder mit roten Sperrzonen geprüft; Verstöße gefunden und korrigiert (16:30 „MATERIAL“-Label links → „BRETTER“ eingerückt; 21:00 „ENTSCHEIDUNG“ + 12,6-%-Zeile rechts unten, Hook-Stempel in Frame 0 zu breit) → ok.
+- Ton: Tom Magic, eleven_v3, 1 Take/Satz, Starts aus gemessenen Dauern (fit.py), atempo 1,03 bzw. 1,05; −14 LUFS; Musik Sidechain; SFX auf jedem Wechsel. 21:00: Satz „Das haben die Forscher rausgerechnet“ (6 s) gestrichen, damit der Kipppunkt bei 48 s bleibt – Aussage steht als Quellenzeile im Bild.

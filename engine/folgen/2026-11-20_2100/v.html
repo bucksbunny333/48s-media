@@ -1,0 +1,171 @@
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#flash{position:absolute;inset:0;opacity:0}
+</style></head><body>
+<svg id="stage" viewBox="0 0 1080 1920"></svg><div id="flash"></div>
+<script src="rig.js"></script><script src="poses.js"></script><script src="kit.js"></script><script src="timing.js"></script>
+<script>
+// „Abgestürzt“ – Scheitern als Börsenchart. Wang, Jones & Wang (2019), Nature Communications 10:4331.
+window.DUR=60.2; const PAY=S[13]; const H=(location.hash||'#B').slice(1);
+const YEL='#ffd60a', GOLD='#f5c451', ORANGE='#ff9f43', CY0=590, CY1=1400, CX0=80, CX1=1000, THR=60;
+const nz=u=>Math.sin(u*1.7)*1.6+Math.sin(u*4.3+1)*1.1+Math.sin(u*9.1+2)*0.6;
+// Kurven (u = Zeit 0..100, Wert 0..100)
+function bv(u){ if(u<=40) return 38+21*(u/40)+nz(u)*(u<38?1:0.2);
+ if(u<=46) return 59-37*eio((u-40)/6);
+ if(u<=58) return 22+6*((u-46)/12)+nz(u)*0.8;
+ return 28+60*eio((u-58)/42)+nz(u)*0.9;}
+function gv(u){ if(u<=40) return 39+22*(u/40)+nz(u+0.3)*(u<38?1:0.2);
+ return 61+16*((u-40)/60)+nz(u+5)*0.9;}
+// persönlicher Chart (ab S[11])
+function pv(u){ if(u<=30) return 45+12*(u/30)+nz(u)*1.2; if(u<=40) return 57-37*eio((u-30)/10); return 20+nz(u)*0.6+((u-40)/10);}
+function fv(u){ return 21+72*eio((u-50)/40)+nz(u)*0.6;}
+let VR=[0,100];const yOf=v=>CY1-(CY1-CY0)*(v-VR[0])/(VR[1]-VR[0]);
+function path(f,u0,u1,ua,ub,n=160){let d='';for(let i=0;i<=n;i++){const u=ua+(ub-ua)*i/n;const x=CX0+(CX1-CX0)*(u-u0)/(u1-u0);d+=(i?' L':'M')+x.toFixed(1)+','+yOf(f(u)).toFixed(1);}return d;}
+const X=(u,u0,u1)=>CX0+(CX1-CX0)*(u-u0)/(u1-u0);
+// ---- Text-Helfer ----
+function L(t,a,b,y,s,size,col,w=900,cx=540,maxw=940){const o=env(t,a,b,0.15,0.22);if(o<=0)return'';size=Math.min(size,Math.floor(maxw/(s.length*0.6)));const sc=0.9+0.1*eb((t-a)/0.32);return `<g opacity="${o}" transform="translate(${cx},${y}) scale(${sc})">${txt(0,0,s,size,col,w,1,'middle',1)}</g>`}
+function LH(t,a,b,y,s,size,col){const o=env(t,a,b,0.001,0.22);if(o<=0)return'';size=Math.min(size,Math.floor(940/(s.length*0.6)));return `<g opacity="${o}" transform="translate(540,${y})">${txt(0,0,s,size,col,900,1,'middle',1)}</g>`}
+const SRC=(t,a,b,l1,l2)=>{const o=env(t,a,b,0.3,0.3);return o>0?txt(465,1532-(l2?28:0),l1,22,'#8a93a3',600,o)+(l2?txt(465,1532,l2,22,'#8a93a3',600,o):''):''};
+function tag(x,y,s,bg,fg,size=30,o=1,sc=1){const w=s.length*size*0.62+44;x=cl(x,60+w/2,1020-w/2);return `<g opacity="${o}" transform="translate(${x},${y}) scale(${sc})"><rect x="${-w/2}" y="${-size*0.95}" width="${w}" height="${size*1.5}" rx="${size*0.4}" fill="${bg}"/>${txt(0,size*0.2,s,size,fg,900)}</g>`}
+function stampT(t,t0,t1,word,col,x,y,size=96,rot=-12,s0=1.8){const o=env(t,t0,t1,0.001,0.25);if(o<=0)return'';const q=cl((t-t0)/0.18);const w=word.length*size*0.66+60;return `<g opacity="${o}" transform="translate(${x},${y}) rotate(${rot}) scale(${s0-(s0-1)*q})"><rect x="${-w/2}" y="${-size*0.85}" width="${w}" height="${size*1.15}" rx="16" fill="none" stroke="${col}" stroke-width="12"/>${txt(0,size*0.12,word,size,col,900,1,'middle',2)}</g>`}
+// ---- Terminal-Hintergrund ----
+function bg(t,red,green){let s=`<rect width="1080" height="1920" fill="#05070b"/>`;
+ for(let i=0;i<=10;i++){const y=CY0+(CY1-CY0)*i/10;s+=`<line x1="${CX0}" y1="${y}" x2="${CX1}" y2="${y}" stroke="#16202c" stroke-width="2"/>`;}
+ for(let i=0;i<=12;i++){const x=CX0+(CX1-CX0)*i/12;s+=`<line x1="${x}" y1="${CY0}" x2="${x}" y2="${CY1}" stroke="#101822" stroke-width="2"/>`;}
+ if(red>0)s+=`<rect width="1080" height="1920" fill="url(#rv)" opacity="${red}"/>`;
+ if(green>0)s+=`<rect width="1080" height="1920" fill="url(#gv)" opacity="${green}"/>`;
+ return `<defs><radialGradient id="rv" cx=".5" cy=".5" r=".75"><stop offset=".45" stop-color="#ff2d3a" stop-opacity="0"/><stop offset="1" stop-color="#ff2d3a" stop-opacity=".55"/></radialGradient><radialGradient id="gv" cx=".5" cy=".5" r=".75"><stop offset=".45" stop-color="#30d158" stop-opacity="0"/><stop offset="1" stop-color="#30d158" stop-opacity=".5"/></radialGradient></defs>`+s;}
+function benAt(x,y,pose,sc,col,rot=0,op=1){const lg=(88+86)*sc;return `<g transform="rotate(${rot} ${x} ${y-lg})" opacity="${op}">${fig(pose,x,y-lg,sc,col,true)}</g>`}
+function line(d,col,w,o=1,glow=false){return (glow?`<path d="${d}" stroke="${col}" stroke-width="${w*3}" fill="none" opacity="${0.18*o}" stroke-linecap="round" stroke-linejoin="round"/>`:'')+`<path d="${d}" stroke="${col}" stroke-width="${w}" fill="none" opacity="${o}" stroke-linecap="round" stroke-linejoin="round"/>`}
+// ---- Haupt-Chart (Studie) ----
+function study(t){let s='';VR=[0,100];
+ // Phasen
+ let u0=0,u1=50,rb=40,rg=-1,showT=false,showD=false,op=1;
+ if(t<S[1]){u0=22;u1=52;rb=42.6+3.4*eio((t+0.05)/0.7);VR=[12,68];}
+ else if(t<S[2]){const k=eio((t-S[1])/0.6);u0=22+12*k;u1=52-6*k;rb=40;showT=true;VR=[12+28*k,68-2*k];}
+ else if(t<S[3]){op=0;}
+ else if(t<S[5]){u0=0;u1=50;rb=40*cl((t-S[3]+0.2)/1.2);rg=rb;showT=true;showD=t>S[4];}
+ else if(t<S[7]){u0=0;u1=50;rb=40+6*eio((t-S[5])/0.5);rg=rb;showT=true;showD=true;op=t>S[6]?1-0.65*cl((t-S[6])/0.4):1;}
+ else if(t<S[9]){const k=eio((t-S[7])/1.0);u0=0;u1=50+50*k;rb=46+44*cl((t-S[7]-0.6)/(S[9]-S[7]-0.8));rg=rb;showT=true;showD=true;}
+ else if(t<S[10]){u0=0;u1=100;rb=90;rg=90;showT=true;showD=true;op=0.1;}
+ else if(t<S[11]){u0=0;u1=100;rb=90+10*cl((t-S[10]-0.3)/1.6);rg=rb;showT=true;showD=true;}
+ else op=0;
+ if(op<=0)return'';
+ s+=`<g opacity="${op}">`;
+ if(showT){const y=yOf(THR);s+=`<line x1="${CX0}" y1="${y}" x2="${CX1}" y2="${y}" stroke="${GOLD}" stroke-width="3" stroke-dasharray="14 10" opacity=".7"/>`+txt(CX0+8,y-14,'FÖRDER-GRENZE',24,GOLD,900,0.9,'start',3);}
+ if(showD){const x=X(40,u0,u1);if(x>CX0&&x<CX1)s+=`<line x1="${x}" y1="${CY0}" x2="${x}" y2="${CY1}" stroke="#5a6678" stroke-width="3" stroke-dasharray="6 8"/>`+txt(Math.min(x,770),CY1+34,'ENTSCHEIDUNG',24,'#8a93a3',900,1,'middle',3);}
+ const ub=Math.max(u0,Math.min(u1,rb)), ug=Math.max(u0,Math.min(u1,rg));
+ if(rg>u0)s+=line(path(gv,u0,u1,u0,ug),GOLD,7,1,true);
+ const crashed=rb>40.3;const bcol=t<S[1]?RED:(crashed&&rb<58?RED:WHITE);
+ if(rb>u0){ if(t<S[2]||rb<=40.3) s+=line(path(bv,u0,u1,u0,ub),bcol,8,1,true); else if(rb<=46) s+=line(path(bv,u0,u1,u0,40),WHITE,8,1,true)+line(path(bv,u0,u1,40,ub),RED,8,1,true);
+  else {s+=line(path(bv,u0,u1,u0,40),WHITE,8,1,true)+line(path(bv,u0,u1,40,46),RED,8,1,true)+line(path(bv,u0,u1,46,ub),rb>85?GREEN:'#e8e8e8',8,1,true);} }
+ // Stars (Volltreffer, Top-5-% zitiert): 6 vs 5 ≈ 16,1 : 13,3
+ if(t>=S[8]&&t<S[11]){const BS=[60,66,72,78,83,88],GS=[58,65,72,79,86];
+  BS.forEach((u,i)=>{if(rb<u)return;const a=cl((t-S[8]-0.2-i*0.7)/0.25);if(a<=0)return;const x=X(u,u0,u1),y=yOf(bv(u))-34;s+=`<g transform="translate(${x},${y}) scale(${0.6+0.4*eb(a)})" opacity="${a}">${star(GREEN)}</g>`;});
+  GS.forEach((u,i)=>{if(rg<u)return;const a=cl((t-S[8]-0.5-i*0.8)/0.25);if(a<=0)return;const x=X(u,u0,u1),y=yOf(gv(u))-34;s+=`<g transform="translate(${x},${y}) scale(${0.6+0.4*eb(a)})" opacity="${a}">${star(GOLD)}</g>`;});}
+ // Ben auf der Linienspitze
+ if(rb>u0&&t<S[11]){let x=X(ub,u0,u1),y=yOf(bv(ub)),pose=P.stand,rot=0,col=WHITE;
+  if(t<S[1]){x+=0;y-=0;const f=cl((t+0.3)/0.9);pose=P.cheer;rot=-50+120*f;y=yOf(bv(ub))-60+40*f;x-=10;col=WHITE;}
+  else if(rb>40.3&&rb<47&&t<S[7]){pose=P.slump;}
+  else if(t>=S[7]&&t<S[9]){pose=Math.sin(t*10)>0?P.walkA:P.walkB;}
+  else if(t>=S[10]){pose=P.cheer;}
+  s+=benAt(x,y-4,pose,0.32,col,rot);
+  if(t<S[2])s+=txt(x,y-150,'DU',30,YEL,900,1,'middle',3);}
+ // Gruppen-Labels
+ if(t>=S[3]&&t<S[6]){const a=cl((t-S[3]-1.2)/0.3),b=cl((t-S[3]-3.0)/0.3);
+  s+=tag(X(Math.min(rb,40),u0,u1)-120,yOf(66)-36,'KNAPP BEKOMMEN ✓',GOLD,'#111',28,a)+tag(X(Math.min(rb,40),u0,u1)-120,yOf(50)+60,'KNAPP VERPASST ✗',RED,'#fff',28,b);}
+ if(t>=S[10]&&t<S[11]){const a=cl((t-S[10]-1.6)/0.25);if(a>0)s+=tag(X(97,u0,u1),Math.max(700,yOf(bv(97))-120),'ÜBERHOLT',GREEN,'#04120a',40,a,0.8+0.2*eb(a));}
+ return s+'</g>';}
+function star(c){let d='';for(let i=0;i<10;i++){const r=i%2?9:22,a=-Math.PI/2+i*Math.PI/5;d+=(i?'L':'M')+(Math.cos(a)*r).toFixed(1)+','+(Math.sin(a)*r).toFixed(1);}return `<path d="${d}Z" fill="${c}" stroke="#000" stroke-width="2"/>`}
+// Sparklines: 1.184 Forscher
+function crowd(t){const o=env(t,S[2],S[3]+0.2,0.25,0.3);if(o<=0)return'';let s=`<g opacity="${o}">`;
+ for(let i=0;i<48;i++){const c=i%6,r=Math.floor(i/6);const x=CX0+20+c*152,y=CY0+r*84;const a=cl((t-S[2]-0.1-i*0.03)/0.2);if(a<=0)continue;let d='';
+  for(let k=0;k<=14;k++){const v=Math.sin(k*0.8+i)*10+Math.sin(k*2.1+i*3)*6+k*1.5;d+=(k?'L':'M')+(x+k*9)+','+(y+40-v);}
+  s+=`<path d="${d}" stroke="${i%2?GOLD:'#e8e8e8'}" stroke-width="3" fill="none" opacity="${a*0.85}"/>`;}
+ s+=txt(540,CY1+50,'1.184 JUNGE FORSCHER',48,WHITE,900,cl((t-S[2]-0.8)/0.3),'middle',2);
+ return s+'</g>';}
+// Jeder Achte
+function eight(t){const o=env(t,S[6],S[7]+0.2,0.25,0.3);if(o<=0)return'';let s=`<g opacity="${o}"><rect x="90" y="${CY0+120}" width="900" height="420" rx="30" fill="#0b0f16" stroke="#2a3444" stroke-width="4"/>`;
+ for(let i=0;i<8;i++){const x=170+i*106,base=CY0+440;let y=base,op=1,rot=0;const a=cl((t-S[6]-0.1-i*0.08)/0.2);if(i===7){const f=cl((t-S[6]-1.4)/0.9);y+=500*f*f;rot=90*f;op=1-f;}
+  s+=`<g opacity="${a*op}">`+benAt(x,y,P.stand,0.42,i===7?RED:'#e8e8e8',rot)+'</g>';}
+ s+=txt(465,CY0+520,'≈ 12,6 % VERSCHWINDEN AUS DEM SYSTEM',30,'#ff8a8a',900,cl((t-S[6]-1.6)/0.3),'middle',1);
+ return s+'</g>';}
+// Balken 16,1 vs 13,3
+function bars(t){const o=env(t,S[9],S[10]+0.1,0.25,0.3);if(o<=0)return'';const k=eio((t-S[9]-0.2)/1.2);let s=`<g opacity="${o}">`;
+ const base=CY1+10,sc=34;s+=`<rect x="110" y="${CY0+60}" width="860" height="${CY1-CY0+30}" rx="30" fill="#05070b" opacity=".85"/>`;
+ [[300,16.1,GREEN,'KNAPP VERPASST'],[630,13.3,GOLD,'KNAPP BEKOMMEN']].forEach(([x,v,c,l])=>{const h=v*sc*k;s+=`<rect x="${x-90}" y="${base-h}" width="180" height="${h}" rx="12" fill="${c}"/>`+txt(x,base-h-24,(v*k).toFixed(1).replace('.',',')+' %',58,c,900)+txt(x,base+48,l,28,'#cfd6e6',900,1,'middle',2);});
+ s+=txt(465,base+96,'ANTEIL VOLLTREFFER · 5 JAHRE DANACH',26,'#8a93a3',900,1,'middle',3);
+ return s+'</g>';}
+// Persönlicher Chart
+function mine(t){VR=[0,100];const o=env(t,S[11],DUR+1,0.4,0.3);if(o<=0)return'';let s=`<g opacity="${o}">`;const u0=0,u1=90;
+ const rp=40;s+=line(path(pv,u0,u1,0,rp),'#e8e8e8',8,1,true);
+ const xh=X(40,u0,u1),yh=yOf(pv(40));
+ s+=`<line x1="${xh}" y1="${CY0}" x2="${xh}" y2="${CY1}" stroke="#5a6678" stroke-width="3" stroke-dasharray="6 8"/>`+txt(xh,CY1+34,'HEUTE',26,YEL,900,1,'middle',4);
+ // Zukunft
+ const fz=env(t,S[12]+0.6,PAY+0.1,0.3,0.1);if(fz>0)s+=txt((xh+CX1)/2,yOf(55),'?',200,'#2a3444',900,fz);
+ if(t>=S[12]&&t<PAY){const e=cl((t-S[12])/0.3);s+=`<path d="M${xh},${yh} L${CX1},${yh}" stroke="#5a6678" stroke-width="5" stroke-dasharray="12 12" opacity="${e}"/>`;
+  s+=stampT(t,S[12]+0.2,PAY,'ENDE?',RED,xh+230,yh-90,80,-8);}
+ if(t>=PAY){const k=cl((t-PAY)/1.4);const ue=40+(90-40)*eio(k);s+=line(path(v=>v<=50?pv(Math.min(v,40))+0*(v-40):fv(v),u0,u1,40,Math.max(40.1,ue)),GREEN,10,1,true);}
+ // Ben
+ let bx=xh,by=yh,pose=P.slump;
+ if(t>=PAY){const k=cl((t-PAY)/1.4);const ue=40+50*eio(k);bx=X(ue,u0,u1);by=yOf(ue<=50?pv(40):fv(ue));pose=k<1?P.cheer:(t>S[14]?P.cheer:P.stand);}
+ else if(t>=S[12]+1.5)pose=P.stand;
+ s+=benAt(bx,by-4,pose,0.36,WHITE);
+ s+=txt(bx,by-170,'DU',30,YEL,900,1,'middle',3);
+ return s+'</g>';}
+// Ticker
+function ticker(t){let txtv='',col=WHITE,o=1;
+ if(t<S[2]){txtv='▼ KNAPP VERPASST';col=RED;}
+ else if(t>=S[5]&&t<S[7]){txtv='▼ ABGELEHNT';col=RED;}
+ else if(t>=S[7]&&t<S[11]){txtv=t>S[10]+1.6?'▲ ÜBERHOLT':'▲ ERHOLT SICH';col=GREEN;}
+ else if(t>=S[11]&&t<PAY){txtv='▼ TIEFPUNKT';col=RED;}
+ else if(t>=PAY){txtv='▲ ANSTIEG';col=GREEN;}
+ else o=0.0;
+ if(!txtv)return'';const bl=(t<1.2||(t>=S[5]&&t<S[5]+0.8))?(0.6+0.4*Math.sin(t*30)):1;
+ return `<g opacity="${o}"><rect x="70" y="420" width="940" height="64" rx="14" fill="#0b0f16" stroke="#1f2a38" stroke-width="3"/>`+txt(96,465,'DEIN KURS',30,'#8a93a3',900,1,'start',4)+txt(990,466,txtv,38,col,900,bl,'end',1)+'</g>';}
+window.SFXC=()=>{const c=[[0,'boom'],[0.03,'whoosh'],[0.1,'buzz']];for(let k=0;k<8;k++)c.push([0.15+k*0.09,'tick']);
+ c.push([S[1],'whoosh'],[S[1]+0.6,'pop'],[S[2],'whoosh']);for(let k=0;k<16;k++)c.push([S[2]+0.1+k*0.09,'tick']);
+ c.push([S[3],'whoosh']);for(let k=0;k<8;k++)c.push([S[3]+0.1+k*0.14,'tick']);c.push([S[3]+1.2,'pop'],[S[3]+3.0,'pop'],[S[4],'whoosh']);
+ c.push([S[5],'boom'],[S[5]+0.05,'buzz'],[S[6],'whoosh']);for(let k=0;k<8;k++)c.push([S[6]+0.1+k*0.08,'tick']);c.push([S[6]+1.4,'whoosh'],[S[6]+1.6,'buzz']);
+ c.push([S[7],'whoosh']);for(let i=0;i<6;i++)c.push([S[8]+0.2+i*0.7,'pop']);for(let i=0;i<5;i++)c.push([S[8]+0.5+i*0.8,'tick']);
+ c.push([S[9],'whoosh']);for(let k=0;k<10;k++)c.push([S[9]+0.2+k*0.12,'tick']);c.push([S[9]+1.4,'ding']);
+ c.push([S[10],'whoosh'],[S[10]+1.6,'ding'],[S[11],'whoosh'],[S[12],'pop'],[S[12]+0.2,'buzz']);
+ c.push([PAY,'boom'],[PAY+0.05,'ding']);for(let k=0;k<10;k++)c.push([PAY+0.1+k*0.13,'tick']);c.push([S[14],'pop'],[S[15],'pop']);return c;};
+window.render=function(t){let s='';
+ const shake=Math.max(env(t,-0.1,0.7,0.001,0.6),env(t,PAY,PAY+0.6,0.001,0.5),env(t,S[5],S[5]+0.5,0.001,0.4));
+ const jx=Math.sin(t*91)*18*shake,jy=Math.cos(t*67)*14*shake;
+ const red=Math.max(env(t,-1,1.6,0.1,0.8),env(t,S[5],S[5]+1.2,0.05,0.8)*0.8);const green=env(t,PAY,PAY+2.2,0.05,1.2);
+ const z=1+0.18*(1-eio(t/1.1));
+ s+=bg(t,red,green)+`<g transform="translate(${jx+540*(1-z)},${jy+820*(1-z)}) scale(${z})">`+study(t)+crowd(t)+eight(t)+bars(t)+mine(t)+'</g>'+ticker(t);
+ if(H!=='A'&&H!=='C')s+=stampT(t,-0.05,1.6,'ABGELEHNT',RED,560,800,110,-12,1.22);
+ if(H==='C'){const o=env(t,-1,1.0,0.1,0.4),k=eio(t/1.0);s+=`<g opacity="${o}" transform="translate(540,${820-300*k}) scale(${2.2-1.4*k})">${txt(0,0,'▼ −38 %',120,RED,900)}</g>`;}
+ s+=`<rect x="0" y="222" width="1080" height="190" fill="#000" opacity=".5"/>`;
+ s+=LH(t,-1,S[1],300,'WANN BIST DU ZULETZT',80,WHITE)+LH(t,-1,S[1],378,'KNAPP GESCHEITERT?',62,RED);
+ s+=L(t,S[1],S[2],300,'SO KNAPP.',104,WHITE)+L(t,S[1]+0.6,S[2],378,'EIN PAAR PUNKTE ZU WENIG.',50,RED);
+ s+=L(t,S[2],S[3],300,'DIE STUDIE',100,WHITE)+L(t,S[2]+0.5,S[3],378,'10 JAHRE VERFOLGT',54,YEL);
+ s+=SRC(t,S[10],S[11],'Wang, Jones & Wang (2019), Nature Communications','Volltreffer = Top 5 % zitiert · Effekt bleibt ohne Aussteiger');
+ s+=SRC(t,S[2]+0.5,S[9],'Wang, Jones & Wang (2019), Nature Communications','NIH-Förderanträge 1990–2005 · 623 knapp verpasst, 561 knapp bekommen');
+ s+=L(t,S[3],S[4],300,'GLEICHE FÖRDERUNG.',80,WHITE)+L(t,S[3]+1.2,S[4],378,'KNAPP DRIN · KNAPP DRAUSSEN',46,GOLD);
+ s+=L(t,S[4],S[5],300,'VORHER GLEICH GUT.',80,WHITE)+L(t,S[4]+1.6,S[5],378,'WIE ZWILLINGE.',58,'#cfd6e6');
+ s+=L(t,S[5],S[6],300,'DANN:',110,WHITE)+stampT(t,S[5],S[6]+0.2,'ABGELEHNT',RED,560,760,104);
+ s+=L(t,S[6],S[7],300,'JEDER ACHTE:',100,WHITE)+L(t,S[6]+0.4,S[7],378,'WEG.',70,RED);
+ s+=L(t,S[7],S[8],300,'UND DIE, DIE BLIEBEN?',76,WHITE);
+ s+=L(t,S[8],S[9],300,'5 JAHRE SPÄTER:',88,WHITE)+L(t,S[8]+0.4,S[9],378,'MEHR VOLLTREFFER ★',54,GREEN);
+ s+=L(t,S[8]+2.4,S[9],548,'★ = TOP 5 % DER MEISTZITIERTEN ARBEITEN',30,'#cfd6e6',900,465,780);
+ s+=L(t,S[9],S[10],300,'16,1 % GEGEN 13,3 %',84,WHITE);
+ s+=L(t,S[10],S[11],300,'≈ EIN FÜNFTEL MEHR.',84,WHITE)+L(t,S[10]+1.6,S[11],378,'DIE GESCHEITERTEN ÜBERHOLEN.',48,GREEN);
+ s+=L(t,S[10]+0.3,S[11],548,'Effekt bleibt auch ohne die Aussteiger',28,'#8a93a3',700,465,780);
+ s+=L(t,S[11],S[12],300,'EINE ABSAGE, DIE DICH',76,WHITE)+L(t,S[11]+0.4,S[12],378,'NICHT RAUSWIRFT, MACHT DICH BESSER.',42,GREEN);
+ s+=L(t,S[12],PAY,300,'DEIN ABSTURZ IST',86,WHITE)+L(t,S[12]+0.4,PAY,378,'NICHT DAS ENDE VOM CHART.',50,RED);
+ if(t>=PAY){const o=env(t,PAY,S[14],0.001,0.25),sc=1.5-0.5*eb((t-PAY)/0.35);s+=`<g opacity="${o}" transform="translate(540,300) scale(${sc})">${txt(0,0,'TIEFPUNKT',112,GREEN,900,1,'middle',2)}</g>`+L(t,PAY+0.3,S[14],378,'VOR DEM ANSTIEG.',62,WHITE);}
+ s+=L(t,S[14],DUR+1,300,'BLEIB IM SPIEL.',104,GREEN)+L(t,S[14]+0.6,DUR+1,378,'DAS IST DIE EINZIGE REGEL.',50,WHITE);
+ if(t>S[15]-0.1){const o=env(t,S[15]-0.1,DUR+1,0.25,0.3),sc=0.85+0.15*eb((t-S[15]+0.1)/0.4);s+=pill(465,1490,'SCHREIB 48, WENN DU GERADE UNTEN BIST.',WHITE,'#000',28,o,sc);}
+ s+=txt(176,176,'48 SEKUNDEN',22,'#8a93a3',800,1,'middle',4);
+ document.getElementById('stage').innerHTML=s;
+ const fl=document.getElementById('flash');const w=env(t,-0.1,0.3,0.001,0.25),g=env(t,PAY,PAY+0.7,0.001,0.6),r=env(t,S[5],S[5]+0.5,0.001,0.4);
+ fl.style.background=g>0?GREEN:(r>0?RED:'#fff');fl.style.opacity=Math.max(0.14*w,0.38*g,0.3*r);
+};
+render(0);
+</script></body></html>
