@@ -51,3 +51,34 @@ Datenlage: Dashboard-Datensatz „performance“ noch leer (erste Nacht-Auswertu
 > 18.11. 17:47: Auf Lukas' Anweisung beide Zusatzvideos sofort NATIV über TikTok Studio (Chrome) hochgeladen, mit KI-Label, öffentlich, Kommentare an. „Motivation vs. Disziplin“ ist live. „9-mal gefallen“ war zunächst „Nur ich“, solange TikTok es prüft. Die vidIQ-Posts um 19:30 und 22:15 lassen sich nicht stoppen und werden zu Duplikaten; die Erinnerungen fragen Lukas, ob sie gelöscht werden sollen. Gelernt: Der TikTok-Upload über TikTok Studio in Chrome klappt (Dateien < 3,8 MB über file_upload). Das ist eine Alternative zu vidIQ und zu Lukas' Upload in der App.
 
 > 19.11. 01:15 – Sonderauftrag „hau mich vom Hocker“: **„Dein Leben in Wochen“** (59 s, ohne Stimme, ElevenLabs nicht verbunden). 4.160 Punkte = 80 Jahre. Die Rechnung läuft live: 19 J. weg (−988), Schlaf (−1.057), Arbeit (−582), Alltag (−397), Social Media 2,5 h/Tag (−330, DAK/UKE 2025) → 806 freie Wochen. Dann Zoom auf Ben („Woche 989“). Bei 0:48 kommt der Payoff: 1 h weniger Handy = +132 Wochen (grün), Musik-Stille + Boom. Schluss: „Schick das jemandem, der es sehen muss.“ Engine: engine/folgen/wochen/wochen.html. Wartet auf Lukas' Urteil; wenn es ihm gefällt, ersetzt es ein Video am 19.11.
+
+## Nachtrag 19.11. / Vorgaben ab 20.11.
+- 19.11.: „Dein Leben in Wochen“ + „150 € am Tag“ = Untergrenze im AUFBAU (nicht im Thema). Text-Vorlage/Safe Zone verbindlich. Ab 20.11. 5 Videos/Tag (07:30 · 12:30 · 16:30 · 18:30 · 21:00), voll automatisiert, Cloud-Weg über vidIQ, Mac darf aus sein; ElevenLabs ohne Sparmodus.
+- 19.11.: „Wochen“ YouTube xLF9dCHr8Jg + Instagram Df75pyuFebr (21:05), TikTok 22:00 · „150 € am Tag“ YouTube 0PJjzmbQpoU + Instagram Df8AueAiEiH (22:05), TikTok 23:00.
+- 20.11. 18:30: Probevideo „1 neue Nachricht – von dir, mit 80“ (Mechanik Chat/Push, Thema Reue/morgen) – für 7 Tage gesperrt.
+
+## Mechanik-Sperre (letzte 7 Tage)
+Raster (Wochen 19.11.) · Kassenbon (150 € 19.11.) · Chat/Push (20.11. 18:30) · Zwei-Figuren-Vergleich (18.11.) · Hürde/Underdog-Zähler (18.11.) · **Videospiel-HUD/Level (20.11. 07:30)** · **Gerichtsverhandlung/Urteil (20.11. 12:30)**
+
+## 20.11.2026 – Lauf 04:31 (Slots 07:30 + 12:30)
+Konzept-Auswahl (je 3, 0–100, Neuheit am Markt ×2):
+- 07:30: **Videospiel „Kein Game Over“ (Gewohnheit, Lally 2010) 86** · Ladebalken „Motivation lädt…“ 70 · Waage Talent vs. Übung 68.
+- 12:30: **Gerichtsverhandlung „Das Urteil“ (Spotlight-Effekt) 87** · Stadion, das sich leert 74 · Lebenslauf „Bewerbung für dein Leben“ 70.
+- Markt-Check (Websuche): „66 Tage“ und „Spotlight-Effekt“ gibt es als Themen-Artikel/Videos, aber nicht als Game-HUD- bzw. Gerichts-Mechanik mit Live-Rechnung → Neuheit liegt in der Mechanik.
+
+| Slot | Video | Thema | Visuelle Mechanik | Twist-Art | Hook (gewählt aus 3) | Länge | IDs / Weg |
+|---|---|---|---|---|---|---|---|
+| 07:30 | **Kein Game Over** | Gewohnheiten/Disziplin (kein Handy) | Videospiel: Level-Welt, Motivations-/Automatik-Balken, Tageszähler, Level-Karte, Wochen-Kalender, Achievement | Mythos-Entlarvung (21 Tage) → Umdeutung „1 Fehltag ≠ Game Over“ | A: „GAME OVER“ knallt in Frame 0 (rot, Wackeln, Ben liegt), Stimme 0,1 s „An welchem Tag gibst du normalerweise auf?“ – B (Ben rennt, Crash erst bei 1,0 s) zu spät, C (Zoom-out) in Frame 0 unleserlich | 60,3 s | YouTube w__HowlcmAQ (öffentlich 07:30) · TikTok vidIQ-Post c725c9cc (07:30) · IG per Erinnerung 07:30 + Absicherung 07:50 |
+| 12:30 | **Das Urteil** | Angst vor Meinung anderer / Selbstwert (kein Handy) | Gerichtssaal: 100 Geschworene starren, Zähler 100 → 50 % → 25 %, Gedankenblasen, Zoom-out „jeder auf seiner eigenen Anklagebank“, Richter = Ben, Freispruch-Stempel | Perspektivwechsel (die Jury ist mit sich selbst beschäftigt) + Urteil | B: Frame 0 = Bildschirm voller roter Gesichter, die dich anstarren + Hammerschlag, Zoom-out auf Ben auf der Anklagebank, Stimme 0,1 s „Wie viele Leute denken gerade an deinen peinlichsten Moment?“ – A (Totale) zu klein, C (Stempel) Weißblitz verwäscht Frame 0 | 60,6 s | YouTube U_2mVJzIGkQ (öffentlich 12:30) · TikTok vidIQ-Post df86096a (12:30) · IG per Erinnerung 12:30 + Absicherung 12:50 |
+
+Quellen im Bild: Lally et al. 2010 (EJSP, UCL; 96 Teilnehmende, Median 66 Tage bis 95 % Automatik, Spanne 18–254, ein verpasster Tag ohne wesentlichen Effekt) · Maltz 1960 · Gilovich, Medvec & Savitsky 2000 (geschätzt ≈ die Hälfte, bemerkt ≈ ein Viertel) · Savitsky, Epley & Gilovich 2001.
+
+Kommentare (ohne Chrome → Lukas bekommt sie zur Slot-Zeit):
+- 07:30 · TikTok „welcher tag ist bei dir der kritische? 👀“ · YouTube „Rechne kurz nach: Wenn du heute startest – auf welches Datum fällt dein Tag 66?“ · Instagram „Was ziehst du die nächsten 66 Tage durch? Ich les alles.“
+- 12:30 · TikTok „was hast du dich bis heute nicht getraut? 👀“ · YouTube „Schätz ehrlich: Hätten mehr oder weniger als jeder Vierte DEIN peinliches Shirt bemerkt?“ · Instagram „Erzähl mir: Wofür hast du dich zu lange geschämt, es anzufangen?“
+
+QC gegen Referenzen („Wochen“, „150 €“, Hook-Niveau „1 neue Nachricht“):
+- **Kein Game Over – besser weil:** Frame 0 ist schon das Ende einer Handlung (GAME OVER + Ben am Boden, rot, Wackeln) statt Text auf Schwarz; Frage an den Zuschauer bei 0,1 s; erstes Aha (Tag 3? 7? 21?) bei 2,6 s, Mythos-Stempel bei 9,7 s. Zwei Kipppunkte (21 = Mythos, Fehltag = kein Game Over) statt einem. Spiel-Optik gibt es im deutschen Motivations-Content kaum. Bildwechsel ≤ 3 s (Tageszähler läuft durchgehend). Payoff „Achievement freigeschaltet“ bei 48,5 s. Schwächer als „150 €“: keine persönliche Hochrechnung in Euro/Jahren – ausgeglichen durch „Dein Tag 66“ als konkrete Handlung.
+- **Das Urteil – besser weil:** Frame 0 = 100 Augenpaare auf dich + Hammerschlag (stärkster Kontrast der Serie), Zähler 100 → 50 % → 25 % als Live-Rechnung, echter Perspektiv-Twist (Zoom-out: jeder auf seiner eigenen Anklagebank) statt reiner Hochrechnung, Payoff „Freispruch“ bei 47,8 s mit Boom + Grün. Gerichts-Mechanik am Markt kaum vorhanden. Risiko: 8–17 s ruhiger (Experiment-Erklärung) – deshalb T-Shirt-Wechsel + Untertitel als Zwischenpayoff.
+- Safe Zone: je ≥ 14 Standbilder mit roten Sperrzonen geprüft; zwei Verstöße gefunden und korrigiert (Quellenzeile/Tageszahlen 07:30, Pill + Mild/Hart-Skala + „ANGEKLAGT“ im Hook-Zoom 12:30) → ok.
+- Ton: Tom Magic, eleven_v3, 1 Take/Satz, Starts aus gemessenen Dauern (fit.py), 07:30 atempo 1,08, 12:30 1,0; −14 LUFS; Musik Sidechain; SFX auf jedem Wechsel.

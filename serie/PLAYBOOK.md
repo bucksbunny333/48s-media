@@ -55,3 +55,14 @@ Videos: @dobeeofc „Der Typ aus der letzten Reihe“ (69 s, DE) · @abovethemat
 ## Vorgaben Lukas (18.11.)
 - Länge: Großteil 45–60 s, Kurzformat nur gelegentlich.
 - Eigener Kommentar unter jedem Video auf jeder Plattform. Ohne Kommentar gilt ein Slot nicht als fertig.
+
+## Safe Zone / Text-Vorlage (Lukas 19.11., gilt für JEDES Video)
+- Text nur in x 45–1031, y 120–1540. Gesperrt: oben x 308–760 / y 128–213, rechts unten x 885–1031 / y 955–1540.
+- Überschrift y≈300, Unterzeile y≈378; unter y 955 zentriert auf x≈465, max. 800 px breit; Marke (176,176).
+- QC: `bash engine/folgen/safe_check.sh final.mp4 out.png t1 t2 …` (rote Sperrzonen über ≥ 10 Standbilder) – Text im Rot = neu rendern.
+- Vorlage: engine/folgen/wochen/wochen.html (Safe-Zone-Fassung).
+
+## Gelernt 20.11.
+- Hook-Test mit 3 Varianten lohnt sich: In beiden Videos war die erste Idee in Frame 0 kaputt (Text zu groß skaliert/unsichtbar, Weißblitz verwäscht das Bild). Immer Standbild bei exakt 0,0 s ansehen. Technik: env() nie mit Einblendzeit 0 (NaN → Element verschwindet).
+- Spiel-HUD (Balken, Zähler, Achievement) und Gericht (Jury, Urteil) sind Mechaniken, die Zahlen „live“ machen, ohne nach Grafik auszusehen.
+- raw.githubusercontent.com/…/main/… liefert direkt nach dem Push 404 (Cache) → für vidiq_video_upload die Commit-SHA-URL nehmen.

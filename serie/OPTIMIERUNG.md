@@ -36,3 +36,5 @@ Status: OFFEN → UMGESETZT (Datum + Video) → GEMESSEN (Ergebnis)
 - 18.11. 17:05: M4 (Kurzformat E1) und M5 (breite Themen) erstmals umgesetzt: „Motivation vs. Disziplin“ 19:30 und „9-mal gefallen“ 22:15. M7 per Erinnerung an jedem Slot. Auswertung am 19.11. um 22:00.
 
 - 18.11. 17:25 – VORGABE LUKAS: Großteil der Videos 45–60 s. Kurzformat (M4/E1) nur noch „mal“ (max. 1–2/Woche, nie 2 Tage hintereinander). Die Elemente aus den Kurzformat-Tests (Zwei-Figuren-Vergleich, Underdog-Zähler, Hook-Text in Frame 0) kommen ins 45–60-s-Format. Eigene Kommentare (M7) sind Pflicht; ein Slot ist erst fertig, wenn sie sichtbar sind.
+
+- 20.11. 04:31-Lauf: M11 (offene Schleife) umgesetzt in beiden Videos (Tageszähler/„Bei Tag wie viel wird's automatisch?“; Zähler 100 → 25 % bis zum Urteil). M12 (Zwischen-Payoff ≤ 8 s) umgesetzt (Zähler, Stempel, Karte, Kalender, Gedankenblasen). Neue Hook-Regel (0,5 s) + 3-Varianten-Hooktest umgesetzt. Beide Videos ohne Handy-Bezug (M5).
