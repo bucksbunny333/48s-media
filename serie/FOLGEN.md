@@ -107,3 +107,5 @@ QC gegen Referenzen („Wochen“, „150 €“, Hook-Niveau „1 neue Nachrich
 > 20.11. 12:33: „Das Urteil“ live – YouTube U_2mVJzIGkQ · TikTok 7710214491069467936 · Instagram Df9jsN0gn3b (KI-Label). Kommentare an Lukas geschickt (kein Chrome). tmp/-Dateien beider Slots entfernt.
 
 > 20.11. 16:31: „Die Brücke“ live – YouTube SKLOmC_my14 · TikTok 7710276340787940641 · Instagram Df9-66tjTq- (KI-Label). Kommentare an Lukas geschickt (kein Chrome).
+
+> 20.11. 21:01: „Abgestürzt“ live – YouTube gSO5pvVsR30 · TikTok 7710346205741468960 · Instagram Df-dxdiD0MH (KI-Label). Kommentare an Lukas geschickt (kein Chrome). tmp/-Dateien des 10:31-Laufs entfernt.
