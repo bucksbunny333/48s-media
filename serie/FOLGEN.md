@@ -105,3 +105,5 @@ QC gegen Referenzen („Wochen“, „150 €“, Hook-Niveau „1 neue Nachrich
 - Safe Zone: je 16–17 Standbilder mit roten Sperrzonen geprüft; Verstöße gefunden und korrigiert (16:30 „MATERIAL“-Label links → „BRETTER“ eingerückt; 21:00 „ENTSCHEIDUNG“ + 12,6-%-Zeile rechts unten, Hook-Stempel in Frame 0 zu breit) → ok.
 - Ton: Tom Magic, eleven_v3, 1 Take/Satz, Starts aus gemessenen Dauern (fit.py), atempo 1,03 bzw. 1,05; −14 LUFS; Musik Sidechain; SFX auf jedem Wechsel. 21:00: Satz „Das haben die Forscher rausgerechnet“ (6 s) gestrichen, damit der Kipppunkt bei 48 s bleibt – Aussage steht als Quellenzeile im Bild.
 > 20.11. 12:33: „Das Urteil“ live – YouTube U_2mVJzIGkQ · TikTok 7710214491069467936 · Instagram Df9jsN0gn3b (KI-Label). Kommentare an Lukas geschickt (kein Chrome). tmp/-Dateien beider Slots entfernt.
+
+> 20.11. 16:31: „Die Brücke“ live – YouTube SKLOmC_my14 · TikTok 7710276340787940641 · Instagram Df9-66tjTq- (KI-Label). Kommentare an Lukas geschickt (kein Chrome).
