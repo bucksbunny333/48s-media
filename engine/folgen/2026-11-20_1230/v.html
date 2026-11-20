@@ -1,0 +1,126 @@
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#flash{position:absolute;inset:0;opacity:0}
+</style></head><body>
+<svg id="stage" viewBox="0 0 1080 1920"></svg><div id="flash"></div>
+<script src="rig.js"></script><script src="poses.js"></script><script src="kit.js"></script><script src="timing.js"></script>
+<script>
+// „Das Urteil“ – Spotlight-Effekt als Gerichtsverhandlung. Gilovich, Medvec & Savitsky 2000; Savitsky, Epley & Gilovich 2001.
+window.DUR=60.6; const PAY=S[13]; const H=(location.hash||'#B').slice(1);
+const YEL='#ffd60a', WOOD='#5a3b22', WOOD2='#3a2614', ORANGE='#ff9f43';
+// ---- Geschworene 10×10 ----
+const J=[];let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+for(let r=0;r<10;r++)for(let c=0;c<10;c++)J.push({x:236+c*68,y:572+r*36,r:rnd(),q:rnd()});
+const ord=J.map((j,i)=>i).sort((a,b)=>J[a].q-J[b].q); const rankOf=new Array(100);ord.forEach((i,k)=>rankOf[i]=k);
+const BENX=465, DOCKY=1330;
+// ---- Helfer ----
+function L(t,a,b,y,s,size,col,w=900,cx=540,maxw=940){const o=env(t,a,b,0.15,0.22);if(o<=0)return'';size=Math.min(size,Math.floor(maxw/(s.length*0.6)));const sc=0.9+0.1*eb((t-a)/0.32);return `<g opacity="${o}" transform="translate(${cx},${y}) scale(${sc})">${txt(0,0,s,size,col,w,1,'middle',1)}</g>`}
+function LOW(t,a,b,s,col,size=44){const o=env(t,a,b,0.15,0.22);if(o<=0)return'';size=Math.min(size,Math.floor(760/(s.length*0.6)));const w=Math.min(800,s.length*size*0.62+60);return `<g opacity="${o}" transform="translate(465,1480)"><rect x="${-w/2}" y="${-size*1.05}" width="${w}" height="${size*1.6}" rx="${size*0.5}" fill="#000" opacity="0.8"/>${txt(0,0,s,size,col,900,1,'middle',1)}</g>`}
+const SRC=(t,a,b,l1,l2)=>{const o=env(t,a,b,0.3,0.3);return o>0?txt(465,1532-(l2?28:0),l1,22,'#9a8f86',600,o)+(l2?txt(465,1532,l2,22,'#9a8f86',600,o):''):''};
+function gavel(x,y,ang,sc=1){return `<g transform="translate(${x},${y}) rotate(${ang}) scale(${sc})"><rect x="-14" y="-10" width="28" height="300" rx="12" fill="#8a5a33"/><rect x="-95" y="-70" width="190" height="90" rx="20" fill="#a86d3c" stroke="#5a3b22" stroke-width="8"/><rect x="-105" y="-62" width="22" height="74" rx="8" fill="#d9a066"/><rect x="83" y="-62" width="22" height="74" rx="8" fill="#d9a066"/></g>`}
+function stamp(t,t0,t1,word,col,y=820,size=150){const o=env(t,t0,t1,0.001,0.25);if(o<=0)return'';const q=cl((t-t0)/0.18);const w=word.length*size*0.66+80;return `<g opacity="${o}" transform="translate(540,${y}) rotate(-10) scale(${1.8-0.8*q})"><rect x="${-w/2}" y="${-size*0.85}" width="${w}" height="${size*1.15}" rx="20" fill="none" stroke="${col}" stroke-width="14"/>${txt(0,size*0.12,word,size,col,900,1,'middle',8)}</g>`}
+// Zustand je Geschworenem: 0 schaut dich an (rot), 1 schaut weg (grau), 2 eigener Prozess
+function jState(i,t){const k=rankOf[i];
+ if(t<S[5]) return 0;
+ if(t<S[6]) return k<50?0:1;
+ return k<25?0:1;}
+function juror(i,t,op){const j=J[i];const st=jState(i,t);
+ const wave=H==='C'?cl((t-0.5-j.r*0.4)/0.15):cl((t+0.05-(j.y-572)/330*0.4)/0.1);
+ const look=st===0;let col=look?'#ffb3b6':'#6b6b6b',hc=look?'#e5484d':'#3a3a3a';
+ if(t>=S[10]&&look){col='#ffd6a5';hc=ORANGE;}
+ if(t>=S[1]&&t<S[5]&&look){const p=0.5+0.5*Math.sin(t*5+j.r*6);hc=`rgba(229,72,77,${0.55+0.45*p})`;}
+ const ex=look?(BENX-j.x)/120:(j.r<0.5?-4:4), ey=look?3:(j.q<0.5?-2:1);
+ let s=`<g opacity="${op}"><path d="M${j.x-20},${j.y+28} Q${j.x},${j.y+6} ${j.x+20},${j.y+28}" fill="${hc}" opacity=".9"/><circle cx="${j.x}" cy="${j.y}" r="14" fill="#111" stroke="${hc}" stroke-width="4"/>`;
+ const eo2=wave;s+=`<ellipse cx="${j.x-5+cl(ex,-4,4)}" cy="${j.y-1+ey}" rx="3.4" ry="${3.6*eo2+0.3}" fill="${look?'#fff':col}"/><ellipse cx="${j.x+5+cl(ex,-4,4)}" cy="${j.y-1+ey}" rx="3.4" ry="${3.6*eo2+0.3}" fill="${look?'#fff':col}"/>`;
+ return s+'</g>';}
+function jury(t){const o=1-env(t,S[9]-0.2,S[11]+0.6,0.4,0.4);const gone=1-cl((t-PAY-0.1)/0.5);let s='';
+ if(o*gone>0.01){s+=`<rect x="190" y="538" width="700" height="396" rx="22" fill="${WOOD2}" opacity="${0.55*o*gone}"/>`;for(let i=0;i<100;i++)s+=juror(i,t,o*gone);}
+ // leere Sitze nach Freispruch
+ if(t>PAY){const e=cl((t-PAY-0.3)/0.6);for(let i=0;i<100;i++){const j=J[i];s+=`<rect x="${j.x-16}" y="${j.y-12}" width="32" height="30" rx="8" fill="none" stroke="#4a3a2c" stroke-width="3" opacity="${e}"/>`;}
+  const q=cl((t-S[14]-0.8)/0.4);if(q>0){const j=J[44];s+=`<rect x="${j.x-16}" y="${j.y-12}" width="32" height="30" rx="8" fill="${YEL}" opacity="${q}"/>`+txt(j.x,j.y-24,'DU',26,YEL,900,q);}}
+ return s;}
+const THOUGHTS=[[12,'MEINE HAARE…'],[37,'MEIN FEHLER…'],[63,'WIE WIRK ICH?'],[85,'HAB ICH WAS FALSCHES GESAGT?'],[28,'STARRT DER MICH AN?'],[71,'MEIN BAUCH…']];
+function thoughts(t){let s='';const a=S[8]+0.3,b=S[9]+0.2;THOUGHTS.forEach(([i,w],k)=>{let j=J[ord[25+((i*7)%75)]];const o=env(t,a+k*0.75,b,0.15,0.25);if(o<=0)return;const sz=26,wd=w.length*sz*0.62+36;let x=cl(j.x,60+wd/2,1020-wd/2);
+ s+=`<g opacity="${o}" transform="translate(${x},${j.y-34}) scale(${0.8+0.2*eb((t-a-k*0.75)/0.3)})"><rect x="${-wd/2}" y="-30" width="${wd}" height="44" rx="22" fill="#f2f2f2"/><path d="M-8,14 L0,26 L8,14Z" fill="#f2f2f2"/>${txt(0,0,w,sz,'#111',900)}</g>`;});return s;}
+// Twist: jeder auf seiner eigenen Anklagebank (Zoom-out-Raster)
+function docks(t){const o=env(t,S[9],S[11]+0.4,0.5,0.4);if(o<=0)return'';const z=1.6-0.6*eo((t-S[9])/1.2);let s=`<g opacity="${o}" transform="translate(540,760) scale(${z}) translate(-540,-760)">`;
+ for(let r=0;r<6;r++)for(let c=0;c<7;c++){const x=180+c*120,y=600+r*62,me=(r===3&&c===3);const ap=cl((t-S[9]-0.1-(r*7+c)*0.02)/0.2);if(ap<=0)continue;
+  s+=`<g opacity="${ap}"><path d="M${x-10},${y-40} L${x+10},${y-40} L${x+30},${y+14} L${x-30},${y+14}Z" fill="#fff6c8" opacity=".10"/><circle cx="${x}" cy="${y-14}" r="9" fill="#111" stroke="${me?YEL:'#d8c9b8'}" stroke-width="3"/><rect x="${x-26}" y="${y-2}" width="52" height="22" rx="4" fill="${me?'#7a5b1a':WOOD}" stroke="${me?YEL:'#2a1a0c'}" stroke-width="3"/></g>`;}
+ return s+'</g>';}
+function bench(t){const o=env(t,S[11],PAY+0.2,0.4,0.3);if(o<=0)return'';const y=600+40*(1-eo((t-S[11])/0.5));
+ return `<g opacity="${o}"><rect x="250" y="${y+150}" width="580" height="190" rx="14" fill="${WOOD}" stroke="#2a1a0c" stroke-width="6"/>${fig(P.stand,540,y+140,0.62,YEL,false)}<path d="M500,${y+40} L580,${y+40} L600,${y+150} L480,${y+150}Z" fill="#111"/>${txt(540,y+255,'RICHTER: DU',46,YEL,900,1,'middle',4)}</g>`;}
+function meter(t){const o=env(t,S[10]+0.4,S[11],0.3,0.3);if(o<=0)return'';const p=cl((t-S[10]-1.6)/1.2);const x=lerpM(780,500,eio(p));
+ return `<g opacity="${o}"><rect x="160" y="1000" width="680" height="22" rx="11" fill="url(#hm)"/><defs><linearGradient id="hm"><stop offset="0" stop-color="${GREEN}"/><stop offset="1" stop-color="${RED}"/></linearGradient></defs>${txt(160,985,'MILD',26,GREEN,900,1,'start',3)}${txt(840,985,'HART',26,RED,900,1,'end',3)}<g transform="translate(${x},1011)"><circle r="24" fill="#fff"/><path d="M-8,-30 L8,-30 L0,-44Z" fill="#fff"/></g>${txt(760,1070,'DEINE ANGST',22,'#ffb3b6',800,1-p*0.6)}${txt(x,1070,p>0.5?'WIRKLICH':'',22,WHITE,800,p)}</g>`;}
+const lerpM=(a,b,k)=>a+(b-a)*k;
+function room(t){let s=`<defs><radialGradient id="bg" cx=".5" cy=".45" r=".8"><stop offset="0" stop-color="#2a1b12"/><stop offset="1" stop-color="#070504"/></radialGradient><radialGradient id="sp" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff3c0" stop-opacity=".55"/><stop offset="1" stop-color="#fff3c0" stop-opacity="0"/></radialGradient></defs><rect width="1080" height="1920" fill="url(#bg)"/>`;
+ for(let i=0;i<9;i++)s+=`<rect x="${i*120+10}" y="440" width="100" height="1000" fill="#000" opacity=".12"/>`;
+ s+=`<rect x="0" y="1440" width="1080" height="480" fill="#0c0806"/>`;
+ return s;}
+function dock(t){// Ben auf der Anklagebank
+ let s='';const free=t>PAY+0.6;const walk=cl((t-S[15])/3);const bx=BENX+walk*360;
+ const sp=t<PAY?1:1-cl((t-PAY)/0.8)*0.5;
+ s+=`<ellipse cx="${bx}" cy="${DOCKY+40}" rx="230" ry="300" fill="url(#sp)" opacity="${sp}"/>`;
+ let pose=P.stand;if(t<PAY&&t>S[1]){pose=FIG.mix(P.stand,P.slump,0.0);pose=Object.assign({},P.stand,{headTilt:-14,lua:-4,rua:4});}
+ if(free)pose=walk>0?(Math.floor(t*4)%2?P.walkA:P.walkB):P.cheer;
+ const by=free?DOCKY+40:DOCKY-14;
+ s+=fig(pose,bx,by,1.0,YEL,true);
+ // T-Shirt
+ const sh=env(t,S[3]+1.2,S[8],0.3,0.4);if(sh>0){s+=`<g opacity="${sh}" transform="translate(${bx},${by-112}) scale(1.15)"><path d="M-36,-38 L-14,-50 Q0,-40 14,-50 L36,-38 L46,-12 L28,-6 L26,48 L-26,48 L-28,-6 L-46,-12Z" fill="#ff5fd2" stroke="#fff" stroke-width="3"/><path d="M0,4 C-10,-8 -24,2 0,22 C24,2 10,-8 0,4Z" fill="#ffe14d"/></g>`;}
+ const box=1-cl((t-PAY-0.2)/0.4);
+ if(box>0)s+=`<g opacity="${box}"><rect x="${BENX-170}" y="${DOCKY-30}" width="340" height="190" rx="10" fill="${WOOD}" stroke="#2a1a0c" stroke-width="6"/><rect x="${BENX-170}" y="${DOCKY-40}" width="340" height="22" rx="8" fill="#7a5233"/>${txt(BENX,DOCKY+90,'ANGEKLAGT',30,'#e8c9a0',900,cl((t-0.75)/0.25),'middle',6)}</g>`;
+ return s;}
+window.SFXC=()=>{const c=[];
+ if(H==='C')c.push([0,'boom'],[0.02,'buzz'],[0.5,'whoosh']);else c.push([0,'boom'],[0.05,'whoosh']);
+ for(let k=0;k<10;k++)c.push([0.2+k*0.05,'tick']);
+ c.push([S[1],'pop'],[S[2],'whoosh'],[S[3],'whoosh'],[S[3]+1.2,'pop'],[S[4],'pop']);
+ c.push([S[5],'buzz']);for(let k=0;k<8;k++)c.push([S[5]+0.1+k*0.05,'tick']);
+ c.push([S[6],'ding']);for(let k=0;k<8;k++)c.push([S[6]+0.1+k*0.05,'tick']);
+ c.push([S[7],'whoosh']);for(let k=0;k<6;k++)c.push([S[8]+0.3+k*0.75,'pop']);
+ c.push([S[9],'whoosh'],[S[9]+0.05,'boom'],[S[10],'pop'],[S[10]+1.6,'whoosh'],[S[11],'boom'],[S[12],'whoosh']);
+ for(let k=0;k<14;k++)c.push([S[12]+0.2+k*0.1,'tick']);
+ c.push([PAY,'boom'],[PAY+0.05,'ding'],[S[14],'whoosh'],[S[14]+0.8,'pop'],[S[15],'pop'],[S[16],'pop']);return c;};
+window.render=function(t){let s='';
+ const shake=Math.max(env(t,-0.1,0.45,0.001,0.4),env(t,PAY,PAY+0.6,0.001,0.5),env(t,S[11],S[11]+0.4,0.001,0.3));
+ const jx=Math.sin(t*91)*18*shake,jy=Math.cos(t*67)*14*shake;
+ const zB=H==='B'?1+1.2*(1-eio(t/1.0)):1;
+ s+=`<g transform="translate(${jx+540*(1-zB)},${jy+760*(1-zB)}) scale(${zB})">`+room(t)+jury(t)+docks(t)+bench(t)+thoughts(t)+dock(t)+meter(t)+'</g>';
+ s+=`<rect x="0" y="222" width="1080" height="190" fill="#000" opacity="${0.6*env(t,-1,S[1]+0.3,0.1,0.3)}"/>`;
+ // Hammer
+ const gA=0;
+ if(t<gA+0.9&&t>=gA-0.3){const k=cl((t-gA+0.3)/0.3);const ang=t<gA?-70+70*eo(k):0;const o=1-cl((t-gA-0.5)/0.4);s+=`<g opacity="${o}">${gavel(880,1080,ang-35,1.1)}<rect x="720" y="1165" width="240" height="40" rx="10" fill="#7a5233"/></g>`;if(t>=gA)s+=`<circle cx="790" cy="1170" r="${40+500*cl((t-gA)/0.5)}" fill="none" stroke="#fff" stroke-width="${10*(1-cl((t-gA)/0.5))}" opacity="${1-cl((t-gA)/0.5)}"/>`;}
+ if(t>=S[12]+0.3&&t<PAY+0.8){const k=cl((t-PAY+0.12)/0.12);const lift=t<PAY-0.12?-60*eo((t-S[12]-0.3)/1.0):-60+60*k;const o=1-cl((t-PAY-0.4)/0.4);s+=`<g opacity="${o}">${gavel(880,1080,lift-35,1.1)}<rect x="720" y="1165" width="240" height="40" rx="10" fill="#7a5233"/></g>`;}
+ if(H==='C')s+=stamp(t,0,0.9,'SCHULDIG?',RED,820,130);
+ // Zähler
+ const cnt=env(t,0.9,S[9],0.2,0.3);if(cnt>0){let n=100,col=RED,lab='SCHAUEN DICH AN';if(t>=S[5]){n=Math.round(100-50*eo((t-S[5])/0.5));lab='GESCHÄTZT';col=RED;}if(t>=S[6]){n=Math.round(50-25*eo((t-S[6])/0.5));lab='HABEN ES WIRKLICH BEMERKT';col=ORANGE;}if(t>=S[7]){n=75;lab='WAREN MIT SICH SELBST BESCHÄFTIGT';col='#bdbdbd';}
+  s+=`<g opacity="${cnt}">${txt(540,1000,(t>=S[5]?'≈ ':'')+n+(t>=S[5]?' %':' VON 100'),62,col,900,1,'middle',2)}${txt(540,1036,lab,26,'#d8c9b8',800,1,'middle',3)}</g>`;}
+ // Texte
+ s+=L(t,-1,S[1],300,'WIE VIELE DENKEN GERADE',72,WHITE)+L(t,-1,S[1],378,'AN DEINEN PEINLICHSTEN MOMENT?',46,'#ffb3b6',900);
+ s+=L(t,S[1],S[2],300,'DU: ANGEKLAGT.',96,WHITE)+L(t,S[1]+1.6,S[2],378,'UND ALLE SCHAUEN ZU.',52,'#ffb3b6',900);
+ s+=L(t,S[2],S[3],300,'SO FÜHLT SICH',84,WHITE)+L(t,S[2],S[3],378,'JEDER NEUANFANG AN.',56,'#ffb3b6',900);
+ s+=LOW(t,S[2]+1.2,S[3],'1. MAL GYM · NEUER JOB · 1. VIDEO',WHITE,38);
+ s+=L(t,S[3],S[5],300,'DAS EXPERIMENT',90,WHITE)+L(t,S[3]+0.6,S[4],378,'CORNELL-UNI: PEINLICHES T-SHIRT AN',42,'#ffb3b6',900);
+ s+=L(t,S[4],S[5],378,'WIE VIELE HABEN ES BEMERKT?',46,YEL,900);
+ s+=SRC(t,S[3]+0.6,S[9],'Gilovich, Medvec & Savitsky (2000), J. Pers. Soc. Psychol.','Schätzung ≈ die Hälfte · bemerkt ≈ ein Viertel');
+ s+=L(t,S[5],S[6],300,'SCHÄTZUNG:',84,WHITE)+L(t,S[5]+0.4,S[6],378,'DIE HÄLFTE.',60,RED,900);
+ s+=L(t,S[6],S[7],300,'IN WAHRHEIT:',84,WHITE)+L(t,S[6]+0.5,S[7],378,'UNGEFÄHR JEDER VIERTE.',56,ORANGE,900);
+ s+=L(t,S[7],S[8],300,'UND DER REST?',96,WHITE);
+ s+=L(t,S[8],S[9],300,'MIT SICH SELBST',84,WHITE)+L(t,S[8],S[9],378,'BESCHÄFTIGT.',60,'#bdbdbd',900);
+ s+=L(t,S[9],S[10],300,'JEDER SITZT AUF',80,WHITE)+L(t,S[9],S[10],378,'SEINER EIGENEN ANKLAGEBANK.',48,YEL,900);
+ s+=LOW(t,S[9]+2.2,S[10],'AUCH DIE, VOR DENEN DU ANGST HAST.',WHITE,38);
+ s+=L(t,S[10],S[11],300,'UND WER ES MERKT,',80,WHITE)+L(t,S[10]+0.6,S[11],378,'URTEILT MILDER ALS GEDACHT.',50,GREEN,900);
+ s+=SRC(t,S[10]+0.6,S[11],'Savitsky, Epley & Gilovich (2001), J. Pers. Soc. Psychol.');
+ s+=L(t,S[11],S[12],300,'DER STRENGSTE RICHTER?',72,WHITE)+L(t,S[11]+1.6,S[12],378,'BIST DU SELBST.',60,YEL,900);
+ s+=L(t,S[12],PAY,300,'DAS URTEIL:',110,WHITE);
+ s+=stamp(t,PAY,S[14]+0.3,'FREISPRUCH',GREEN,780,120);
+ s+=L(t,S[14],S[15],300,'DIE JURY IN DEINEM KOPF',66,WHITE)+L(t,S[14]+0.3,S[15],378,'IST LEER.',70,GREEN,900);
+ s+=L(t,S[15],DUR+1,300,'FANG HEUTE AN,',90,WHITE)+L(t,S[15]+0.5,DUR+1,378,'WOFÜR DU DICH GESCHÄMT HAST.',46,YEL,900);
+ if(t>S[16]-0.1){const o=env(t,S[16]-0.1,DUR+1,0.25,0.3),sc=0.85+0.15*eb((t-S[16]+0.1)/0.4);s+=pill(465,1490,'SCHICK DAS JEMANDEM, DER ZU VIEL NACHDENKT.',WHITE,'#000',26,o,sc);}
+ s+=txt(176,176,'48 SEKUNDEN',22,'#9a8f86',800,1,'middle',4);
+ document.getElementById('stage').innerHTML=s;
+ const fl=document.getElementById('flash');const w=env(t,-0.1,0.3,0.001,0.25),g=env(t,PAY,PAY+0.7,0.001,0.6);
+ fl.style.background=g>0?GREEN:'#fff';fl.style.opacity=Math.max(0.16*w,0.38*g);
+};
+render(0);
+</script></body></html>
