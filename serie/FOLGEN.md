@@ -82,3 +82,5 @@ QC gegen Referenzen („Wochen“, „150 €“, Hook-Niveau „1 neue Nachrich
 - **Das Urteil – besser weil:** Frame 0 = 100 Augenpaare auf dich + Hammerschlag (stärkster Kontrast der Serie), Zähler 100 → 50 % → 25 % als Live-Rechnung, echter Perspektiv-Twist (Zoom-out: jeder auf seiner eigenen Anklagebank) statt reiner Hochrechnung, Payoff „Freispruch“ bei 47,8 s mit Boom + Grün. Gerichts-Mechanik am Markt kaum vorhanden. Risiko: 8–17 s ruhiger (Experiment-Erklärung) – deshalb T-Shirt-Wechsel + Untertitel als Zwischenpayoff.
 - Safe Zone: je ≥ 14 Standbilder mit roten Sperrzonen geprüft; zwei Verstöße gefunden und korrigiert (Quellenzeile/Tageszahlen 07:30, Pill + Mild/Hart-Skala + „ANGEKLAGT“ im Hook-Zoom 12:30) → ok.
 - Ton: Tom Magic, eleven_v3, 1 Take/Satz, Starts aus gemessenen Dauern (fit.py), 07:30 atempo 1,08, 12:30 1,0; −14 LUFS; Musik Sidechain; SFX auf jedem Wechsel.
+
+> 20.11. 07:31: „Kein Game Over“ live – YouTube w__HowlcmAQ · TikTok 7710137155439349025 · Instagram Df9BPgvlKAZ (KI-Label, gepostet 07:32). Kommentare an Lukas geschickt (kein Chrome).
