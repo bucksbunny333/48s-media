@@ -133,3 +133,5 @@ QC gegen Referenzen („Wochen“, „150 €“, Hook-Niveau „1 neue Nachrich
 - **Akku leer – besser weil:** Frame 0 = Absturz in Bewegung statt Raster/Text; Konsequenz mit Zahl bei 5–10 s („2 Wochen × 6 Stunden“), Studie erst bei 28 s; zwei Kipppunkte (= 1 Nacht wach, dann „du merkst es nicht“ als Gefühlt-vs-Echt-Linie im selben Objekt); Entlastung statt Vorwurf („nicht faul – leer“) → hohe Teilbarkeit; Payoff Stecker + Grün bei 47,5 s. Risiko: 26–28 s ruhiger („Jetzt das Gemeine“) – durch Abdunklung + Flackern als Spannungspause gesetzt.
 - Safe Zone: je 20+ Standbilder mit roten Sperrzonen geprüft; Verstöße korrigiert (07:30 „DAS ZÖGERN WAR'S“ zu breit, „DU“-Label über Zähler; 12:30 „ECHT/GEFÜHLT“-Labels rechts unten im Button-Bereich → links, zwei Überschriften zu breit, Kabel über Unterzeile) → ok.
 - Ton: Tom Magic, eleven_v3, 1 Take/Satz (30 Sätze, ~4.000 Credits), Starts aus gemessenen Dauern (fit.py), atempo 1,04 bzw. 1,0; −14 LUFS; Musik Sidechain; SFX auf jedem Wechsel.
+
+> 21.11. 07:34: „Kopf oder Zahl“ live – YouTube NKebfMV8HHc · TikTok 7710508195348761888 · Instagram Df_mIpaHCEa (KI-Label). Kommentare an Lukas geschickt (kein Chrome).
