@@ -58,7 +58,7 @@ Datenlage: Dashboard-Datensatz „performance“ noch leer (erste Nacht-Auswertu
 - 20.11. 18:30: Probevideo „1 neue Nachricht – von dir, mit 80“ (Mechanik Chat/Push, Thema Reue/morgen) – für 7 Tage gesperrt.
 
 ## Mechanik-Sperre (letzte 7 Tage)
-Raster (Wochen 19.11.) · Kassenbon (150 € 19.11.) · Chat/Push (20.11. 18:30) · Zwei-Figuren-Vergleich (18.11.) · Hürde/Underdog-Zähler (18.11.) · **Videospiel-HUD/Level (20.11. 07:30)** · **Gerichtsverhandlung/Urteil (20.11. 12:30)**
+Münze/Weggabel (21.11. 07:30) · Akku (21.11. 12:30) · Mini-Welt-Brücke (20.11.) · Börsenchart (20.11.) · Raster (Wochen 19.11.) · Kassenbon (150 € 19.11.) · Chat/Push (20.11. 18:30) · Zwei-Figuren-Vergleich (18.11.) · Hürde/Underdog-Zähler (18.11.) · **Videospiel-HUD/Level (20.11. 07:30)** · **Gerichtsverhandlung/Urteil (20.11. 12:30)**
 
 ## 20.11.2026 – Lauf 04:31 (Slots 07:30 + 12:30)
 Konzept-Auswahl (je 3, 0–100, Neuheit am Markt ×2):
