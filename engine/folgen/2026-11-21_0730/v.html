@@ -1,0 +1,152 @@
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#flash{position:absolute;inset:0;opacity:0}
+</style></head><body>
+<svg id="stage" viewBox="0 0 1080 1920"></svg><div id="flash"></div>
+<script src="rig.js"></script><script src="poses.js"></script><script src="kit.js"></script><script src="timing.js"></script>
+<script>
+// „Kopf oder Zahl“ – Levitt (2021), Review of Economic Studies 88(1): 22.511 Münzwürfe bei Lebensentscheidungen.
+window.DUR=61.0; const PAY=S[12]; const H=(location.hash||'#A').slice(1);
+const YEL='#ffd60a', GOLD='#f5c451', GOLD2='#b8862b', SIL='#9aa3b2', SIL2='#5d6573';
+const CX=540, CY=760, R=220, BX=465, BY=1410, LX=175, LY=990, RX=770, RY=990;
+function L(t,a,b,y,s,size,col,w=900,cx=540,maxw=940){const o=env(t,a,b,0.15,0.22);if(o<=0)return'';size=Math.min(size,Math.floor(maxw/(s.length*0.6)));const sc=0.9+0.1*eb((t-a)/0.32);return `<g opacity="${o}" transform="translate(${cx},${y}) scale(${sc})">${txt(0,0,s,size,col,w,1,'middle',1)}</g>`}
+function LH(t,a,b,y,s,size,col){const o=env(t,a,b,0.001,0.22);if(o<=0)return'';size=Math.min(size,Math.floor(940/(s.length*0.6)));return `<g opacity="${o}" transform="translate(540,${y})">${txt(0,0,s,size,col,900,1,'middle',1)}</g>`}
+const SRC=(t,a,b,l1,l2)=>{const o=env(t,a,b,0.3,0.3);return o>0?txt(465,1532-(l2?28:0),l1,22,'#8a93a3',600,o)+(l2?txt(465,1532,l2,22,'#8a93a3',600,o):''):''};
+function tag(x,y,s,bg,fg,size=30,o=1,sc=1){const w=s.length*size*0.62+44;return `<g opacity="${o}" transform="translate(${x},${y}) scale(${sc})"><rect x="${-w/2}" y="${-size*0.95}" width="${w}" height="${size*1.5}" rx="${size*0.4}" fill="${bg}"/>${txt(0,size*0.2,s,size,fg,900)}</g>`}
+function stampT(t,t0,t1,word,col,x,y,size=96,rot=-12,s0=1.8){const o=env(t,t0,t1,0.001,0.25);if(o<=0)return'';const q=cl((t-t0)/0.18);const w=word.length*size*0.66+60;return `<g opacity="${o}" transform="translate(${x},${y}) rotate(${rot}) scale(${s0-(s0-1)*q})"><rect x="${-w/2}" y="${-size*0.85}" width="${w}" height="${size*1.15}" rx="16" fill="none" stroke="${col}" stroke-width="12"/>${txt(0,size*0.12,word,size,col,900,1,'middle',2)}</g>`}
+function benAt(x,y,pose,sc,col,rot=0,op=1,flip=true){const lg=(88+86)*sc;return `<g transform="rotate(${rot} ${x} ${y-lg})" opacity="${op}">${fig(pose,x,y-lg,sc,col,flip)}</g>`}
+// ---- Münze ----
+// ang: Drehung um die Hochachse (rad). face: {h:[gross,klein], t:[gross,klein]} oder Funktion
+function face(kind,R,col){
+ if(kind==='smile') return `<path d="M${-R*0.45},${R*0.12} Q0,${R*0.62} ${R*0.45},${R*0.12}" stroke="${col}" stroke-width="${R*0.1}" fill="none" stroke-linecap="round"/><circle cx="${-R*0.3}" cy="${-R*0.22}" r="${R*0.09}" fill="${col}"/><circle cx="${R*0.3}" cy="${-R*0.22}" r="${R*0.09}" fill="${col}"/>`;
+ if(kind==='flat') return `<line x1="${-R*0.38}" y1="${R*0.28}" x2="${R*0.38}" y2="${R*0.28}" stroke="${col}" stroke-width="${R*0.1}" stroke-linecap="round"/><circle cx="${-R*0.3}" cy="${-R*0.22}" r="${R*0.09}" fill="${col}"/><circle cx="${R*0.3}" cy="${-R*0.22}" r="${R*0.09}" fill="${col}"/>`;
+ if(kind==='?') return txt(0,R*0.36,'?',R*1.05,col,900);
+ if(kind==='check') return `<path d="M${-R*0.42},${R*0.02} L${-R*0.1},${R*0.34} L${R*0.46},${-R*0.3}" stroke="${col}" stroke-width="${R*0.14}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+ if(Array.isArray(kind)) return txt(0,kind[1]?R*0.08:R*0.2,kind[0],Math.min(R*0.42,R*1.45/(kind[0].length*0.64)),col,900,1,'middle',2)+(kind[1]?txt(0,R*0.46,kind[1],R*0.2,col,900,1,'middle',4):'');
+ return '';}
+function coin(x,y,R,ang,hf,tf,op=1,glow=0){const c=Math.cos(ang),ac=Math.max(0.04,Math.abs(c));const heads=c>=0;
+ const m=heads?GOLD:SIL, d=heads?GOLD2:SIL2, ink=heads?'#4a3208':'#22262e';
+ const th=R*0.09*Math.sqrt(1-ac*ac)+R*0.02; const sx=Math.sign(Math.sin(ang))||1;
+ let s=`<g opacity="${op}">`;
+ if(glow>0)s+=`<circle cx="${x}" cy="${y}" r="${R*1.5}" fill="url(#cg)" opacity="${glow}"/>`;
+ s+=`<ellipse cx="${x+sx*th}" cy="${y}" rx="${R*ac}" ry="${R}" fill="${d}"/>`;
+ s+=`<rect x="${Math.min(x,x+sx*th)}" y="${y-R}" width="${Math.abs(th)}" height="${2*R}" fill="${d}"/>`;
+ s+=`<ellipse cx="${x}" cy="${y}" rx="${R*ac}" ry="${R}" fill="${m}"/>`;
+ s+=`<ellipse cx="${x}" cy="${y}" rx="${R*0.86*ac}" ry="${R*0.86}" fill="none" stroke="${d}" stroke-width="${R*0.05}"/>`;
+ s+=`<ellipse cx="${x-R*0.3*ac}" cy="${y-R*0.35}" rx="${R*0.22*ac}" ry="${R*0.12}" fill="#fff" opacity=".25"/>`;
+ if(ac>0.18)s+=`<g transform="translate(${x},${y}) scale(${c>=0?ac:-ac*-1},1)">${face(heads?hf:tf,R,ink)}</g>`;
+ return s+'</g>';}
+// ---- Weg-Gabel ----
+const qp=(a,b,c,k)=>[(1-k)*(1-k)*a[0]+2*(1-k)*k*b[0]+k*k*c[0],(1-k)*(1-k)*a[1]+2*(1-k)*k*b[1]+k*k*c[1]];
+const PL=[[BX,BY],[BX-40,1190],[LX,LY]], PR=[[BX,BY],[BX+60,1190],[RX,RY]];
+function paths(t,o,rcol,rglow,lcol='#2b303a'){if(o<=0)return'';const d=p=>`M${p[0][0]},${p[0][1]} Q${p[1][0]},${p[1][1]} ${p[2][0]},${p[2][1]}`;
+ return `<g opacity="${o}"><path d="${d(PL)}" stroke="${lcol}" stroke-width="58" fill="none" stroke-linecap="round"/>`+
+ (rglow>0?`<path d="${d(PR)}" stroke="${rcol}" stroke-width="120" fill="none" stroke-linecap="round" opacity="${0.18*rglow}"/>`:'')+
+ `<path d="${d(PR)}" stroke="${rcol}" stroke-width="58" fill="none" stroke-linecap="round"/>`+
+ `<path d="${d(PL)}" stroke="#000" stroke-width="4" stroke-dasharray="18 22" fill="none" opacity=".5"/><path d="${d(PR)}" stroke="#000" stroke-width="4" stroke-dasharray="18 22" fill="none" opacity=".35"/></g>`;}
+function bg(t,red,green,split){let s=`<defs><radialGradient id="cg"><stop offset="0" stop-color="${GOLD}" stop-opacity=".55"/><stop offset="1" stop-color="${GOLD}" stop-opacity="0"/></radialGradient><radialGradient id="rv" cx=".5" cy=".5" r=".75"><stop offset=".45" stop-color="#ff2d3a" stop-opacity="0"/><stop offset="1" stop-color="#ff2d3a" stop-opacity=".55"/></radialGradient><radialGradient id="gv" cx=".5" cy=".5" r=".75"><stop offset=".45" stop-color="#30d158" stop-opacity="0"/><stop offset="1" stop-color="#30d158" stop-opacity=".5"/></radialGradient><radialGradient id="sp" cx=".5" cy=".42" r=".6"><stop offset="0" stop-color="#1d2433"/><stop offset="1" stop-color="#05070c"/></radialGradient></defs><rect width="1080" height="1920" fill="url(#sp)"/>`;
+ if(split>0)s+=`<rect x="0" y="0" width="540" height="1920" fill="#3a4150" opacity="${0.5*split}"/><rect x="540" y="0" width="540" height="1920" fill="${GOLD2}" opacity="${0.5*split}"/>`;
+ // Sterne/Staub
+ for(let i=0;i<40;i++){const x=(i*263)%1080,y=(i*397)%1300+120;s+=`<circle cx="${x}" cy="${y}" r="${1.5+(i%3)}" fill="#fff" opacity="${0.08+0.08*Math.sin(t*2+i)}"/>`;}
+ if(red>0)s+=`<rect width="1080" height="1920" fill="url(#rv)" opacity="${red}"/>`;
+ if(green>0)s+=`<rect width="1080" height="1920" fill="url(#gv)" opacity="${green}"/>`;
+ return s;}
+const HF=['KOPF','ÄNDERN'], TF=['ZAHL','BLEIBEN'];
+// Hauptmünze: Position, Größe, Winkel je Phase
+function mainCoin(t){let x=CX,y=CY,r=R,ang=t*14,hf=HF,tf=TF,op=1,glow=0,ex='';
+ if(t<S[1]){ if(H==='A'){const k=eio(t/0.95);r=R*(2.5-1.5*k);y=CY+120*(1-k);} else if(H==='B'){const k=cl(t/0.5);y=-300+(CY+300)*k*k;if(t>0.5){y=CY-60*Math.abs(Math.sin((t-0.5)*7))*Math.exp(-(t-0.5)*4);}} ang=t*(18-8*cl(t/5));}
+ else if(t<S[2]){const k=eio((t-S[1])/0.6);r=R*(1-0.45*k);y=CY-40*k;ang=t*10;}
+ else if(t<S[3]){const i=Math.min(2,Math.floor((t-S[2])/1.55));r=R*0.8;y=CY;const f=cl((t-S[2]-i*1.55)/0.5);ang=Math.PI*(2*i+2*eio(f))+(t>S[2]+4.4?0:0);hf=[['JOB','KÜNDIGEN?'],['SCHLUSS','MACHEN?'],['WEG-','ZIEHEN?']][i];tf=hf;}
+ else if(t<S[4]){const k=eio((t-S[3])/0.9);ang=Math.PI*8*(1-k);r=R*(0.8+0.15*k);glow=k;hf=HF;}
+ else if(t<S[5]){r=R*0.62;y=CY+30*Math.sin(t*2);ang=0.35*Math.sin(t*2.2);hf='?';glow=0;}
+ else if(t<S[6]){const k=cl((t-S[5])/(S[6]-S[5]));r=R*0.62;ang=t*16;hf='?';tf='?';op=1-cl((t-S[6]+0.4)/0.3);}
+ else if(t<S[9]) return '';
+ else if(t<S[10]){r=R*0.7;ang=0.5+0.2*Math.sin(t*30)*(t<S[9]+2.5?1:0.3);hf=HF;y=CY+10*Math.sin(t*25);}
+ else if(t<S[11]){const k=eio((t-S[10])/1.2);r=R*0.85;ang=Math.PI*6*(1-k);glow=k*0.9;hf=HF;}
+ else if(t<PAY){// Münze bricht
+  r=R*0.85;const c1=cl((t-S[11]-0.25)/0.2),c2=cl((t-S[11]-0.9)/(PAY-S[11]-0.9));
+  if(c2<=0){let s=coin(x,y,r,0,HF,TF,1,0);if(c1>0)s+=`<path d="M${x-20},${y-r} L${x+30},${y-80} L${x-25},${y+10} L${x+20},${y+90} L${x-10},${y+r}" stroke="#05070c" stroke-width="12" fill="none" opacity="${c1}"/>`;return s;}
+  const dy=900*c2*c2;return `<g opacity="${1-c2}"><g transform="translate(${-120*c2},${dy}) rotate(${-40*c2} ${x} ${y})"><clipPath id="lh"><rect x="0" y="0" width="${x}" height="1920"/></clipPath><g clip-path="url(#lh)">${coin(x,y,r,0,HF,TF)}</g></g><g transform="translate(${120*c2},${dy*0.9}) rotate(${40*c2} ${x} ${y})"><clipPath id="rh"><rect x="${x}" y="0" width="1080" height="1920"/></clipPath><g clip-path="url(#rh)">${coin(x,y,r,0,HF,TF)}</g></g></g>`;}
+ else return '';
+ return coin(x,y,r,ang,hf,tf,op,glow)+ex;}
+// 22.511 Mini-Münzen
+function swarm(t){const o=env(t,S[1]+0.3,S[2]+0.3,0.3,0.3);if(o<=0)return'';let s=`<g opacity="${o}">`;
+ for(let i=0;i<42;i++){const c=i%7,r=Math.floor(i/7);const x=120+c*140+(r%2)*30,y=520+r*95;const a=cl((t-S[1]-0.3-i*0.04)/0.25);if(a<=0)continue;
+  if(Math.hypot(x-CX,y-(CY-40))<R*0.6)continue; s+=coin(x,y,34*eb(a),t*(6+i%5)+i,'',['',''],0.75);}
+ return s+'</g>';}
+function counter(t){// rattert in Frame 0 los
+ const o=env(t,0.3,S[2],0.12,0.3);if(o<=0)return'';const k=t<S[1]?eo(cl((t-0.3)/1.3)):1;const n=Math.round(22511*k);const sc=t>=S[1]?1+0.25*eb(cl((t-S[1])/0.4))-0.25*cl((t-S[1]-0.4)/0.4):1;
+ const y=t<S[1]?1090:1100;
+ return `<g opacity="${o}" transform="translate(465,${y}) scale(${sc})">${txt(0,0,n.toLocaleString('de-DE'),t<S[1]?92:110,YEL,900,1,'middle',2)}${txt(0,48,'ECHTE MÜNZWÜRFE',30,'#cfd6e6',900,1,'middle',5)}</g>`;}
+function months(t){const o=env(t,S[5],S[6]+0.1,0.15,0.25);if(o<=0)return'';const m=Math.min(6,1+Math.floor((t-S[5])/0.32));
+ let s=`<g opacity="${o}"><rect x="315" y="${CY-210}" width="450" height="420" rx="40" fill="#f2f2f2"/><rect x="315" y="${CY-210}" width="450" height="110" rx="40" fill="${RED}"/><rect x="315" y="${CY-140}" width="450" height="40" fill="${RED}"/>`;
+ s+=txt(540,CY-135,'MONAT',44,'#fff',900,1,'middle',6)+txt(540,CY+120,'+'+m,200,'#111',900)+'</g>';return s;}
+// Zwei Münzen am Ende der Wege
+function twoCoins(t){const o=env(t,S[6],S[9]+0.1,0.3,0.35);if(o<=0)return'';const a=cl((t-S[6]-0.1)/0.5),b=cl((t-S[6]-0.9)/0.5);let s=`<g opacity="${o}">`;
+ const big=t>S[7]?1+0.12*eb(cl((t-S[7])/0.4)):1;
+ s+=`<g opacity="${b}">`+coin(300,CY+20,140,Math.PI*(1-eio(b)),'flat','flat')+txt(300,CY+210,'GEBLIEBEN',36,SIL,900,1,'middle',4)+'</g>';
+ s+=`<g opacity="${a}">`+coin(700,CY,175*big*(0.6+0.4*eb(a)),Math.PI*2*(1-eio(a)),'smile','smile',1,0.6)+txt(700,CY+240,'GEÄNDERT',40,GOLD,900,1,'middle',4)+'</g>';
+ if(t>=S[7]&&t<S[8]){const k1=cl((t-S[7]-1.1)/0.25),k2=cl((t-S[7]-1.8)/0.25);s+=tag(380,1120,'JOB',GOLD,'#111',40,k1,0.7+0.3*eb(k1))+tag(590,1120,'BEZIEHUNG',GOLD,'#111',40,k2,0.7+0.3*eb(k2));}
+ if(t>=S[8])s+=stampT(t,S[8]+0.3,S[9]+0.1,'WIEDER SO',GREEN,700,CY-250,58,-10);
+ return s+'</g>';}
+// Ben
+function ben(t){let x=BX,y=BY,pose=P.stand,flip=true,col=WHITE,rot=0,ex='';
+ if(t<S[1]){pose=FIG.mix(P.stand,P.cheer,0.25+0.25*Math.sin(t*6));if(H==='B'&&t<0.55){pose=P.reach;}}
+ else if(t>=S[4]&&t<S[5]){const k=Math.sin((t-S[4])*2.2);x=BX+70*k;flip=Math.cos((t-S[4])*2.2)>0;pose=Math.sin(t*9)>0?P.walkA:P.walkB;}
+ else if(t>=S[9]&&t<S[10]){pose=P.slump;x=BX-20+6*Math.sin(t*40);}
+ else if(t>=S[11]&&t<PAY){pose=P.stand;}
+ else if(t>=PAY){const k=cl((t-PAY-0.3)/5.0);const p=qp(PR[0],PR[1],PR[2],eio(k)*0.92);x=p[0];y=p[1];pose=k<1?(Math.sin(t*9)>0?P.walkA:P.walkB):P.cheer;if(t>S[14])pose=P.cheer;}
+ const sc=t>=PAY?0.62-0.2*cl((t-PAY-0.3)/5):0.62;
+ return benAt(x,y,pose,sc,col,rot,1,flip)+(t<S[2]?txt(x+95,y-150,'DU',30,YEL,900,1,'middle',3):'');}
+function steps(t){if(t<S[13])return'';let s='';[['1 MAIL',0.42],['1 ANRUF',0.62],['1 BEWERBUNG',0.82]].forEach(([w,k],i)=>{const a=cl((t-S[13]-0.6-i*1.15)/0.25);if(a<=0)return;const p=qp(PR[0],PR[1],PR[2],k);s+=tag(Math.min(p[0]-150,700),p[1]-40,w,GREEN,'#04120a',34,a*env(t,S[13],S[14]+0.8,0.01,0.3),0.7+0.3*eb(a));});return s;}
+window.SFXC=()=>{const c=[[0,'boom'],[0.02,'whoosh']];for(let k=0;k<20;k++)c.push([0.06+k*0.07,'tick']);
+ c.push([S[0]+4.2,'pop'],[S[1],'whoosh'],[S[1]+0.05,'ding']);for(let i=0;i<14;i++)c.push([S[1]+0.3+i*0.12,'pop']);
+ for(let i=0;i<3;i++)c.push([S[2]+i*1.55,'whoosh'],[S[2]+i*1.55+0.45,'pop']);
+ c.push([S[3],'whoosh']);for(let k=0;k<8;k++)c.push([S[3]+k*0.1,'tick']);c.push([S[3]+0.9,'ding']);
+ c.push([S[4],'whoosh'],[S[4]+0.2,'buzz']);for(let m=0;m<6;m++)c.push([S[5]+m*0.32,'tick']);c.push([S[5]+1.7,'pop']);
+ c.push([S[6],'whoosh'],[S[6]+0.15,'ding'],[S[6]+0.9,'pop'],[S[7],'pop'],[S[7]+1.1,'pop'],[S[7]+1.8,'pop'],[S[8]+0.3,'boom']);
+ c.push([S[9],'buzz'],[S[9]+0.05,'whoosh'],[S[10],'whoosh']);for(let k=0;k<10;k++)c.push([S[10]+k*0.11,'tick']);c.push([S[10]+1.2,'ding']);
+ c.push([S[11]+0.25,'buzz'],[S[11]+0.9,'whoosh'],[PAY,'boom'],[PAY+0.05,'ding']);for(let k=0;k<12;k++)c.push([PAY+0.4+k*0.4,'tick']);
+ for(let i=0;i<3;i++)c.push([S[13]+0.6+i*1.15,'pop']);c.push([S[14],'whoosh'],[S[14]+0.4,'pop']);return c;};
+window.render=function(t){let s='';
+ const shake=Math.max(env(t,-0.1,0.8,0.001,0.6),env(t,PAY,PAY+0.6,0.001,0.5),env(t,S[11]+0.25,S[11]+0.6,0.001,0.3)*0.6,env(t,S[9],S[9]+0.5,0.001,0.4)*0.5);
+ const jx=Math.sin(t*91)*18*shake,jy=Math.cos(t*67)*14*shake;
+ const red=Math.max(env(t,S[9],S[10]+0.2,0.1,0.6)*0.7,env(t,S[11]+0.25,PAY,0.1,0.2)*0.5);const green=env(t,PAY,PAY+2.4,0.05,1.2);
+ const split=H==='C'?env(t,-1,1.4,0.1,0.6):0;
+ const rG=t>=PAY?GREEN:GOLD2, rGl=t>=PAY?1:(t>=S[3]&&t<S[4]?cl((t-S[3]-0.9)/0.4):(t>=S[10]&&t<S[11]?cl((t-S[10]-1.2)/0.4):0));
+ const pathO=t<S[5]||t>=S[9]?1:0.25;
+ s+=bg(t,red,green,split)+`<g transform="translate(${jx},${jy})">`+paths(t,pathO,t>=PAY?GREEN:(rGl>0?GOLD:'#4a3f22'),rGl)+mainCoin(t)+swarm(t)+months(t)+twoCoins(t)+ben(t)+steps(t);
+ if(t>=PAY){const o=env(t,PAY+4.2,DUR+1,0.3,0.3);s+=`<g opacity="${o}"><line x1="${RX}" y1="${RY}" x2="${RX}" y2="${RY-150}" stroke="#fff" stroke-width="8"/><path d="M${RX},${RY-150} L${RX+0},${RY-150} L${RX-150},${RY-120} L${RX},${RY-90}Z" fill="${GREEN}"/>${txt(RX-60,RY-108,'HEUTE',26,'#04120a',900,1,'middle',2)}</g>`;}
+ s+='</g>'+counter(t);
+ if(t<0.9){const o=1-cl(t/0.9);for(let i=0;i<22;i++){const a=i*Math.PI*2/22+0.13,r0=380+((i*97)%140),r1=r0+260+((i*53)%200);s+=`<line x1="${CX+Math.cos(a)*r0}" y1="${CY+Math.sin(a)*r0}" x2="${CX+Math.cos(a)*r1}" y2="${CY+Math.sin(a)*r1}" stroke="${GOLD}" stroke-width="7" stroke-linecap="round" opacity="${0.55*o}"/>`;}}
+ if(H==='C'){const o=env(t,-1,1.4,0.001,0.5);s+=txt(270,1000,'BLEIBEN',64,'#e8e8e8',900,o)+txt(780,1000,'ÄNDERN',64,'#111',900,o);}
+ s+=`<rect x="0" y="222" width="1080" height="190" fill="#000" opacity=".45"/>`;
+ s+=LH(t,-1,S[0]+4.1,300,'KOPF: DU ÄNDERST ES.',80,GOLD)+LH(t,-1,S[0]+4.1,378,'ZAHL: ALLES BLEIBT.',62,'#cfd6e6');
+ s+=L(t,S[0]+4.1,S[1],320,'WAS WIRFST DU?',110,WHITE);
+ s+=L(t,S[1],S[2],300,'22.511 MAL',110,YEL)+L(t,S[1]+0.5,S[2],378,'ECHTE ENTSCHEIDUNGEN',54,WHITE);
+ const q=Math.min(2,Math.floor((t-S[2])/1.55));
+ if(t>=S[2]&&t<S[3]){s+=L(t,S[2],S[3],300,'KÜNDIGEN. SCHLUSS. UMZUG.',72,WHITE)+L(t,S[2]+3.4,S[3],378,'DIE MÜNZE HAT ENTSCHIEDEN.',54,GOLD);}
+ s+=SRC(t,S[1]+0.6,S[6],'Levitt (2021), Review of Economic Studies 88(1)','22.511 Münzwürfe · Nachbefragung nach 2 und 6 Monaten');
+ s+=L(t,S[3],S[4],300,'BEI KOPF:',110,GOLD)+L(t,S[3]+0.9,S[4],378,'≈ 25 % HÄUFIGER GETRAUT',58,WHITE);
+ s+=L(t,S[4],S[5],300,'UND DEINE?',110,YEL)+L(t,S[4]+1.6,S[5],378,'DIE DU SEIT MONATEN SCHIEBST.',50,WHITE);
+ s+=L(t,S[5],S[6],300,'6 MONATE SPÄTER',96,WHITE);
+ s+=L(t,S[6],S[7],300,'WER GEÄNDERT HAT:',86,WHITE)+L(t,S[6]+0.9,S[7],378,'DEUTLICH GLÜCKLICHER.',60,GREEN);
+ s+=L(t,S[7],S[8],300,'VOR ALLEM BEI',86,WHITE)+L(t,S[7]+0.4,S[8],378,'DEN GROSSEN SACHEN.',62,GOLD);
+ s+=L(t,S[8],S[9],300,'UND SIE WÜRDEN SICH',80,WHITE)+L(t,S[8]+0.4,S[9],378,'WIEDER SO ENTSCHEIDEN.',58,GREEN);
+ s+=L(t,S[9],S[10],300,'WIR SIND',100,WHITE)+L(t,S[9]+1.4,S[10],378,'VIEL ZU VORSICHTIG.',66,RED);
+ s+=SRC(t,S[9],S[11],'Levitt (2021): Menschen sind bei lebensverändernden','Entscheidungen womöglich „übermäßig vorsichtig“');
+ s+=L(t,S[10],S[11],300,'FAUSTREGEL:',100,GOLD)+L(t,S[10]+1.0,S[11],378,'UNSICHER? NIMM DIE VERÄNDERUNG.',46,WHITE);
+ s+=L(t,S[11],PAY,300,'DIE MÜNZE WAR',96,WHITE)+L(t,S[11]+0.3,PAY,378,'NIE DAS PROBLEM.',70,RED);
+ if(t>=PAY){const o=env(t,PAY,S[13],0.001,0.25),sc=1.5-0.5*eb((t-PAY)/0.35);s+=`<g opacity="${o}" transform="translate(540,300) scale(${sc})">${txt(0,0,'DAS ZÖGERN WAR’S.',84,GREEN,900,1,'middle',1)}</g>`+L(t,PAY+1.0,S[13],378,'UND DAS ENDET HEUTE.',62,WHITE);}
+ s+=L(t,S[13],S[14],300,'EIN SCHRITT REICHT.',96,GREEN);
+ s+=L(t,S[14],DUR+1,300,'SCHICK DAS DEM MENSCHEN,',70,WHITE)+L(t,S[14]+0.6,DUR+1,378,'DER SEIT MONATEN „MAL SCHAUEN“ SAGT.',40,GOLD);
+ if(t>S[14]+1.0){const o=env(t,S[14]+1.0,DUR+1,0.25,0.3),sc=0.85+0.15*eb((t-S[14]-1.0)/0.4);s+=pill(465,1180,'SCHREIB 48, WENN DU’S HEUTE ANGEHST.',WHITE,'#000',28,o,sc);}
+ s+=txt(176,176,'48 SEKUNDEN',22,'#8a93a3',800,1,'middle',4);
+ document.getElementById('stage').innerHTML=s;
+ const fl=document.getElementById('flash');const w=env(t,-0.1,0.3,0.001,0.25),g=env(t,PAY,PAY+0.7,0.001,0.6),r=env(t,S[11]+0.25,S[11]+0.6,0.001,0.3);
+ fl.style.background=g>0?GREEN:(r>0?RED:GOLD);fl.style.opacity=Math.max(0.16*w,0.38*g,0.25*r);
+};
+render(0);
+</script></body></html>
