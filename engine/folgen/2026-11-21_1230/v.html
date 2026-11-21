@@ -1,0 +1,117 @@
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#flash{position:absolute;inset:0;opacity:0}
+</style></head><body>
+<svg id="stage" viewBox="0 0 1080 1920"></svg><div id="flash"></div>
+<script src="rig.js"></script><script src="poses.js"></script><script src="kit.js"></script><script src="timing.js"></script>
+<script>
+// „Akku leer“ – Van Dongen, Maislin, Mullington & Dinges (2003), SLEEP 26(2):117–126.
+window.DUR=60.4; const PAY=S[12]; const H=(location.hash||'#C').slice(1);
+const YEL='#ffd60a', ORANGE='#ff9f0a';
+const BX0=330,BX1=750,BY0=560,BY1=1300,NSEG=10;
+function L(t,a,b,y,s,size,col,w=900,cx=540,maxw=940){const o=env(t,a,b,0.15,0.22);if(o<=0)return'';size=Math.min(size,Math.floor(maxw/(s.length*0.6)));const sc=0.9+0.1*eb((t-a)/0.32);return `<g opacity="${o}" transform="translate(${cx},${y}) scale(${sc})">${txt(0,0,s,size,col,w,1,'middle',1)}</g>`}
+function LH(t,a,b,y,s,size,col){const o=env(t,a,b,0.001,0.22);if(o<=0)return'';size=Math.min(size,Math.floor(940/(s.length*0.6)));return `<g opacity="${o}" transform="translate(540,${y})">${txt(0,0,s,size,col,900,1,'middle',1)}</g>`}
+const SRC=(t,a,b,l1,l2)=>{const o=env(t,a,b,0.3,0.3);return o>0?txt(465,1532-(l2?28:0),l1,22,'#8a93a3',600,o)+(l2?txt(465,1532,l2,22,'#8a93a3',600,o):''):''};
+function tag(x,y,s,bg,fg,size=30,o=1,sc=1){const w=s.length*size*0.62+44;return `<g opacity="${o}" transform="translate(${x},${y}) scale(${sc})"><rect x="${-w/2}" y="${-size*0.95}" width="${w}" height="${size*1.5}" rx="${size*0.4}" fill="${bg}"/>${txt(0,size*0.2,s,size,fg,900)}</g>`}
+function stampT(t,t0,t1,word,col,x,y,size=96,rot=-12,s0=1.8){const o=env(t,t0,t1,0.001,0.25);if(o<=0)return'';const q=cl((t-t0)/0.18);const w=word.length*size*0.66+60;return `<g opacity="${o}" transform="translate(${x},${y}) rotate(${rot}) scale(${s0-(s0-1)*q})"><rect x="${-w/2}" y="${-size*0.85}" width="${w}" height="${size*1.15}" rx="16" fill="#05070c" fill-opacity=".7" stroke="${col}" stroke-width="12"/>${txt(0,size*0.12,word,size,col,900,1,'middle',2)}</g>`}
+function benAt(x,y,pose,sc,col,rot=0,op=1,flip=true){const lg=(88+86)*sc;return `<g transform="rotate(${rot} ${x} ${y-lg})" opacity="${op}">${fig(pose,x,y-lg,sc,col,flip)}</g>`}
+// Ladestand (0..1) über die Zeit
+const DAY=d=>1-0.80*Math.pow(d/14,0.9);           // 14 Tage à 6 h → fast leer
+function level(t){
+ if(t<S[1]){ if(H==='C'){return 0.06+0.74*(1-eio(t/0.5));} return 0.06;}
+ if(t<S[2]) return 0.06+0.94*eio((t-S[1]-0.2)/0.9);
+ if(t<S[3]) return 1;
+ if(t<S[4]) return DAY(cl((t-S[3]-0.3)/0.8));
+ if(t<S[5]) return DAY(1+13*cl((t-S[4])/(S[5]-S[4]-0.4)));
+ if(t<S[9]) return DAY(14);
+ if(t<S[10]) return DAY(14)-0.14*eio((t-S[9]-0.4)/1.6);
+ if(t<PAY) return 0.06;
+ return 0.06+0.94*eio((t-PAY-0.5)/4.0);}
+function day(t){if(t<S[3])return 0; if(t<S[4])return 1; if(t<S[5])return Math.min(14,1+Math.floor(13*cl((t-S[4])/(S[5]-S[4]-0.4))+0.0001)); if(t<S[9]+0.01)return 14; return 14;}
+function lvlCol(l){return l>0.5?GREEN:(l>0.22?ORANGE:RED);}
+function battery(t,lv,blink,ghost,charging){let s='';const W=BX1-BX0,H_=BY1-BY0,pad=24,seg=(H_-2*pad)/NSEG;
+ const col=charging?GREEN:lvlCol(lv);const n=lv*NSEG;
+ s+=`<rect x="${BX0}" y="${BY0}" width="${W}" height="${H_}" rx="56" fill="#0b0f16" stroke="${blink?RED:'#e8e8e8'}" stroke-width="16"/>`;
+ s+=`<rect x="470" y="${BY0-48}" width="140" height="56" rx="14" fill="${blink?RED:'#e8e8e8'}"/>`;
+ for(let i=0;i<NSEG;i++){const f=cl(n-i);if(f<=0)continue;const y1=BY1-pad-i*seg,h=(seg-10)*f;const op=(blink&&i===0)?(0.45+0.55*(Math.sin(t*14)>0?1:0)):1;
+  s+=`<rect x="${BX0+pad}" y="${y1-h}" width="${W-2*pad}" height="${h}" rx="14" fill="${col}" opacity="${op}"/>`;}
+ if(ghost>0){const gy=BY1-pad-0.85*NSEG*seg;s+=`<g opacity="${ghost}"><rect x="${BX0+10}" y="${gy}" width="${W-20}" height="${BY1-10-gy}" rx="30" fill="none" stroke="${YEL}" stroke-width="6" stroke-dasharray="20 14"/></g>`;}
+ if(charging){const k=0.5+0.5*Math.sin(t*6);s+=`<path d="M560,780 L470,960 L540,960 L510,1120 L615,910 L545,910 L590,780Z" fill="#fff" opacity="${0.55+0.45*k}"/>`;}
+ return s;}
+function bg(t,red,green,night){let s=`<defs><radialGradient id="rv" cx=".5" cy=".5" r=".75"><stop offset=".45" stop-color="#ff2d3a" stop-opacity="0"/><stop offset="1" stop-color="#ff2d3a" stop-opacity=".6"/></radialGradient><radialGradient id="gv" cx=".5" cy=".5" r=".75"><stop offset=".45" stop-color="#30d158" stop-opacity="0"/><stop offset="1" stop-color="#30d158" stop-opacity=".5"/></radialGradient><radialGradient id="sp" cx=".5" cy=".45" r=".6"><stop offset="0" stop-color="#1a2030"/><stop offset="1" stop-color="#05070c"/></radialGradient></defs><rect width="1080" height="1920" fill="url(#sp)"/>`;
+ if(night>0)s+=`<rect width="1080" height="1920" fill="#000" opacity="${night}"/>`;
+ if(red>0)s+=`<rect width="1080" height="1920" fill="url(#rv)" opacity="${red}"/>`;
+ if(green>0)s+=`<rect width="1080" height="1920" fill="url(#gv)" opacity="${green}"/>`;
+ return s;}
+// Ben im Akku
+function ben(t,lv){let pose=P.stand,x=540,y=BY1-26,rot=0;
+ if(lv<0.3)pose=FIG.mix(P.stand,P.slump,cl((0.3-lv)/0.2));
+ if(t<S[1])pose=P.slump;
+ if(t>=S[1]&&t<S[3])pose=FIG.mix(P.slump,P.cheer,eio((t-S[1]-0.3)/0.8));
+ if(t>=S[7]&&t<S[8])pose=FIG.mix(P.slump,P.cheer,0.55);    // fühlt sich ok
+ if(t>=PAY){const k=eio((t-PAY-0.5)/2);pose=FIG.mix(P.slump,P.cheer,k);}
+ if(t>=S[4]&&t<S[5]&&lv>=0.3){pose=Math.sin(t*5)>0?P.walkA:P.walkB;}
+ const sw=(lv<0.25&&t<PAY)?3*Math.sin(t*3):0;
+ if(lv<0.15&&!(t>=S[7]&&t<S[8])){return benAt(540,BY1-26,P.slump,0.78,WHITE,sw,1,true);}
+ return benAt(x,y,pose,0.78,WHITE,sw,1,true);}
+function days(t){const o=env(t,S[2],S[10]+0.2,0.3,0.4);if(o<=0)return'';const d=day(t);let s=`<g opacity="${o}">`;
+ for(let i=0;i<14;i++){const x=110+i*55,y=1390;const on=i<d;const a=t<S[3]?cl((t-S[2]-0.3-i*0.06)/0.2):1;s+=`<g opacity="${a}"><rect x="${x-20}" y="${y-20}" width="40" height="40" rx="9" fill="${on?lvlCol(DAY(i+1)):'#1a2030'}" stroke="#2a3444" stroke-width="3"/>${txt(x,y+9,'6h',15,on?'#05070c':'#5c6678',900)}</g>`;}
+ s+=txt(465,1458,'14 NÄCHTE × 6 STUNDEN IM BETT',28,'#cfd6e6',900,1,'middle',3);
+ return s+'</g>';}
+function dayTag(t){if(t<S[3]||t>=S[9])return'';const d=day(t);const o=env(t,S[3],S[9],0.15,0.3);const pop=1+0.18*Math.exp(-((t-S[4])%0.43)*10)*(t>S[4]&&t<S[5]?1:0);return tag(540,462,'TAG '+d+' / 14',d>=14?RED:'#e8e8e8','#05070c',40,o,pop);}
+function nots(t){if(t<S[10]||t>=S[11]+0.2)return'';let s='';[['FAUL?',0.5],['UNMOTIVIERT?',1.6],['DUMM?',2.7]].forEach(([w,dt],i)=>{const a=cl((t-S[10]-dt+0.5)/0.2),k=cl((t-S[10]-dt-0.2)/0.25),o=env(t,S[10],S[11]+0.2,0.01,0.3);if(a<=0)return;const y=700+i*190,x=i%2?820:200;const wd=w.length*44*0.62;
+ s+=`<g opacity="${a*o}">`+tag(x,y,w,'#1a2030','#e8e8e8',44)+`<line x1="${x-wd/2-10}" y1="${y-12}" x2="${x-wd/2-10+(wd+20)*k}" y2="${y-12}" stroke="${RED}" stroke-width="10" stroke-linecap="round"/></g>`;});return s;}
+function plug(t){if(t<PAY-0.6)return'';const k=eio((t-PAY+0.6)/0.6);const y=-200+(BY0-60+200)*k;const o=env(t,PAY-0.6,S[14],0.01,0.4);
+ return `<g opacity="${o}"><path d="M540,${y-60} C620,${y-70} 1000,${y-40} 1100,${y-40}" stroke="#e8e8e8" stroke-width="14" fill="none"/><rect x="500" y="${y-70}" width="80" height="70" rx="10" fill="#e8e8e8"/><rect x="512" y="${y}" width="14" height="30" fill="#bbb"/><rect x="554" y="${y}" width="14" height="30" fill="#bbb"/></g>`;}
+window.SFXC=()=>{const c=[[0,'boom'],[0.02,'buzz']];for(let k=0;k<5;k++)c.push([0.05+k*0.28,'buzz']);c.push([1.1,'pop']);
+ c.push([S[1],'whoosh']);for(let k=0;k<10;k++)c.push([S[1]+0.2+k*0.09,'tick']);c.push([S[1]+1.15,'ding']);
+ c.push([S[2],'whoosh']);for(let i=0;i<14;i++)c.push([S[2]+0.3+i*0.06,'tick']);
+ c.push([S[3],'pop'],[S[3]+0.5,'tick'],[S[4],'whoosh']);for(let d=1;d<14;d++)c.push([S[4]+(S[5]-S[4]-0.4)*d/13,'tick']);c.push([S[5]-0.3,'buzz']);
+ c.push([S[5],'whoosh'],[S[5]+3.2,'boom'],[S[6],'whoosh'],[S[7],'pop'],[S[7]+0.4,'ding'],[S[8]+1.6,'boom'],[S[9],'whoosh'],[S[9]+0.5,'buzz'],[S[9]+1.4,'buzz']);
+ [0.5,1.6,2.7].forEach(d=>c.push([S[10]+d,'pop'],[S[10]+d+0.25,'whoosh']));c.push([S[11],'buzz'],[S[11]+1.0,'buzz'],[PAY-0.5,'whoosh'],[PAY,'boom'],[PAY+0.05,'ding']);
+ for(let k=0;k<14;k++)c.push([PAY+0.5+k*0.28,'tick']);c.push([S[13],'pop'],[S[13]+2.0,'ding'],[S[14],'whoosh'],[S[14]+1.0,'pop']);return c;};
+window.render=function(t){let s='';const lv=level(t);
+ const shake=Math.max(env(t,-0.1,0.8,0.001,0.6),env(t,PAY,PAY+0.6,0.001,0.5),env(t,S[5]+3.2,S[5]+3.6,0.001,0.3)*0.6,env(t,S[8]+1.6,S[8]+2.0,0.001,0.3)*0.5);
+ const jx=Math.sin(t*91)*18*shake,jy=Math.cos(t*67)*14*shake;
+ const red=Math.max(env(t,-1,1.8,0.1,0.8),env(t,S[5]+3.2,S[6],0.05,0.6)*0.7,env(t,S[9]+0.4,PAY,0.3,0.2)*0.6*(t<S[10]||t>S[11]?1:0.4));
+ const green=env(t,PAY,PAY+2.4,0.05,1.2);const night=env(t,S[6],S[7],0.2,0.3)*0.55;
+ const blink=(lv<0.12&&t<PAY);const ghost=env(t,S[7]+0.3,S[9],0.3,0.4);
+ s+=bg(t,red,green,night)+`<g transform="translate(${jx},${jy})">`+battery(t,lv,blink,ghost,t>=PAY+0.4)+ben(t,lv)+plug(t)+days(t)+dayTag(t)+nots(t);
+ if(ghost>0){s+=`<g opacity="${ghost}">`+tag(190,BY1-24-0.85*(BY1-BY0-48)+0,'GEFÜHLT',YEL,'#111',30)+'</g>';const gy=BY1-24-0.85*(BY1-BY0-48),ry=BY1-24-lv*(BY1-BY0-48);
+  const a=env(t,S[8]+0.4,S[9],0.3,0.4);if(a>0)s+=`<g opacity="${a}"><line x1="290" y1="${gy+30}" x2="290" y2="${ry-30}" stroke="${RED}" stroke-width="8" stroke-dasharray="4 10"/>`+tag(200,ry,'ECHT',RED,'#fff',30)+'</g>';}
+ s+=stampT(t,S[5]+3.2,S[6]+0.1,'= 1 NACHT WACH',RED,540,900,74,-8);
+ s+=stampT(t,S[9]+1.4,S[10]+0.1,'4 h = 2 NÄCHTE WACH',RED,540,900,60,-8);
+ s+=stampT(t,S[8]+1.6,S[9],'NICHT GEWÖHNT',RED,520,1060,60,-6);
+ if(H==='A'||H==='C'){const o=env(t,-1,S[1],0.001,0.3);if(o>0)s+=`<g opacity="${o*(Math.sin(t*12)>-0.3?1:0.5)}">`+tag(540,470,'⚠ AKKU FAST LEER',RED,'#fff',42)+'</g>';}
+ if(H==='B'&&t<1.0){const o=1-cl((t-0.6)/0.4),r=Math.sin(t*60)*8;s+=`<g opacity="${o}" transform="translate(540,900) rotate(${r})"><circle r="260" fill="#f2f2f2" stroke="${RED}" stroke-width="24"/><line x1="0" y1="0" x2="0" y2="-170" stroke="#111" stroke-width="18" stroke-linecap="round"/><line x1="0" y1="0" x2="120" y2="40" stroke="#111" stroke-width="18" stroke-linecap="round"/><circle cx="-190" cy="-230" r="70" fill="${RED}"/><circle cx="190" cy="-230" r="70" fill="${RED}"/></g>`;}
+ if(t>=1.0&&t<S[1]+0.2){const a=cl((t-1.0)/0.2),o=env(t,1.0,S[1]+0.2,0.01,0.2);s+=`<g opacity="${o}" transform="translate(540,860) scale(${0.6+0.4*eb(a)})">`+tag(0,0,'6 STUNDEN?',YEL,'#111',64)+'</g>';}
+ if(t>=S[11]&&t<PAY){const o=env(t,S[11]+0.3,PAY,0.2,0.1)*(Math.sin(t*9)>-0.2?1:0.35);s+=txt(540,880,'RESERVE',78,RED,900,o,'middle',4);}
+ s+='</g>';
+ s+=`<rect x="0" y="222" width="1080" height="190" fill="#000" opacity=".45"/>`;
+ s+=LH(t,-1,S[1],300,'WIE VIELE STUNDEN',84,WHITE)+LH(t,-1,S[1],378,'HAST DU HEUTE GESCHLAFEN?',54,YEL);
+ s+=L(t,S[1],S[2],300,'SECHS?',120,WHITE)+L(t,S[1]+0.8,S[2],378,'KLINGT DOCH OKAY.',62,GREEN);
+ s+=L(t,S[2],S[3],300,'2 WOCHEN LANG',100,WHITE)+L(t,S[2]+0.6,S[3],378,'JEDE NACHT 6 STUNDEN.',60,YEL);
+ s+=L(t,S[3],S[4],300,'TAG 1:',110,WHITE)+L(t,S[3]+0.6,S[4],378,'MERKST DU KAUM.',62,GREEN);
+ s+=L(t,S[4],S[5],300,'DEIN AKKU',104,WHITE)+L(t,S[4]+1.2,S[5],378,'LÄUFT LEER. JEDEN TAG.',58,ORANGE);
+ s+=L(t,S[5],S[6],300,'NACH 14 TAGEN:',96,WHITE)+L(t,S[5]+0.9,S[6],378,'KONZENTRATION + REAKTION',54,RED);
+ s+=SRC(t,S[5],S[10]+0.2,'Van Dongen et al. (2003), SLEEP 26(2) · 48 Erwachsene','14 Tage 4, 6 oder 8 h im Bett · Konzentrations- und Gedächtnistests');
+ s+=L(t,S[6],S[7],320,'JETZT DAS GEMEINE.',90,RED);
+ s+=L(t,S[7],S[8],300,'SIE FÜHLTEN SICH',96,WHITE)+L(t,S[7]+0.6,S[8],378,'KAUM MÜDER.',70,YEL);
+ s+=L(t,S[8],S[9],300,'„HAB MICH DRAN GEWÖHNT.“',58,YEL)+L(t,S[8]+1.6,S[9],378,'HATTEN SIE NICHT.',66,RED);
+ s+=L(t,S[9],S[10],300,'MIT 4 STUNDEN:',96,WHITE)+L(t,S[9]+0.8,S[10],378,'WIE 2 NÄCHTE OHNE SCHLAF.',54,RED);
+ s+=L(t,S[10],S[11],300,'VIELLEICHT BIST DU',84,WHITE)+L(t,S[10]+0.4,S[11],378,'GAR NICHT …',62,WHITE);
+ s+=L(t,S[11],PAY,300,'… SONDERN SEIT WOCHEN',62,WHITE)+L(t,S[11]+0.4,PAY,378,'AUF RESERVE.',72,RED);
+ if(t>=PAY){const o=env(t,PAY,S[13],0.001,0.25),sc=1.5-0.5*eb((t-PAY)/0.35);s+=`<g opacity="${o}" transform="translate(540,300) scale(${sc})">${txt(0,0,'DAS UPGRADE:',100,GREEN,900,1,'middle',1)}</g>`+L(t,PAY+1.2,S[13],378,'KOSTET 0 €.',72,WHITE);}
+ s+=L(t,S[13],S[14],300,'HEUTE 1 STUNDE',100,GREEN)+L(t,S[13]+0.5,S[14],378,'FRÜHER INS BETT.',66,WHITE);
+ s+=L(t,S[13]+2.0,S[14],1420,'NICHT MORGEN. HEUTE.',58,YEL,900,465,800);
+ s+=L(t,S[14],DUR+1,300,'SCHICK DAS DEM, DER SAGT:',70,WHITE)+L(t,S[14]+0.6,DUR+1,378,'„ICH BRAUCH NICHT VIEL SCHLAF.“',48,YEL);
+ if(t>S[14]+1.0){const o=env(t,S[14]+1.0,DUR+1,0.25,0.3),sc=0.85+0.15*eb((t-S[14]-1.0)/0.4);s+=pill(465,1460,'SCHREIB 48, WENN DU HEUTE FRÜHER GEHST.',WHITE,'#000',28,o,sc);}
+ s+=txt(176,176,'48 SEKUNDEN',22,'#8a93a3',800,1,'middle',4);
+ document.getElementById('stage').innerHTML=s;
+ const fl=document.getElementById('flash');const w=env(t,-0.1,0.3,0.001,0.25),g=env(t,PAY,PAY+0.7,0.001,0.6),r=env(t,S[5]+3.2,S[5]+3.6,0.001,0.3);
+ fl.style.background=g>0?GREEN:RED;fl.style.opacity=Math.max(0.22*w,0.38*g,0.3*r);
+};
+render(0);
+</script></body></html>
