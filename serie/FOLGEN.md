@@ -179,3 +179,5 @@ QC gegen Referenzen („Wochen“, „150 €“, Hook „1 neue Nachricht“) u
 > 25.11. 16:33: „Black Friday“ live – TikTok 7712131765531331873 · Instagram DgK2_LovLuT (KI-Label) · YouTube: Datei + Texte an Lukas (vidIQ-Kontingent verbraucht, kein Chrome). Kommentare an Lukas geschickt.
 
 > 25.11. 18:33: „Sie mag dich mehr, als du denkst“ live – TikTok 7712162845244394791 · Instagram DgLErvehht_ (KI-Label) · YouTube: Datei + Texte an Lukas. Kommentare an Lukas geschickt.
+
+> 25.11. 21:03: „Noch 36 Tage“ live – TikTok vidIQ-Post 0ad429d4 zugestellt (completed, kein Link geliefert) · Instagram DgLVyVbB5e0 (KI-Label) · YouTube: Datei + Texte an Lukas. Kommentare an Lukas geschickt. tmp/-Dateien des 25.11. entfernt.
