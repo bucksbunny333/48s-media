@@ -1,0 +1,145 @@
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#flash{position:absolute;inset:0;opacity:0}
+</style></head><body>
+<svg id="stage" viewBox="0 0 1080 1920"></svg><div id="flash"></div>
+<script src="rig.js"></script><script src="poses.js"></script><script src="kit.js"></script><script src="h.js"></script><script src="timing.js"></script>
+<script>
+// „Noch 36 Tage“ – Oscarsson et al. (2020), PLOS ONE · Dai, Milkman & Riis (2014), Management Science
+window.DUR=60.9; const PAY=S[12]; const H=(location.hash||'#A').slice(1);
+const TODAY=328; // 25.11.2026 = Tag 329 (0-basiert 328)
+const MON=['JANUAR','FEBRUAR','MÄRZ','APRIL','MAI','JUNI','JULI','AUGUST','SEPTEMBER','OKTOBER','NOVEMBER','DEZEMBER'];
+const WD=['SONNTAG','MONTAG','DIENSTAG','MITTWOCH','DONNERSTAG','FREITAG','SAMSTAG'];
+function dateOf(i){const d=new Date(2026,0,1+i);return {d:d.getDate(),m:MON[d.getMonth()],w:WD[d.getDay()],y:d.getFullYear()};}
+const CX0=290,CX1=790,CY0=480,CY1=990;
+function page(i,col='#f4efe4',numCol='#111',over=''){const D=dateOf(i);return `<rect x="${CX0}" y="${CY0+70}" width="${CX1-CX0}" height="${CY1-CY0-70}" rx="18" fill="${col}"/>`+
+ txt(540,CY0+150,D.m+(D.y!==2026?' '+D.y:''),44,RED,900,1,'middle',4)+txt(540,CY0+390,String(D.d),230,numCol,900)+txt(540,CY0+470,D.w,40,'#555',900,1,'middle',4)+over;}
+function binder(){let s=`<rect x="${CX0-10}" y="${CY0}" width="${CX1-CX0+20}" height="90" rx="18" fill="${RED}"/>`;for(let i=0;i<6;i++)s+=`<circle cx="${CX0+50+i*80}" cy="${CY0+30}" r="12" fill="#05070c"/>`;return s;}
+// Abreiß-Animation: aktuelle Seite (cur) liegt oben, Seite in Flug (prog 0..1)
+function calendar(t,cur,flyIdx,prog,sc=1,o=1,over=''){if(o<=0)return'';let s=`<g opacity="${o}" transform="translate(540,735) scale(${sc}) translate(-540,-735)">`;
+ // Seitenstapel-Kante
+ const left=Math.max(0,364-cur);for(let k=Math.min(6,Math.ceil(left/6));k>0;k--)s+=`<rect x="${CX0+k*3}" y="${CY0+70+k*5}" width="${CX1-CX0}" height="${CY1-CY0-70}" rx="18" fill="#d8d0bf" stroke="#b9b09d" stroke-width="2"/>`;
+ s+=page(cur,'#f4efe4','#111',over);
+ if(flyIdx!==null&&prog<1){const p=eio(prog);const x=540+(-380+760*((flyIdx*7)%2))*p,y=735-120*p+700*p*p,r=(((flyIdx*13)%2)?1:-1)*70*p;
+  s+=`<g transform="translate(${x-540},${y-735}) rotate(${r} 540 ${CY0+70})" opacity="${1-p*0.7}">`+page(flyIdx)+'</g>';}
+ return s+binder()+'</g>';}
+// Welcher Tag liegt oben?
+function calState(t){
+ if(t<S[1]){ // Hook: reißt von 18.11. bis 25.11.
+  if(H==='B'){return {cur:TODAY,fly:null,p:1};}
+  const n=7;const k=cl((t+0.25)/1.35)*n;const i=Math.floor(k);if(i>=n)return {cur:TODAY,fly:TODAY-1,p:cl((t+0.25-1.35)/0.2)+1};
+  return {cur:TODAY-n+i+1,fly:TODAY-n+i,p:k-i};}
+ if(t<S[2]) return {cur:TODAY,fly:null,p:1};
+ if(t<S[3]){const n=37;const k=cl((t-S[2]-0.3)/2.6)*n;const i=Math.min(n-1,Math.floor(k));return {cur:TODAY+i+1,fly:k<n?TODAY+i:null,p:k-i};}
+ return {cur:TODAY,fly:null,p:1};}
+function yearGrid(t){const o=env(t,S[3],S[5]+0.2,0.3,0.3);if(o<=0)return'';let s=`<g opacity="${o}">`;const k=cl((t-S[3]-0.2)/1.2);
+ for(let i=0;i<365;i++){const c=i%25,r=Math.floor(i/25);const x=77+c*31.5,y=520+r*31.5;const past=i<TODAY,today=i===TODAY,rest=i>TODAY;
+  const show=cl(k*365/40-i/40+1);if(show<=0)continue;
+  const col=today?YEL:(rest?RED:'#3a4454');s+=`<rect x="${x}" y="${y}" width="26" height="26" rx="5" fill="${col}" opacity="${show*(rest?(0.55+0.45*Math.sin(t*6+i*0.3)):1)}"/>`;}
+ if(t>S[3]+1.3){const q=cl((t-S[3]-1.3)/0.3);s+=`<g transform="translate(465,1060) scale(${0.6+0.4*eb(q)})" opacity="${q}">`+tag(0,0,'36 VON 365 TAGEN = 9,9 %',RED,'#fff',48)+'</g>';}
+ return s+'</g>';}
+function hoursScene(t){const o=env(t,S[4],S[5]+0.2,0.2,0.3);if(o<=0)return'';const k=eo(cl((t-S[4]-0.2)/2.2));let s=`<g opacity="${o}">`;
+ s+=`<rect x="0" y="480" width="1080" height="640" fill="#05070c" opacity=".82"/>`;
+ s+=txt(540,800,fmt(Math.round(576*k))+' h',190,RED,900)+txt(540,880,'WACHE STUNDEN (36 × 16 h)',36,'#cfd6e6',900,1,'middle',3);
+ // Mülleimer + fallende Uhren
+ s+=`<g transform="translate(465,1240)"><path d="M-110,-70 L110,-70 L90,120 L-90,120 Z" fill="#1a2030" stroke="#8a93a3" stroke-width="8"/><rect x="-130" y="-100" width="260" height="30" rx="10" fill="#8a93a3"/></g>`;
+ for(let i=0;i<10;i++){const tt=(t-S[4]-0.3-i*0.35);if(tt<0)continue;const f=cl(tt/0.7);const x=200+((i*173)%560)*(1-f)+465*f-((i*173)%560)*0+0;const xx=(200+((i*173)%560))*(1-f)+465*f,y=980+260*f*f;
+  if(f<1)s+=`<g transform="translate(${xx},${y}) rotate(${f*200})"><circle r="26" fill="none" stroke="${ORANGE}" stroke-width="6"/><line x1="0" y1="0" x2="0" y2="-16" stroke="${ORANGE}" stroke-width="5"/><line x1="0" y1="0" x2="12" y2="0" stroke="${ORANGE}" stroke-width="5"/></g>`;}
+ return s+'</g>';}
+const N=1066;
+function dots(t){const o=env(t,S[5],S[7]+0.4,0.3,0.3);if(o<=0)return'';let s=`<g opacity="${o}">`;const k=cl((t-S[5]-0.3)/2.4);const g=t>S[6]?eio(cl((t-S[6]-0.4)/1.2)):0;
+ const split=t>S[7]?eio(cl((t-S[7]-0.2)/1.0)):0;
+ for(let i=0;i<N;i++){if(i>k*N)break;const c=i%41,r=Math.floor(i/41);let x=78+c*19,y=530+r*19;
+  const grp=(i*7919)%100<64.5?1:0; // ~64,5 % Annäherungsziele
+  if(split>0){x+=(grp?150:-150)*split*(c>20?1:0.6)*0+0;}
+  const win=(i*104729)%1000<550;const col=g>0&&win?GREEN:'#cfd6e6';
+  s+=`<circle cx="${x}" cy="${y}" r="7" fill="${col}" opacity="${g>0&&win?0.4+0.6*g:0.8}"/>`;}
+ s+=`<g transform="translate(465,1090)">`+tag(0,0,fmt(Math.round(N*k))+' MENSCHEN · 1 JAHR',WHITE,'#111',38)+'</g>';
+ if(t>S[6]+0.4){const q=cl((t-S[6]-0.4)/0.3);s+=`<g transform="translate(465,1200) scale(${0.6+0.4*eb(q)})" opacity="${q}">`+tag(0,0,'55 % SAGEN: GESCHAFFT',GREEN,'#05070c',44)+'</g>';}
+ return s+'</g>';}
+function bars(t){const o=env(t,S[7]+0.4,S[10]+0.2,0.3,0.3);if(o<=0)return'';let s=`<g opacity="${o}">`;const base=1180,maxH=560;
+ const a=t>S[8]+0.3?47.1*eo(cl((t-S[8]-0.3)/1.4)):0,b=t>S[9]+0.3?58.9*eo(cl((t-S[9]-0.3)/1.4)):0;
+ [[260,a,RED,'„NICHT MEHR …“','AUFHÖREN'],[670,b,GREEN,'„AB JETZT …“','NEU ANFANGEN']].forEach(([x,v,col,l1,l2])=>{const h=maxH*v/100;
+  s+=`<rect x="${x-120}" y="${base-maxH}" width="240" height="${maxH}" rx="20" fill="#0b0f16" stroke="#2a3444" stroke-width="4"/><rect x="${x-120}" y="${base-h}" width="240" height="${h}" rx="20" fill="${col}"/>`;
+  if(v>0)s+=txt(x,base-h-24,fmt(v,1)+' %',62,col,900);
+  s+=txt(x,base+60,l2,38,WHITE,900,1,'middle',2)+txt(x,base+108,l1,32,'#8a93a3',800);});
+ if(t>S[9]+1.9){const q=cl((t-S[9]-1.9)/0.3);s+=`<g transform="translate(465,1360) scale(${0.6+0.4*eb(q)})" opacity="${q}">`+tag(0,0,'+ 11,8 PROZENTPUNKTE',GREEN,'#05070c',40)+'</g>';}
+ return s+'</g>';}
+function swap(t){const o=env(t,S[10],S[11]+0.2,0.2,0.3);if(o<=0)return'';let s=`<g opacity="${o}">`;
+ s+=`<rect x="0" y="480" width="1080" height="980" fill="#05070c" opacity=".88"/>`;
+ const q1=cl((t-S[10]-0.2)/0.3),x1=cl((t-S[10]-1.4)/0.3),q2=cl((t-S[10]-2.2)/0.3);
+ s+=`<g opacity="${q1}" transform="translate(540,650)"><rect x="-400" y="-90" width="800" height="170" rx="30" fill="#1a2030" stroke="${RED}" stroke-width="6"/>${txt(0,22,'WENIGER SÜSSES',64,'#8a93a3',900)}<line x1="-300" y1="0" x2="${-300+600*x1}" y2="0" stroke="${RED}" stroke-width="12" stroke-linecap="round"/></g>`;
+ s+=`<g opacity="${q2}" transform="translate(540,900) scale(${0.8+0.2*eb(q2)})"><rect x="-400" y="-90" width="800" height="170" rx="30" fill="#0f2a18" stroke="${GREEN}" stroke-width="8"/>${txt(0,22,'JEDEN TAG 1 STÜCK OBST',56,GREEN,900)}</g>`;
+ // Apfel
+ if(q2>0)s+=`<g opacity="${q2}" transform="translate(465,1200) scale(${0.7+0.3*eb(q2)})"><circle cx="-30" cy="0" r="70" fill="${RED}"/><circle cx="30" cy="0" r="70" fill="${RED}"/><path d="M0,-70 q10,-40 40,-50" stroke="#8b5a2b" stroke-width="10" fill="none"/><ellipse cx="40" cy="-110" rx="30" ry="14" fill="${GREEN}"/></g>`;
+ return s+'</g>';}
+function mornings(t){const o=env(t,S[11]+0.6,PAY+0.05,0.3,0.05);if(o<=0)return'';let s=`<g opacity="${o}">`;const D=['MO','DI','MI','DO','FR','SA','SO'];
+ for(let i=0;i<7;i++){const q=cl((t-S[11]-1.6-i*0.25)/0.25);const x=230+i*100,y=1190;s+=`<g opacity="${q}"><rect x="${x-50}" y="${y-60}" width="100" height="130" rx="16" fill="#1a2030" stroke="${YEL}" stroke-width="4"/><circle cx="${x}" cy="${y+12}" r="26" fill="${YEL}"/><rect x="${x-46}" y="${y+12}" width="92" height="40" fill="#1a2030"/>${txt(x,y-18,D[i],26,WHITE,900)}</g>`;}
+ s+=txt(465,1320,'JEDER MORGEN = NEUSTART',36,YEL,900,1,'middle',3);
+ return s+'</g>';}
+window.SFXC=()=>{const c=[[0,'whoosh'],[0.02,'boom']];for(let k=0;k<7;k++)c.push([Math.max(0,-0.25+k*1.35/7+0.19),'whoosh']);c.push([1.15,'buzz'],[S[1],'pop'],[S[1]+1.3,'boom']);
+ c.push([S[2],'whoosh']);for(let k=0;k<18;k++)c.push([S[2]+0.3+k*0.144,'tick']);c.push([S[2]+2.9,'pop']);
+ c.push([S[3],'whoosh']);for(let k=0;k<10;k++)c.push([S[3]+0.2+k*0.12,'tick']);c.push([S[3]+1.3,'boom']);
+ c.push([S[4],'whoosh']);for(let k=0;k<10;k++)c.push([S[4]+0.3+k*0.35+0.7,'pop']);c.push([S[4]+2.4,'buzz']);
+ c.push([S[5],'whoosh']);for(let k=0;k<12;k++)c.push([S[5]+0.3+k*0.2,'tick']);c.push([S[6],'whoosh'],[S[6]+0.4,'ding'],[S[7],'whoosh'],[S[7]+0.2,'buzz']);
+ c.push([S[8]+0.3,'whoosh'],[S[8]+1.7,'buzz'],[S[9]+0.3,'whoosh'],[S[9]+1.7,'ding'],[S[9]+1.9,'pop']);
+ c.push([S[10],'whoosh'],[S[10]+0.2,'pop'],[S[10]+1.4,'buzz'],[S[10]+2.2,'ding']);
+ c.push([S[11],'whoosh']);for(let i=0;i<7;i++)c.push([S[11]+1.6+i*0.25,'pop']);
+ c.push([PAY-0.4,'whoosh'],[PAY,'boom'],[PAY+0.05,'ding'],[S[13],'whoosh'],[S[13]+1.2,'pop'],[S[13]+2.4,'ding'],[S[14],'whoosh'],[S[14]+1.0,'pop']);return c;};
+window.render=function(t){let s='';
+ const shake=Math.max(env(t,-0.1,0.6,0.001,0.5),env(t,PAY,PAY+0.6,0.001,0.5),env(t,S[1]+1.3,S[1]+1.7,0.001,0.3)*0.6,env(t,S[3]+1.3,S[3]+1.6,0.001,0.3)*0.5);
+ const jx=Math.sin(t*91)*18*shake,jy=Math.cos(t*67)*14*shake;
+ const red=Math.max(env(t,-1,1.6,0.1,0.8)*0.7,env(t,S[1]+1.3,S[2],0.05,0.4)*0.5,env(t,S[3]+1.3,S[5],0.2,0.4)*0.5);
+ const green=env(t,PAY,PAY+2.6,0.05,1.2);
+ s+=bg(red,green)+`<g transform="translate(${jx},${jy})">`;
+ // Kalender
+ const st=calState(t);
+ const calO=Math.max(env(t,-1,S[3]+0.2,0.001,0.3),env(t,S[11],DUR+1,0.3,0.3));
+ let over='';
+ if(t>=S[1]&&t<S[2]){const q=cl((t-S[1]-1.3)/0.2);if(q>0)over=`<g opacity="${q*0.75}"><rect x="${CX0}" y="${CY0+70}" width="${CX1-CX0}" height="${CY1-CY0-70}" rx="18" fill="#05070c" opacity=".35"/></g>`;}
+ if(t>=PAY&&t<S[13]+1.2){const q=cl((t-PAY-0.1)/0.3);over=`<g opacity="${q}"><rect x="${CX0+20}" y="${CY0+90}" width="${CX1-CX0-40}" height="90" rx="12" fill="${GREEN}"/>${txt(540,CY0+152,'1. JANUAR',56,'#05070c',900,1,'middle',3)}</g>`;}
+ if(t>=S[13]+1.2){over=`<g><rect x="${CX0+20}" y="${CY0+90}" width="${CX1-CX0-40}" height="90" rx="12" fill="${GREEN}"/>${txt(540,CY0+152,'TAG 1 ✓',60,'#05070c',900,1,'middle',3)}</g>`;}
+ let csc=1;if(t>=S[11]&&t<PAY)csc=0.8;if(t>=PAY)csc=1-0.2*(1-eb(cl((t-PAY)/0.4)))+0.0;
+ if(H==='C'&&t<0.8)csc=2.2-1.2*eio(t/0.8);
+ s+=calendar(t,st.cur,st.fly,st.p,csc,calO,over);
+ if(t>=S[1]&&t<S[2]){const q=cl((t-S[1])/0.25);s+=`<g opacity="${q}" transform="translate(465,1110) scale(${0.6+0.4*eb(q)})">`+tag(0,0,'NOCH 36 TAGE',RED,'#fff',64)+'</g>';}
+ s+=stampT(t,S[1]+1.3,S[2],'ABGESCHRIEBEN',RED,540,760,76,-12);
+ if(t<S[1]){const n=364-st.cur;s+=`<g transform="translate(465,1110)">`+tag(0,0,'NOCH '+n+' TAGE',RED,'#fff',64,1,1+0.08*Math.sin(t*20))+'</g>';}
+ if(t>=S[2]&&t<S[3]){const d=Math.max(0,36-Math.floor(cl((t-S[2]-0.3)/2.6)*37));s+=`<g transform="translate(465,1110)">`+tag(0,0,d>0?'NOCH '+d+' TAGE':'„JETZT ABER!“',d>0?'#1a2030':YEL,d>0?'#fff':'#111',60)+'</g>';}
+ s+=yearGrid(t)+hoursScene(t)+dots(t)+bars(t)+swap(t)+mornings(t);
+ // Ben
+ if(t<S[3]+0.2){const o=env(t,-1,S[3]+0.2,0.01,0.3);const pose=t<S[1]?FIG.mix(P.stand,P.reach,0.6+0.4*Math.sin(t*8)):(t<S[2]?P.slump:FIG.mix(P.stand,P.cheer,0.5));s+=`<g opacity="${o}">`+benAt(150,1470,pose,0.7,WHITE,0,1,true)+'</g>';}
+ if(t>=S[11]){const o=env(t,S[11],DUR+1,0.3,0.3);let pose=P.stand;if(t>=PAY)pose=FIG.mix(P.stand,P.cheer,eio((t-PAY-0.3)/0.8));if(t>=S[13]&&t<S[13]+1.2)pose=P.reach;s+=`<g opacity="${o}">`+benAt(110,1470,pose,0.7,WHITE,0,1,true)+'</g>';}
+ if(t>=S[13]){const q=cl((t-S[13]-1.6)/0.3);if(q>0)s+=`<g opacity="${q}" transform="translate(465,1100) scale(${0.6+0.4*eb(q)})">`+tag(0,0,'+ 1 SACHE DAZU. NICHT WEG.',GREEN,'#05070c',46)+'</g>';}
+ if(t>=PAY&&t<S[13]){const q=cl((t-PAY-0.3)/0.3);s+=`<g opacity="${q}" transform="translate(465,1100) scale(${0.6+0.4*eb(q)})">`+tag(0,0,'= HEUTE',GREEN,'#05070c',80)+'</g>';}
+ s+='</g>';
+ s+=head();
+ s+=LH(t,-1,S[1],300,'WIE VIELE TAGE',90,WHITE)+LH(t,-1,S[1],378,'HAT DIESES JAHR NOCH?',58,YEL);
+ s+=L(t,S[1],S[2],300,'NOCH 36.',110,RED)+L(t,S[1]+1.3,S[2],378,'DIE MEISTEN HABEN SIE ABGESCHRIEBEN.',44,WHITE);
+ s+=L(t,S[2],S[3],300,'„ICH FANG AM',92,WHITE)+L(t,S[2]+0.4,S[3],378,'1. JANUAR AN.“',66,YEL);
+ s+=L(t,S[3],S[4],300,'36 TAGE =',104,WHITE)+L(t,S[3]+1.0,S[4],378,'FAST 10 % VOM JAHR.',62,RED);
+ s+=L(t,S[4],S[5],300,'576 WACHE STUNDEN.',80,RED)+L(t,S[4]+2.0,S[5],378,'EINFACH WEGGEWORFEN.',58,WHITE);
+ s+=L(t,S[5],S[6],300,'1.066 VORSÄTZE',96,WHITE)+L(t,S[5]+1.0,S[6],378,'EIN JAHR LANG BEGLEITET.',56,YEL);
+ s+=L(t,S[6],S[7],300,'NACH 1 JAHR:',100,WHITE)+L(t,S[6]+0.6,S[7],378,'55 % „GESCHAFFT“.',62,GREEN);
+ s+=L(t,S[7],S[8],320,'ABER JETZT DER UNTERSCHIED …',62,YEL);
+ s+=L(t,S[8],S[9],300,'„NICHT MEHR …“',96,WHITE)+L(t,S[8]+1.4,S[9],378,'47 % SCHAFFEN ES.',62,RED);
+ s+=L(t,S[9],S[10],300,'„AB JETZT …“',100,WHITE)+L(t,S[9]+1.4,S[10],378,'59 % SCHAFFEN ES.',62,GREEN);
+ s+=L(t,S[10],S[11],300,'ALSO NICHT WEGLASSEN,',72,WHITE)+L(t,S[10]+2.2,S[11],378,'SONDERN DAZUNEHMEN.',60,GREEN);
+ s+=L(t,S[11],PAY,300,'DAS DATUM?',100,WHITE)+L(t,S[11]+1.0,PAY,378,'NUR EIN GEFÜHL.',64,YEL);
+ if(t>=PAY){const o=env(t,PAY,S[13],0.001,0.25),sc=1.5-0.5*eb((t-PAY)/0.35);s+=`<g opacity="${o}" transform="translate(540,300) scale(${sc})">${txt(0,0,'DEIN 1. JANUAR',100,GREEN,900,1,'middle',1)}</g>`+L(t,PAY+0.6,S[13],378,'IST HEUTE.',76,WHITE);}
+ s+=L(t,S[13],S[14],300,'FANG HEUTE AN.',100,GREEN)+L(t,S[13]+0.9,S[14],378,'MIT EINER SACHE, DIE DU DAZUNIMMST.',44,WHITE);
+ s+=L(t,S[14],DUR+1,300,'SCHICK DAS DEM, DER',80,WHITE)+L(t,S[14]+0.5,DUR+1,378,'IMMER SAGT: „AB JANUAR DANN.“',50,YEL);
+ if(t>S[14]+1.0){const o=env(t,S[14]+1.0,DUR+1,0.25,0.3),sc=0.85+0.15*eb((t-S[14]-1.0)/0.4);s+=pill(465,1440,'SCHREIB 48, WENN DU HEUTE ANFÄNGST.',WHITE,'#000',30,o,sc);}
+ s+=cpill(t,S[3]+0.3,S[5],'WIE VIELE TAGE HAST DU SCHON ABGESCHRIEBEN?');
+ s+=SRC(t,S[3],S[5]+0.2,'Eigene Rechnung: 36 von 365 Tagen = 9,9 % · 36 × 16 h = 576 h','Stand 25.11.2026');
+ s+=SRC(t,S[5],S[11],'Oscarsson et al. (2020), PLOS ONE: 1.066 Teilnehmende, 1 Jahr begleitet','55 % erfolgreich · Annäherungsziele 58,9 % vs. Vermeidungsziele 47,1 %');
+ s+=SRC(t,S[11],PAY+0.2,'Dai, Milkman & Riis (2014), Management Science: „Fresh-Start-Effekt“','Neuanfänge häufen sich zu Wochen-, Monats- und Jahresbeginn');
+ s+=brand();
+ document.getElementById('stage').innerHTML=s;
+ const fl=document.getElementById('flash');const w=env(t,-0.1,0.3,0.001,0.25),g=env(t,PAY,PAY+0.7,0.001,0.6),r=env(t,S[1]+1.3,S[1]+1.7,0.001,0.3);
+ fl.style.background=g>0?GREEN:RED;fl.style.opacity=Math.max(0.22*w,0.38*g,0.3*r);
+};
+render(0);
+</script></body></html>

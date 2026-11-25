@@ -1,0 +1,166 @@
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#flash{position:absolute;inset:0;opacity:0}
+</style></head><body>
+<svg id="stage" viewBox="0 0 1080 1920"></svg><div id="flash"></div>
+<script src="rig.js"></script><script src="poses.js"></script><script src="kit.js"></script><script src="h.js"></script><script src="timing.js"></script>
+<script>
+// „Black Friday: Was kostet dich das wirklich?“ – Mindestlohn 2026 (13,90 €/h, Bundesregierung) · HDE-Prognose BF+CM 2026 (6,2 Mrd. €)
+window.DUR=60.4; const PAY=S[12]; const H=(location.hash||'#A').slice(1);
+const TX=540, TY=900; // Preisschild-Zentrum
+const WAGE=13.90;
+// ---------- Preisschild ----------
+function priceTag(t,cx,cy,rot,sc,inner,col='#f4efe4',edge=RED){
+ const w=560,h=520;
+ return `<g transform="translate(${cx},${cy}) rotate(${rot}) scale(${sc})">
+ <line x1="0" y1="${-h/2-40}" x2="0" y2="${-h/2-420}" stroke="#cfc6b4" stroke-width="6"/>
+ <path d="M${-w/2+40},${-h/2+40} L0,${-h/2-60} L${w/2-40},${-h/2+40} L${w/2},${-h/2+80} L${w/2},${h/2-30} Q${w/2},${h/2} ${w/2-30},${h/2} L${-w/2+30},${h/2} Q${-w/2},${h/2} ${-w/2},${h/2-30} L${-w/2},${-h/2+80} Z" fill="${col}" stroke="${edge}" stroke-width="10"/>
+ <circle cx="0" cy="${-h/2-6}" r="22" fill="#05070c" stroke="#cfc6b4" stroke-width="6"/>
+ ${inner}</g>`;}
+function burst(x,y,r,col,s,size,sc=1,rot=-14){let p='';const n=16;for(let i=0;i<2*n;i++){const a=i*Math.PI/n,rr=i%2?r*0.78:r;p+=(i?'L':'M')+(x+Math.cos(a)*rr).toFixed(1)+','+(y+Math.sin(a)*rr).toFixed(1);}
+ return `<g transform="translate(${x},${y}) scale(${sc}) rotate(${rot}) translate(${-x},${-y})"><path d="${p}Z" fill="${col}"/>${txt(x,y+size*0.35,s,size,'#fff',900)}</g>`}
+function clockIcon(x,y,r,k,col){k=Math.min(k,0.999);const a=k*2*Math.PI;return `<g><circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="${col}" stroke-width="${r*0.16}"/>${k>0?`<path d="M${x},${y} L${x},${y-r*0.8} A${r*0.8},${r*0.8} 0 ${k>0.5?1:0} 1 ${x+Math.sin(a)*r*0.8},${y-Math.cos(a)*r*0.8} Z" fill="${col}" opacity=".85"/>`:''}</g>`}
+// Countdown (Sekunden) während Hook/S1
+function cdVal(t){if(t<S[2]) return Math.max(0,59-Math.floor(Math.max(0,t-0.4)*1.0)); if(t<S[11]) return 52; return 52;}
+function countdown(t,x,y,sc,col,label,val){const o=1;return `<g transform="translate(${x},${y}) scale(${sc})"><rect x="-230" y="-62" width="460" height="104" rx="20" fill="#05070c" stroke="${col}" stroke-width="6"/>${txt(-118,10,label,26,col,900,1,'middle',2)}${txt(86,22,val,66,col,900,1,'middle',2)}</g>`}
+// ---------- Tag-Inhalt ----------
+function tagInner(t){let s='';
+ if(t<S[2]+0.3){ // Deal
+  s+=txt(0,-90,'SNEAKER',44,'#333',900,1,'middle',6);
+  s+=`<g opacity=".7">${txt(0,-10,'240 €',64,'#777',800)}<line x1="-110" y1="-30" x2="110" y2="-30" stroke="${RED}" stroke-width="10"/></g>`;
+  s+=txt(0,130,'120 €',150,'#111',900);
+  return s;}
+ if(t<S[4]){ // Rückseite: Zeit
+  s+=clockIcon(0,-40,110,((t-S[2]-0.3)/2.5)%1,'#111');
+  if(t>S[3]){const o=cl((t-S[3])/0.3);s+=`<g opacity="${o}">${txt(0,150,'1 h = 13,90 €',58,'#111',900)}</g>`;}
+  else s+=txt(0,150,'DEINE ZEIT',54,'#111',900,1,'middle',4);
+  return s;}
+ if(t<S[6]){ // 120 € in Stunden
+  const k=cl((t-S[4]-0.4)/2.6);const hrs=8.63*eo(k);
+  s+=txt(0,-120,'120 € =',60,'#555',900);
+  s+=txt(0,40,fmt(hrs,1),170,t>S[5]?RED:'#111',900);
+  s+=txt(0,150,'STUNDEN ARBEIT',46,'#111',900,1,'middle',3);
+  return s;}
+ return s;}
+// ---------- Szenen ----------
+function hookLayer(t){let s='';
+ if(H==='B'&&t<1.2){const o=1-cl((t-0.9)/0.3);s+=`<g opacity="${o}">`+countdown(t,540,840,2.0,RED,'NOCH','00:'+String(cdVal(t)).padStart(2,'0'))+'</g>';}
+ if(H==='C'&&t<1.2){const o=1-cl((t-0.9)/0.3),p=1+0.08*Math.sin(t*20);s+=`<g opacity="${o}" transform="translate(540,1000) scale(${p})"><rect x="-330" y="-90" width="660" height="180" rx="90" fill="${ORANGE}"/>${txt(0,26,'JETZT KAUFEN',76,'#111',900)}</g><path d="M${600+60*Math.cos(t*9)},${1040+40*Math.sin(t*9)} l0,90 l24,-22 l20,40 l18,-8 l-20,-40 l32,-2 Z" fill="#fff" opacity="${o}"/>`;}
+ return s;}
+function scene(t){let s='';
+ // Preisschild: Einschwingen + Pendel
+ let drop=1, rot=0, sc=1;
+ const t0=(H==='A')?-0.4:1.0;
+ drop=eb(cl((t-t0+0.06)/0.35)); rot=(t<S[6])?Math.sin((t-t0)*3.2)*16*Math.exp(-(t-t0)*0.45)+Math.sin(t*1.3)*2:0;
+ const flip=(t>=S[2]&&t<S[2]+0.6)?Math.abs(Math.cos(Math.PI*cl((t-S[2])/0.6))):1;
+ const tagO=env(t,t0-0.01,S[6]+0.4,0.001,0.4);
+ if(tagO>0&&t>=t0-0.01){const y=TY-900*(1-drop);s+=`<g opacity="${tagO}">`+`<g transform="translate(${TX},0) scale(${Math.max(0.02,flip)},1) translate(${-TX},0)">`+priceTag(t,TX,y,rot,1.12,tagInner(t))+'</g></g>';
+  // -50 % Burst
+  const bo=env(t,Math.max(-1,t0+0.05),S[2],0.001,0.3);if(bo>0){const bs=1.6-0.6*eb(cl((t-Math.max(0,t0)-0.0)/0.3));s+=`<g opacity="${bo}">`+burst(800,690,120,RED,'−50 %',58,bs*(1+0.04*Math.sin(t*14)))+'</g>';}
+ }
+ // Countdown oben im Bild
+ const co=env(t,(H==='A'?0:1.0),S[2]+0.5,0.001,0.3)+env(t,S[11],PAY+0.2,0.2,0.001);
+ if(co>0){const v=t<S[2]?cdVal(t):Math.max(0,52-Math.floor((t-S[11])*6));const blink=(Math.sin(t*12)>-0.2)?1:0.55;const frozen=t>=S[2]&&t<S[2]+0.5;
+  const y=t<S[11]?1390:720;const sc2=t<S[11]?1:1+0.7*eb(cl((t-S[11])/0.4));
+  s+=`<g opacity="${Math.min(1,co)*(frozen?1:blink)}">`+countdown(t,t<S[11]?465:540,y,sc2,frozen?YEL:RED,frozen?'PAUSE':'NOCH','00:'+String(v).padStart(2,'0'))+'</g>';}
+ // Ben (links unten) greift zum Deal
+ if(t<S[4]+0.2){const reach=t<S[2]?eio(cl(t/0.8)):0;let pose=FIG.mix(P.stand,P.reach,reach);if(t>=S[5])pose=FIG.mix(P.stand,P.slump,eio((t-S[5])/0.6));
+  s+=`<g opacity="${env(t,-1,S[4]+0.2,0.01,0.3)}">`+benAt(170,1520,pose,0.9,WHITE,0,1,true)+'</g>';}
+ // Stundenbalken unter dem Schild (S4–S6)
+ const ho=env(t,S[4]+0.3,S[6]+0.2,0.3,0.3);if(ho>0){const k=cl((t-S[4]-0.4)/2.6)*8.63;let b='';for(let i=0;i<9;i++){const f=cl(k-i);const x=130+i*76;b+=`<rect x="${x}" y="1190" width="62" height="62" rx="12" fill="#1a2030" stroke="#2a3444" stroke-width="3"/>`+(f>0?`<rect x="${x}" y="${1190+62*(1-f)}" width="62" height="${62*f}" rx="12" fill="${i<8?ORANGE:RED}"/>`:'')+txt(x+31,1232,(i+1)+'h',20,f>0.5?'#111':'#5c6678',900);}
+  s+=`<g opacity="${ho}">${b}${txt(465,1300,'1 KASTEN = 1 STUNDE ZUM MINDESTLOHN',26,'#cfd6e6',800,1,'middle',2)}</g>`;}
+ s+=stampT(t,S[5]+0.2,S[6]+0.1,'= 1 ARBEITSTAG',RED,465,1385,66,-6);
+ if(false){const o=env(t,S[5]+1.4,S[6],0.15,0.2);s+=`<g opacity="${o}">`+tag(465,1400,'… FÜR 1 KLICK',RED,'#fff',44)+'</g>';}
+ // Black Friday Umsatz-Zähler (S6)
+ const bo2=env(t,S[6],S[7]+0.1,0.2,0.3);if(bo2>0){const k=eo(cl((t-S[6]-0.5)/2.6));const v=6.2*k;
+  s+=`<g opacity="${bo2}">`;
+  // Einkaufswagen-Schwarm
+  for(let i=0;i<26;i++){const a=i*2.39,rr=220+((i*53)%160);const ph=cl((t-S[6]-i*0.06)/0.5);const x=540+Math.cos(a)*rr*ph,y=880+Math.sin(a)*rr*0.8*ph;s+=`<g transform="translate(${x},${y}) scale(${0.6+0.2*(i%3)})" opacity="${ph*0.55}"><path d="M-30,-20 L-20,-20 L-8,18 L28,18 L36,-8 L-14,-8" fill="none" stroke="${ORANGE}" stroke-width="6" stroke-linejoin="round"/><circle cx="-2" cy="30" r="6" fill="${ORANGE}"/><circle cx="24" cy="30" r="6" fill="${ORANGE}"/></g>`;}
+  s+=`<circle cx="540" cy="880" r="250" fill="#05070c" stroke="${ORANGE}" stroke-width="10"/>`+txt(540,900,fmt(v,1).replace(',',',')+' MRD €',96,WHITE,900)+txt(540,980,'UMSATZ-PROGNOSE',30,ORANGE,900,1,'middle',3);
+  if(t>S[6]+4.2){const q=cl((t-S[6]-4.2)/0.25);s+=`<g transform="translate(540,1240) scale(${0.6+0.4*eb(q)})" opacity="${q}">`+tag(0,0,'IN NUR 2 TAGEN',RED,'#fff',54)+'</g>';}
+  s+='</g>';}
+ // Abdunkeln – „Rechnung, die keiner macht“ (S7)
+ if(t>=S[7]&&t<S[8]){const k=cl((t-S[7])/0.4);s+=`<g opacity="${k}">`+clockIcon(540,900,170,cl((t-S[7])/2.3),RED)+'</g>';}
+ // 52 Wochen-Schildchen (S8–S10)
+ const wo=env(t,S[8],S[10]+0.4,0.2,0.3);if(wo>0){let g='';const n=t<S[9]?Math.floor(1+51*eio(cl((t-S[8]-0.6)/2.2))):52;
+  for(let i=0;i<52;i++){if(i>=n)break;const c=i%8,r=Math.floor(i/8);const x=135+c*95,y=620+r*92;const pop=cl((t-S[8]-0.6-i*(2.2/52))/0.15);
+   g+=`<g transform="translate(${x},${y}) scale(${0.5+0.5*eb(pop)}) rotate(${-8+(i*37)%16})"><rect x="-44" y="-30" width="88" height="60" rx="10" fill="#f4efe4" stroke="${RED}" stroke-width="4"/>${txt(0,12,'50 €',28,'#111',900)}</g>`;}
+  s+=`<g opacity="${wo*(t>S[10]?1-cl((t-S[10])/0.5):1)}">${g}</g>`;
+  s+=`<g opacity="${wo}">`+txt(465,1330,t<S[9]?'WOCHE '+n+' / 52':'52 WOCHEN × 50 €',44,'#cfd6e6',900,1,'middle',2)+'</g>';}
+ if(t>=S[9]&&t<S[10]+0.4){const q=cl((t-S[9])/0.3),o=env(t,S[9],S[10]+0.4,0.01,0.3);s+=`<g opacity="${o}" transform="translate(540,1060) scale(${0.5+0.5*eb(q)})">`+tag(0,0,fmt(Math.round(2600*eo(cl((t-S[9])/1.2))))+' € / JAHR',YEL,'#111',70)+'</g>';}
+ // 23 Arbeitstage-Kalender (S10)
+ const ao=env(t,S[10]+0.3,S[11]+0.2,0.3,0.3);if(ao>0){const k=23.38*eo(cl((t-S[10]-0.6)/3.2));let g='';
+  ['MO','DI','MI','DO','FR'].forEach((d,j)=>g+=txt(260+j*130,600,d,28,'#8a93a3',900));
+  for(let i=0;i<25;i++){const c=i%5,r=Math.floor(i/5);const x=200+c*130,y=630+r*120;const f=cl(k-i);
+   g+=`<rect x="${x}" y="${y}" width="118" height="108" rx="14" fill="#1a2030" stroke="#2a3444" stroke-width="3"/>`+(f>0?`<rect x="${x}" y="${y}" width="${118*f}" height="108" rx="14" fill="${RED}"/>`:'')+txt(x+59,y+68,f>=1?'8h':'',30,'#fff',900);}
+  for(let r=0;r<5;r++)g+=txt(150,700+r*120,'W'+(r+1),24,'#8a93a3',900,1,'end');
+  s+=`<g opacity="${ao}">${g}</g>`;
+  s+=`<g opacity="${ao}">`+txt(465,1310,fmt(k,1)+' ARBEITSTAGE',64,WHITE,900)+'</g>';
+  if(t>S[10]+3.6){const q=cl((t-S[10]-3.6)/0.3);s+=`<g opacity="${q*ao}" transform="translate(465,1410) scale(${0.7+0.3*eb(q)})">`+tag(0,0,'≈ 5 WOCHEN NUR FÜR DEN SCHRANK',RED,'#fff',34)+'</g>';}
+  // Ben trägt Kisten
+  s+=`<g opacity="${ao}">`+benAt(110,1560,Math.sin(t*5)>0?P.walkA:P.walkB,0.55,WHITE,0,1,true)+'</g>';}
+ // S11: Countdown ist der Trick
+ s+=stampT(t,S[11]+1.6,PAY,'DER TRICK',YEL,540,820,92,-10);
+ if(t>=S[11]&&t<PAY){const o=env(t,S[11],PAY,0.2,0.05);s+=`<g opacity="${o}">`+benAt(540,1500,FIG.mix(P.stand,P.slump,0.4),0.85,WHITE,0,1,true)+'</g>';}
+ // PAYOFF: 48:00:00
+ if(t>=PAY){const k=eb(cl((t-PAY)/0.35));const o=env(t,PAY,DUR+1,0.001,0.4);const run=Math.max(0,(t-PAY-0.8));const hh=48-Math.floor(run*2.5)%49;
+  s+=`<g opacity="${o}" transform="translate(540,640) scale(${0.6+0.4*k})"><rect x="-330" y="-110" width="660" height="200" rx="28" fill="#05070c" stroke="${GREEN}" stroke-width="10"/>${txt(0,40,String(Math.max(0,hh)).padStart(2,'0')+':00:00',120,GREEN,900,1,'middle',4)}</g>`;
+  // Ben jubelt
+  s+=`<g opacity="${env(t,PAY,DUR+1,0.3,0.3)}">`+benAt(890,1540,FIG.mix(P.stand,P.cheer,eio((t-PAY-0.3)/0.8)),0.65,WHITE,0,1,true)+'</g>';
+ }
+ // S13: drei Schritte
+ if(t>=S[13]){const steps=[['1','IN DEN WARENKORB',0.0],['2','48 STUNDEN WARTEN',1.4],['3','WILLST DU ES NOCH? KAUF.',3.0]];
+  steps.forEach(([n,w,dt],i)=>{const q=cl((t-S[13]-dt)/0.3);if(q<=0)return;const o=env(t,S[13]+dt,DUR+1,0.01,0.4);const y=860+i*140;
+   s+=`<g opacity="${o}" transform="translate(${-60*(1-eo(q))},0)"><circle cx="150" cy="${y-14}" r="44" fill="${GREEN}"/>${txt(150,y+2,n,48,'#05070c',900)}${txt(215,y+4,w,44,WHITE,900,1,'start')}</g>`;});}
+ return s;}
+window.SFXC=()=>{const c=[];const t0=H==='A'?0:1.0;
+ if(H!=='A'){for(let k=0;k<4;k++)c.push([0.05+k*0.25,'tick']);}
+ c.push([t0,'whoosh'],[t0+0.1,'boom'],[t0+0.15,'pop']);for(let k=1;k<7;k++)c.push([0.4+k*1.0,'tick']);
+ c.push([S[2],'buzz'],[S[2]+0.1,'whoosh'],[S[3],'pop'],[S[3]+0.3,'ding']);
+ c.push([S[4],'whoosh']);for(let k=0;k<9;k++)c.push([S[4]+0.4+k*0.3,'tick']);c.push([S[5]+0.2,'boom'],[S[5]+1.4,'pop']);
+ c.push([S[6],'whoosh']);for(let k=0;k<12;k++)c.push([S[6]+0.5+k*0.2,'tick']);c.push([S[6]+4.2,'pop'],[S[7],'buzz'],[S[7]+0.1,'whoosh']);
+ c.push([S[8],'whoosh']);for(let k=0;k<13;k++)c.push([S[8]+0.6+k*0.17,'tick']);c.push([S[9],'ding']);
+ c.push([S[10],'whoosh']);for(let k=0;k<12;k++)c.push([S[10]+0.6+k*0.27,'tick']);c.push([S[10]+3.6,'boom']);
+ c.push([S[11],'whoosh']);for(let k=0;k<8;k++)c.push([S[11]+0.2+k*0.17,'tick']);c.push([S[11]+1.6,'buzz']);
+ c.push([PAY-0.4,'whoosh'],[PAY,'boom'],[PAY+0.05,'ding']);
+ c.push([S[13],'pop'],[S[13]+1.4,'pop'],[S[13]+3.0,'pop'],[S[13]+3.2,'ding'],[S[14],'whoosh'],[S[14]+1.0,'pop']);return c;};
+window.render=function(t){let s='';
+ const shake=Math.max(env(t,(H==='A'?0:1.0)-0.05,(H==='A'?0.7:1.7),0.001,0.6),env(t,PAY,PAY+0.6,0.001,0.5),env(t,S[5]+0.2,S[5]+0.6,0.001,0.3)*0.6,env(t,S[10]+3.6,S[10]+4.0,0.001,0.3)*0.5);
+ const jx=Math.sin(t*91)*18*shake,jy=Math.cos(t*67)*14*shake;
+ const red=Math.max(env(t,-1,1.6,0.1,0.8)*0.8,env(t,S[5]+0.2,S[6],0.05,0.5)*0.6,env(t,S[10]+3.6,S[11]+0.2,0.2,0.4)*0.5,env(t,S[11],PAY,0.3,0.05)*0.4);
+ const green=env(t,PAY,PAY+2.6,0.05,1.2);
+ s+=bg(red,green);
+ if(t>=S[7]&&t<S[8])s+=`<rect width="1080" height="1920" fill="#000" opacity="${0.5*env(t,S[7],S[8],0.2,0.2)}"/>`;
+ s+=`<g transform="translate(${jx},${jy})">`+scene(t)+hookLayer(t)+'</g>';
+ s+=head();
+ s+=LH(t,-1,S[1],300,'WIE VIELE STUNDEN',84,WHITE)+LH(t,-1,S[1],378,'KOSTET DICH DIESER DEAL?',54,YEL);
+ s+=L(t,S[1],S[2],300,'−50 %! NOCH 59 SEK.',84,RED)+L(t,S[1]+2.6,S[2],378,'DEIN DAUMEN ZUCKT SCHON.',54,WHITE);
+ s+=L(t,S[2],S[3],300,'NICHT IN EURO.',96,WHITE)+L(t,S[2]+1.4,S[3],378,'SONDERN IN DEINER ZEIT.',58,YEL);
+ s+=L(t,S[3],S[4],300,'MINDESTLOHN 2026',90,WHITE)+L(t,S[3]+1.0,S[4],378,'13,90 € PRO STUNDE (BRUTTO)',52,YEL);
+ s+=L(t,S[4],S[5],300,'SNEAKER FÜR 120 €?',86,WHITE)+L(t,S[4]+1.8,S[5],378,'= ÜBER 8 STUNDEN ARBEIT.',58,ORANGE);
+ s+=L(t,S[5],S[6],300,'EIN GANZER ARBEITSTAG.',76,RED)+L(t,S[5]+1.3,S[6],378,'FÜR EINEN KLICK.',62,WHITE);
+ s+=L(t,S[6],S[7],300,'FREITAG: BLACK FRIDAY',80,WHITE)+L(t,S[6]+1.4,S[7],378,'HANDEL ERWARTET 6,2 MRD. €',54,ORANGE);
+ s+=L(t,S[7],S[8],320,'DIE RECHNUNG, DIE KEINER MACHT:',58,RED);
+ s+=L(t,S[8],S[9],300,'1 SPONTANKAUF',96,WHITE)+L(t,S[8]+0.8,S[9],378,'50 € PRO WOCHE (BEISPIEL)',54,YEL);
+ s+=L(t,S[9],S[10],300,'= 2.600 € IM JAHR',92,YEL)+L(t,S[9]+0.8,S[10],378,'2.600 € : 13,90 € = 187 STUNDEN',50,WHITE);
+ s+=L(t,S[10],S[11],300,'= 23 ARBEITSTAGE',96,RED)+L(t,S[10]+1.4,S[11],378,'FÜR SACHEN IM SCHRANK.',58,WHITE);
+ s+=L(t,S[11],PAY,300,'DER COUNTDOWN',92,WHITE)+L(t,S[11]+1.4,PAY,378,'IST NICHT DEIN PROBLEM.',58,YEL);
+ if(t>=PAY){const o=env(t,PAY,S[13],0.001,0.25),sc=1.5-0.5*eb((t-PAY)/0.35);s+=`<g opacity="${o}" transform="translate(540,300) scale(${sc})">${txt(0,0,'DIE 48-STUNDEN-REGEL',76,GREEN,900,1,'middle',1)}</g>`+L(t,PAY+0.8,S[13],378,'STATT 59 SEKUNDEN.',62,WHITE);}
+ s+=L(t,S[13],S[14],300,'DIE 48-STUNDEN-REGEL',76,GREEN)+L(t,S[13]+0.4,S[14],378,'SO GEHT SIE:',60,WHITE);
+ s+=L(t,S[14],DUR+1,300,'SCHICK DAS DEM,',86,WHITE)+L(t,S[14]+0.5,DUR+1,378,'DER SCHON DEN WARENKORB VOLL HAT.',44,YEL);
+ if(t>S[14]+1.0){const o=env(t,S[14]+1.0,DUR+1,0.25,0.3),sc=0.85+0.15*eb((t-S[14]-1.0)/0.4);s+=pill(465,1440,'SCHREIB 48, WENN DU'+"'"+'S AUSPROBIERST.',WHITE,'#000',30,o,sc);}
+ // Kommentar-Pille (M14)
+ s+=cpill(t,S[3]+0.2,S[4]+3.2,'WAS WAR DEIN TEUERSTER SPONTANKAUF?');
+ // Quellen
+ s+=SRC(t,S[3],S[6],'Mindestlohn ab 1.1.2026: 13,90 €/h brutto (Bundesregierung)','120 € : 13,90 € = 8,6 h');
+ s+=SRC(t,S[6],S[7]+0.1,'HDE-Prognose Black Friday + Cyber Monday 2026','(27.–30.11.): 6,2 Mrd. € Umsatz');
+ s+=SRC(t,S[8],S[11],'Beispielrechnung: 50 €/Woche × 52 = 2.600 € · : 13,90 €/h','= 187 h · : 8 h = 23,4 Arbeitstage');
+ s+=brand();
+ document.getElementById('stage').innerHTML=s;
+ const fl=document.getElementById('flash');const w=env(t,(H==='A'?0:1.0)-0.05,(H==='A'?0.3:1.3),0.001,0.25),g=env(t,PAY,PAY+0.7,0.001,0.6),r=env(t,S[5]+0.2,S[5]+0.6,0.001,0.3);
+ fl.style.background=g>0?GREEN:RED;fl.style.opacity=Math.max(0.22*w,0.38*g,0.3*r);
+};
+render(0);
+</script></body></html>
