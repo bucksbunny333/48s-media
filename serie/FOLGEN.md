@@ -177,3 +177,5 @@ QC gegen Referenzen („Wochen“, „150 €“, Hook „1 neue Nachricht“) u
 - Hinweis: Die Cloud-Absicherungen für Instagram konnten in diesem Lauf nicht als eigene geplante Aufgaben angelegt werden (geplante Läufe dürfen keine neuen Aufgaben anlegen) → stattdessen 20-Min-Checks per Erinnerung in dieser Sitzung.
 
 > 25.11. 16:33: „Black Friday“ live – TikTok 7712131765531331873 · Instagram DgK2_LovLuT (KI-Label) · YouTube: Datei + Texte an Lukas (vidIQ-Kontingent verbraucht, kein Chrome). Kommentare an Lukas geschickt.
+
+> 25.11. 18:33: „Sie mag dich mehr, als du denkst“ live – TikTok 7712162845244394791 · Instagram DgLErvehht_ (KI-Label) · YouTube: Datei + Texte an Lukas. Kommentare an Lukas geschickt.
