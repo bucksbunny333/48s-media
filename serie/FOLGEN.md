@@ -175,3 +175,5 @@ QC gegen Referenzen („Wochen“, „150 €“, Hook „1 neue Nachricht“) u
 - Ton: Tom Magic, eleven_v3, 1 Take/Satz (45 Sätze, ~6.300 Credits), Starts aus gemessenen Dauern (fit.py), atempo 1,08 / 1,0 / 1,0; −14 LUFS (gemessen −14,0 / −14,1 / −13,9); Musik Sidechain; SFX auf jedem Wechsel.
 - Kein Handy-Bezug in allen drei Videos. Mechaniken neu (Preisschild/Countdown, Sterne-Bewertung, Abreißkalender) → bis 02.12. gesperrt.
 - Hinweis: Die Cloud-Absicherungen für Instagram konnten in diesem Lauf nicht als eigene geplante Aufgaben angelegt werden (geplante Läufe dürfen keine neuen Aufgaben anlegen) → stattdessen 20-Min-Checks per Erinnerung in dieser Sitzung.
+
+> 25.11. 16:33: „Black Friday“ live – TikTok 7712131765531331873 · Instagram DgK2_LovLuT (KI-Label) · YouTube: Datei + Texte an Lukas (vidIQ-Kontingent verbraucht, kein Chrome). Kommentare an Lukas geschickt.
