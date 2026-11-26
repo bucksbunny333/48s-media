@@ -1,0 +1,141 @@
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#flash{position:absolute;inset:0;opacity:0}
+</style></head><body>
+<svg id="stage" viewBox="0 0 1080 1920"></svg><div id="flash"></div>
+<script src="rig.js"></script><script src="poses.js"></script><script src="kit.js"></script><script src="h.js"></script><script src="timing.js"></script>
+<script>
+// „Sorgen-Wetter“ – LaFreniere & Newman (2020), Behavior Therapy 51(3), 413–423
+window.DUR=60.5; const PAY=S[12]; const H=(location.hash||'#B').slice(1); const ENDC=59.1;
+const STORM='#6b7a99', SUN='#ffd60a';
+function cloud(x,y,sc,col,o=1){return `<g opacity="${o}" transform="translate(${x},${y}) scale(${sc})"><path d="M-70,30 Q-100,30 -100,0 Q-100,-30 -65,-32 Q-55,-75 -10,-70 Q25,-95 55,-55 Q100,-60 100,-10 Q105,30 65,30 Z" fill="${col}"/></g>`}
+function bolt(x,y,sc,o=1){return `<g opacity="${o}" transform="translate(${x},${y}) scale(${sc})"><path d="M10,-40 L-25,15 L0,15 L-15,60 L30,0 L5,0 L20,-40Z" fill="${SUN}"/></g>`}
+function sun(x,y,sc,o=1,rot=0){let r='';for(let i=0;i<8;i++){const a=i*Math.PI/4+rot;r+=`<line x1="${Math.cos(a)*48}" y1="${Math.sin(a)*48}" x2="${Math.cos(a)*68}" y2="${Math.sin(a)*68}" stroke="${SUN}" stroke-width="10" stroke-linecap="round"/>`;}return `<g opacity="${o}" transform="translate(${x},${y}) scale(${sc})">${r}<circle r="36" fill="${SUN}"/></g>`}
+function rain(x,y,w,t,o=1){let s=`<g opacity="${o}" stroke="#4da3ff" stroke-width="5" stroke-linecap="round">`;for(let i=0;i<10;i++){const xx=x-w/2+((i*73)%w),yy=y+((t*700+i*57)%180);s+=`<line x1="${xx}" y1="${yy}" x2="${xx-8}" y2="${yy+28}"/>`;}return s+'</g>'}
+function bed(x,y){return `<g stroke="${GREY}" stroke-width="10" stroke-linecap="round" fill="none"><path d="M${x},${y} L${x+420},${y} M${x},${y-110} L${x},${y+50} M${x+420},${y-50} L${x+420},${y+50}"/></g><rect x="${x+10}" y="${y-36}" width="400" height="36" rx="10" fill="#2a3444"/>`}
+// Hook: Unwetter über Bens Bett (bis S2)
+function hook(t){const o=env(t,-1,S[2]+0.1,0.001,0.3);if(o<=0)return'';let s=`<g opacity="${o}">`;
+ const flash=(t%1.3)<0.12||(t<0.25);
+ s+=cloud(540,720,2.6,flash?'#9aa7c4':STORM)+cloud(300,780,1.5,'#4a5670')+cloud(800,770,1.6,'#4a5670');
+ s+=rain(540,840,560,t);
+ if(flash)s+=bolt(520,900,2.2)+bolt(760,880,1.4);
+ // Warnbanner
+ const bl=Math.floor(t*4)%2===0;s+=`<g transform="translate(540,470)">`+tag(0,0,'UNWETTERWARNUNG',bl?RED:'#5c1a1d',WHITE,46)+'</g>';
+ // Ben im Bett, Augen offen
+ s+=bed(260,1250)+benAt(560,1290,P.lie,0.75,WHITE,0,1,true);
+ // Uhr
+ s+=`<g transform="translate(465,1360)">`+tag(0,0,t<S[1]?'HEUTE NACHT: STURM 100 %':'23:47 · KOPF AN',RED,WHITE,38)+'</g>';
+ return s+'</g>';}
+// Studie: Sorgen-Raster 10 Tage × 4 (S2..S9)
+const GRID=[];for(let d=0;d<10;d++)for(let k=0;k<4;k++)GRID.push([d,k]);
+const TRUE_IDX=[13,31,37,7]; // 4 von 40 ≈ 10 % (schematisch; Studie: 8,6 %)
+function grid(t){const o=env(t,S[2],S[9]+0.1,0.3,0.3);if(o<=0)return'';let s=`<g opacity="${o}">`;
+ s+=`<rect x="60" y="450" width="960" height="520" rx="28" fill="#0b0f16" stroke="#2a3444" stroke-width="5"/>`;
+ s+=txt(100,500,'SORGEN-TAGEBUCH · SCHEMATISCH',28,'#8a93a3',900,1,'start',4);
+ const n=t<S[3]?Math.floor(cl((t-S[2]-0.6)/4.2)*12):Math.min(40,12+Math.floor((t-S[3])/2.4*28));
+ const flip=t>=S[6]?cl((t-S[6]-0.3)/1.6):0;
+ GRID.forEach(([d,k],i)=>{if(i>=n)return;const x=135+d*90,y=575+k*100;const isT=TRUE_IDX.includes(i);
+  const turned=!isT&&flip>(i/40);
+  if(turned)s+=sun(x,y,0.48,1,t);else s+=cloud(x,y,0.36,isT&&t>=S[6]?RED:STORM);});
+ // Tage-Beschriftung
+ for(let d=0;d<10;d++)s+=txt(135+d*90,955,'T'+(d+1),22,'#5c6575',900,n>d*4?1:0.3);
+ return s+'</g>';}
+function study(t){let s='';
+ if(t>=S[2]&&t<S[4]){const d=Math.min(10,1+Math.floor((t-S[2])/0.8));s+=`<g transform="translate(465,1080)">`+tag(0,0,'TAG '+d+' VON 10 · NOTIERT: '+Math.min(40,t<S[3]?Math.floor(cl((t-S[2]-0.6)/4.2)*12):12+Math.floor((t-S[3])/2.4*28)),WHITE,'#05070c',36)+'</g>';
+  if(t>=S[3]){const q=cl((t-S[3]-0.3)/0.3);s+=`<g opacity="${q}" transform="translate(465,1190) scale(${0.7+0.3*eb(q)})">`+tag(0,0,'🔔 4× AM TAG',YEL,'#05070c',40)+'</g>';}}
+ if(t>=S[4]&&t<S[5]){const k=cl((t-S[4]-0.3)/2.6);s+=`<g><rect x="85" y="1060" width="760" height="70" rx="16" fill="#1d2533"/><rect x="85" y="1060" width="${760*k}" height="70" rx="16" fill="${BLUE}"/>`+txt(465,1108,Math.round(30*k)+' / 30 TAGE WARTEN',38,WHITE,900)+'</g>';
+  const q=cl((t-S[4]-3.0)/0.3);s+=`<g opacity="${q}" transform="translate(465,1220) scale(${0.7+0.3*eb(q)})">`+tag(0,0,'IST ES PASSIERT?',WHITE,'#05070c',44)+'</g>';}
+ if(t>=S[5]&&t<S[6]+0.3){const qo=env(t,S[5],S[6]+0.3,0.2,0.2);['50 %','30 %','10 %'].forEach((w,i)=>{const q=cl((t-S[5]-0.2-i*0.35)/0.25);s+=`<g opacity="${qo*q}" transform="translate(${165+i*300},1120) scale(${0.7+0.3*eb(q)})">`+tag(0,0,w+'?',ORANGE,'#05070c',46)+'</g>';});
+  if(t>S[5]+2.0)s+=txt(465,1280,'…',120,YEL,900,(Math.floor(t*4)%2)?1:0.3);}
+ if(t>=S[6]&&t<S[7]){const k=eo(cl((t-S[6]-0.3)/1.6));s+=`<g transform="translate(465,1140) scale(${0.8+0.2*eb(k)})">`+txt(0,0,fmt(91.4*k,1)+' %',150,SUN,900)+'</g>'+txt(465,1240,'NIE PASSIERT',56,WHITE,900,k);}
+ // 7 von 29
+ if(t>=S[7]&&t<S[8]){for(let i=0;i<29;i++){const c=i%10,r=Math.floor(i/10);const x=110+c*80,y=1090+r*110;const hit=[2,5,9,12,17,21,26].includes(i);const q=cl((t-S[7]-0.4-i*0.03)/0.2);
+   s+=`<g opacity="${q}"><circle cx="${x}" cy="${y-22}" r="16" fill="${hit?SUN:'#5c6575'}"/><path d="M${x-22},${y+30} Q${x},${y-6} ${x+22},${y+30}Z" fill="${hit?SUN:'#5c6575'}"/></g>`;}
+  const q=cl((t-S[7]-1.6)/0.3);s+=`<g opacity="${q}" transform="translate(465,1440)">`+tag(0,0,'7 VON 29: KEINE EINZIGE SORGE PASSIERT',SUN,'#05070c',30)+'</g>';}
+ // Rest: besser / wie befürchtet / schlimmer
+ if(t>=S[8]&&t<S[9]){const q=cl((t-S[8]-0.3)/0.4);const segs=[[30.1,GREEN,'BESSER'],[44.2,'#8a93a3','WIE BEFÜRCHTET'],[25.8,RED,'SCHLIMMER']];let x=85;
+  s+=txt(85,1070,'VON DEN SORGEN, DIE PASSIERT SIND:',30,'#cfd6e6',900,q,'start',1);
+  segs.forEach(([v,c,l],i)=>{const w=760*v/100*eo(cl((t-S[8]-0.5-i*0.5)/0.6));s+=`<rect x="${x}" y="1100" width="${w}" height="90" fill="${c}" opacity="${i==0?1:0.75}"/>`;if(w>40)s+=txt(x+w/2,1160,Math.round(v)+' %',38,'#05070c',900);s+=txt(x+(760*v/100)/2,1240,l,24,c,900,w>40?1:0);x+=760*v/100;});
+  const q2=cl((t-S[8]-2.2)/0.3);s+=`<g opacity="${q2}" transform="translate(${85+760*0.15},1320) scale(${0.7+0.3*eb(q2)})">`+tag(0,0,'FAST JEDE 3.',GREEN,'#05070c',36)+'</g>';}
+ return s;}
+// Wetterbericht + Nacht (S9..PAY)
+function report(t){const o=env(t,S[9],PAY+0.05,0.3,0.15);if(o<=0)return'';let s=`<g opacity="${o}">`;
+ if(t<S[10]){s+=`<rect x="60" y="450" width="960" height="560" rx="28" fill="#0b2a4a" stroke="#2a3444" stroke-width="5"/>`+txt(100,505,'KOPF-WETTER · VORHERSAGE',30,'#cfd6e6',900,1,'start',3);
+  for(let i=0;i<6;i++){const x=200+(i%3)*260,y=650+Math.floor(i/3)*200;s+=cloud(x,y,0.7,STORM)+bolt(x,y+40,0.7,(Math.floor(t*3+i)%3===0)?1:0.3);}
+  s+=benAt(300,1450,FIG.mix(P.stand,P.reach,0.8),0.7,WHITE,0,1,false);
+  s+=`<g transform="translate(600,1150)">`+tag(0,0,'VORHERSAGE: STURM',RED,WHITE,36)+'</g>'+`<g transform="translate(600,1250)">`+tag(0,0,'TATSÄCHLICH: 9 VON 10 SONNE',SUN,'#05070c',30)+'</g>';}
+ else{// Ben wach im Bett
+  s+=cloud(540,660,1.6,STORM)+txt(540,690,'?',90,WHITE,900);
+  s+=bed(260,1050)+benAt(560,1090,P.lie,0.75,WHITE,0,1,true);
+  const hh=t<S[11]?'02:13':'03:41';s+=`<g transform="translate(465,1200)">`+tag(0,0,hh+' · NOCH WACH',RED,WHITE,40)+'</g>';
+  if(t>=S[11]){const q=cl((t-S[11]-0.3)/0.3);s+=`<g opacity="${q}" transform="translate(465,1340)"><circle cx="-40" cy="-10" r="50" fill="none" stroke="${WHITE}" stroke-width="12"/><line x1="0" y1="25" x2="45" y2="70" stroke="${WHITE}" stroke-width="16" stroke-linecap="round"/></g>`+xmark(505,1330,50,q);}}
+ return s+'</g>'+stampT(t,S[11]+0.8,PAY,'NIE GEPRÜFT.',RED,540,860,90,-8);}
+// Payoff
+function payoff(t){if(t<PAY)return'';let s='';const o=env(t,PAY,ENDC+0.3,0.001,0.3);s+=`<g opacity="${o}">`;
+ // Notizzettel
+ s+=`<g transform="translate(465,760) rotate(-3) scale(${1.3-0.3*eb(cl((t-PAY)/0.4))})"><rect x="-300" y="-210" width="600" height="420" rx="18" fill="#f4efe4"/>`;
+ const l1='MEINE SORGE:',l2='„…“',l3='DATUM: 26.11.';const n3=Math.floor(cl((t-PAY-1.6)/0.8)*l3.length);
+ s+=txt(-250,-120,l1,46,'#111',900,cl((t-PAY-0.2)/0.3),'start')+txt(-250,-20,l2,60,'#555',800,cl((t-PAY-0.8)/0.3),'start')+txt(-250,110,l3.slice(0,n3),50,'#c0392b',900,1,'start');
+ if(t>=S[13]){const q=cl((t-S[13]-0.6)/0.3);s+=`<g opacity="${q}"><rect x="-262" y="142" width="480" height="60" rx="12" fill="none" stroke="${GREEN}" stroke-width="7"/>`+txt(-240,186,'NACHSCHAUEN: 26.12.',38,'#1e8a3c',900,1,'start')+'</g>';}
+ s+='</g>';
+ // Wolke -> Sonne
+ if(t>=S[13]){const k=eio(cl((t-S[13]-1.6)/1.4));s+=cloud(465,1180,1.7,STORM,1-k)+sun(465,1180,1.8*(0.4+0.6*k),k,t*0.6);
+  const q=cl((t-S[13]-2.8)/0.3);s+=`<g opacity="${q}" transform="translate(465,1370)">`+tag(0,0,'MEISTENS: SONNE ☀',SUN,'#05070c',42)+'</g>';}
+ else s+=benAt(760,1450,FIG.mix(P.stand,P.reach,0.6),0.7,WHITE,0,1,false);
+ return s+'</g>';}
+function endCard(t){if(t<ENDC)return'';const o=cl((t-ENDC)/0.25);const sc=0.9+0.1*eb((t-ENDC)/0.4);
+ return `<g opacity="${o}"><rect width="1080" height="1920" fill="#05070c" opacity=".93"/>`+txt(540,300,'MORGEN · 07:30',64,YEL,900,1,'middle',2)+
+ txt(540,560,'NEUES VIDEO',84,WHITE,900)+txt(540,660,'MIT BEN.',84,ORANGE,900)+
+ `<g transform="translate(465,1100) scale(${sc})">`+pill(0,0,'FOLG BEN →',GREEN,'#05070c',70)+'</g>'+benAt(465,1460,P.cheer,0.7,WHITE,0,1,true)+'</g>';}
+window.SFXC=()=>{const c=[[0,'whoosh'],[0.05,'boom'],[0.1,'buzz']];for(let k=0;k<4;k++)c.push([k*1.3+0.02,'boom']);
+ c.push([S[1],'whoosh'],[S[1]+0.3,'tick'],[S[2],'whoosh']);for(let k=0;k<12;k++)c.push([S[2]+0.6+k*0.35,'pop']);
+ c.push([S[3],'ding']);for(let k=0;k<14;k++)c.push([S[3]+k*0.17,'pop']);
+ c.push([S[4],'whoosh']);for(let k=0;k<12;k++)c.push([S[4]+0.3+k*0.22,'tick']);c.push([S[4]+3.0,'pop']);
+ c.push([S[5],'whoosh']);for(let k=0;k<3;k++)c.push([S[5]+0.2+k*0.35,'pop']);for(let k=0;k<12;k++)c.push([S[5]+2.0+k*0.12,'tick']);
+ c.push([S[6],'whoosh'],[S[6]+0.2,'boom'],[S[6]+0.25,'ding']);for(let k=0;k<8;k++)c.push([S[6]+0.3+k*0.2,'pop']);
+ c.push([S[7],'whoosh']);for(let k=0;k<7;k++)c.push([S[7]+0.4+k*0.2,'pop']);c.push([S[7]+1.6,'ding']);
+ c.push([S[8],'whoosh'],[S[8]+0.5,'pop'],[S[8]+1.0,'pop'],[S[8]+1.5,'pop'],[S[8]+2.2,'ding']);
+ c.push([S[9],'whoosh'],[S[9]+0.5,'boom'],[S[10],'whoosh'],[S[11],'whoosh'],[S[11]+0.3,'buzz'],[S[11]+0.8,'boom']);
+ c.push([PAY-0.4,'whoosh'],[PAY,'boom'],[PAY+0.05,'ding'],[PAY+0.2,'pop'],[PAY+0.8,'pop']);for(let k=0;k<6;k++)c.push([PAY+1.6+k*0.13,'tick']);
+ c.push([S[13],'whoosh'],[S[13]+0.6,'pop'],[S[13]+1.6,'whoosh'],[S[13]+2.8,'ding'],[S[14],'whoosh'],[S[14]+0.8,'pop'],[ENDC,'whoosh'],[ENDC+0.3,'ding']);return c;};
+window.render=function(t){let s='';
+ const shake=Math.max(env(t,-0.1,0.8,0.001,0.7),env(t,PAY,PAY+0.6,0.001,0.5),env(t,S[6]+0.2,S[6]+0.6,0.001,0.3)*0.6,env(t,S[11]+0.8,S[11]+1.2,0.001,0.3)*0.5,((t%1.3)<0.12&&t<S[2])?0.4:0);
+ const jx=Math.sin(t*91)*18*shake,jy=Math.cos(t*67)*14*shake;
+ const red=Math.max(env(t,-1,S[2],0.1,0.6)*0.5,env(t,S[10],PAY,0.3,0.1)*0.45);
+ const green=env(t,PAY,PAY+2.6,0.05,1.2);
+ s+=bg(red,green);
+ s+=`<g transform="translate(${jx},${jy})">`;
+ const z=H==='C'&&t<0.9?1.6-0.6*eio(t/0.9):(t<0.5?1.12-0.12*eio(t/0.5):1);
+ s+=`<g transform="translate(540,800) scale(${z}) translate(-540,-800)">`+hook(t)+'</g>';
+ s+=grid(t)+study(t)+report(t)+payoff(t);
+ if(H==='B'&&t<1.2){for(let i=0;i<6;i++){s+=bolt(150+i*150,500+((i*311)%700),1.2,(Math.floor(t*8+i)%2));}}
+ s+='</g>';
+ s+=head();
+ s+=LH(t,-1,S[1],300,'WIE VIELE DEINER SORGEN',72,WHITE)+LH(t,-1,S[1],378,'SIND WIRKLICH PASSIERT?',56,YEL);
+ s+=L(t,S[1],S[2],300,'GEWITTER IM KOPF.',90,WHITE)+L(t,S[1]+1.4,S[2],378,'JEDEN ABEND VORM EINSCHLAFEN.',50,STORM==''?WHITE:'#9aa7c4');
+ s+=L(t,S[2],S[3],300,'DAS EXPERIMENT:',96,WHITE)+L(t,S[2]+1.4,S[3],378,'JEDE SORGE AUFSCHREIBEN.',56,YEL);
+ s+=L(t,S[3],S[4],300,'4× AM TAG.',110,YEL)+L(t,S[3]+1.0,S[4],378,'10 TAGE LANG. JEDE EINZELNE.',52,WHITE);
+ s+=L(t,S[4],S[5],300,'30 TAGE SPÄTER:',96,WHITE)+L(t,S[4]+2.4,S[5],378,'IST ES PASSIERT?',62,BLUE);
+ s+=L(t,S[5],S[6],300,'RATE MAL.',120,WHITE)+L(t,S[5]+0.6,S[6],378,'WIE VIELE SIND EINGETRETEN?',52,ORANGE);
+ s+=L(t,S[6],S[7],300,'91 % DER SORGEN:',90,SUN)+L(t,S[6]+1.4,S[7],378,'NIE PASSIERT.',70,WHITE);
+ s+=L(t,S[7],S[8],300,'7 VON 29 LEUTEN:',90,WHITE)+L(t,S[7]+1.4,S[8],378,'KEINE EINZIGE.',70,SUN);
+ s+=L(t,S[8],S[9],300,'UND VOM REST?',100,WHITE)+L(t,S[8]+1.6,S[9],378,'FAST JEDE 3. LIEF BESSER.',56,GREEN);
+ s+=L(t,S[9],S[10],300,'DEIN KOPF MELDET STURM.',72,WHITE)+L(t,S[9]+1.4,S[10],378,'FAST IMMER.',70,RED);
+ s+=L(t,S[10],S[11],300,'UND DU GLAUBST IHM.',84,WHITE)+L(t,S[10]+1.0,S[11],378,'JEDE NACHT.',70,RED);
+ s+=L(t,S[11],PAY,300,'DAS PROBLEM:',100,WHITE)+L(t,S[11]+0.8,PAY,378,'DU PRÜFST NIE NACH.',62,RED);
+ if(t>=PAY){const o=env(t,PAY,S[13],0.001,0.25),sc=1.5-0.5*eb((t-PAY)/0.35);s+=`<g opacity="${o}" transform="translate(540,300) scale(${sc})">${txt(0,0,'SCHREIB SIE AUF.',84,GREEN,900,1,'middle',1)}</g>`+L(t,PAY+1.2,S[13],378,'HEUTE ABEND. MIT DATUM.',56,WHITE);}
+ s+=L(t,S[13],S[14],300,'IN 30 TAGEN:',100,GREEN)+L(t,S[13]+1.0,S[14],378,'NACHSCHAUEN.',66,WHITE);
+ s+=L(t,S[14],ENDC+0.2,300,'SCHICK DAS JEMANDEM,',80,WHITE)+L(t,S[14]+0.5,ENDC+0.2,378,'DER NACHTS ZU VIEL NACHDENKT.',50,YEL);
+ if(t>S[14]+0.6&&t<ENDC){const o=env(t,S[14]+0.6,ENDC,0.25,0.2),sc=0.85+0.15*eb((t-S[14]-0.6)/0.4);s+=pill(465,1440,'SCHREIB 48, WENN DU SIE HEUTE AUFSCHREIBST.',WHITE,'#000',26,o,sc);}
+ if(t>=S[1]+0.4&&t<S[4])s+=cpill(t,S[1]+0.4,S[4],'WELCHE SORGE HÄLT DICH NACHTS WACH? → KOMMENTARE');
+ s+=SRC(t,S[2],PAY,'LaFreniere & Newman (2020), Behavior Therapy 51(3), N = 29','Studierende mit Angststörung (GAD) · 91,4 % nicht eingetreten');
+ s+=endCard(t);
+ s+=brand();
+ document.getElementById('stage').innerHTML=s;
+ const fl=document.getElementById('flash');const w=env(t,-0.1,0.3,0.001,0.25),g=env(t,PAY,PAY+0.7,0.001,0.6),y=env(t,S[6]+0.2,S[6]+0.7,0.001,0.4),lb=(t<S[2]&&(t%1.3)<0.1)?1:0;
+ fl.style.background=g>0?GREEN:(y>0?SUN:(lb?'#cfd6ff':RED));fl.style.opacity=Math.max(0.22*w,0.38*g,0.3*y,0.25*lb);
+};
+render(0);
+</script></body></html>
