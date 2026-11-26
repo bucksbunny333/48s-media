@@ -1,0 +1,2 @@
+# bash dl.sh dir : lädt urls.txt -> raw_XX.mp3, schneidet Stille vorn/hinten -> vo_XX.mp3
+cd $1; k=0; while read u; do n=$(printf %02d $k); curl -sf -o raw_$n.mp3 "$u" || echo FAIL $n; ffmpeg -nostdin -v error -y -i raw_$n.mp3 -af "silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse,apad=pad_dur=0.05" -ar 44100 vo_$n.mp3; echo $n $(ffprobe -v error -show_entries format=duration -of csv=p=0 vo_$n.mp3); k=$((k+1)); done < urls.txt
