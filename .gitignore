@@ -9,3 +9,9 @@ engine/folgen/20*/render.log
 engine/folgen/20*/qc/f_*.png
 engine/folgen/20*/qc/h*_*.png
 engine/folgen/*/s_*.png
+
+# Zwischenstände (nicht versionieren)
+.tmpdoc/
+engine/folgen/*/video.mp4
+engine/folgen/*/raw_*.mp3
+engine/folgen/*/*.log
