@@ -202,3 +202,5 @@ QC gegen Referenzen („Wochen“, „150 €“, Hook „1 neue Nachricht“) u
 - Safe Zone: je 13–19 Standbilder mit Sperrzonen + Pixel-Messung der Überschriften (alle in x 45–1031) geprüft; korrigiert: Stempel „BRONZE LÄCHELT ÖFTER“/„WIE SILBER“ links im Rand, „PLATZ 2 DER WELT“ abgeschnitten, Schriftbreiten-Schätzung zu knapp (Überschriften bis x 1042) → h.js-Faktor 0,68; 12:30: Stempel „MEHR ALS DIE HÄLFTE WEG“ in der Button-Ecke, „UMGEDREHT“ links im Rand, Methodenzeile rechts, Schritte-Text im Payoff → ok.
 - Ton: Tom Magic, eleven_v3, 1 Take/Satz (31 Sätze, ~4.300 Credits), Starts aus gemessenen Dauern (fit.py), atempo 1,10 / 1,08; −14,1 / −14,0 LUFS; Musik Sidechain; SFX auf jedem Wechsel.
 - Mechaniken neu (Siegerpodest/Freude-Skala, Gedächtnis-Gläser) → bis 03.12. gesperrt.
+
+> 26.11. 07:33: „Silber oder Bronze?“ live – TikTok 7712363663272840487 · Instagram DgMd6cPJ-Wb (KI-Label) · YouTube: Datei + Texte an Lukas (vidIQ-Kontingent bis 09:00, kein Chrome). Kommentare an Lukas geschickt.
