@@ -1,0 +1,139 @@
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#flash{position:absolute;inset:0;opacity:0}
+</style></head><body>
+<svg id="stage" viewBox="0 0 1080 1920"></svg><div id="flash"></div>
+<script src="rig.js"></script><script src="poses.js"></script><script src="kit.js"></script><script src="h.js"></script><script src="timing.js"></script>
+<script>
+// „Sitzplan“ – Rohrer, Keller & Elwert (2021), PLOS ONE 16(8): e0255097
+window.DUR=61.0; const PAY=S[12]; const H=(location.hash||'#B').slice(1); const ENDC=59.6;
+const PINK='#ff6fae';
+const KC=['#4da3ff','#ff9f0a','#ff6fae','#b48cff','#30d158','#ffd60a','#5ac8fa','#ff7a5c','#9ce36b'];
+// Sitzplan: 3×3 Zweiertische, Sitzpositionen
+const SEATS=[];for(let r=0;r<3;r++)for(let c=0;c<3;c++){const x=180+c*300,y=560+r*150;SEATS.push([x-55,y],[x+55,y]);}
+function rnd(i){const x=Math.sin(i*127.1)*43758.5453;return x-Math.floor(x);}
+function perm(seed){const a=[...Array(18).keys()];for(let i=17;i>0;i--){const j=Math.floor(rnd(seed*31+i)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function room(t,shuffle,o=1,hl=-1,linkAll=0){if(o<=0)return'';let s=`<g opacity="${o}"><rect x="60" y="440" width="960" height="500" rx="28" fill="#0b0f16" stroke="#2a3444" stroke-width="5"/>`;
+ s+=`<rect x="380" y="455" width="320" height="16" rx="8" fill="#2a3444"/>`+txt(540,500,'TAFEL',22,'#5c6575',900,1,'middle',6);
+ for(let r=0;r<3;r++)for(let c=0;c<3;c++){const x=180+c*300,y=560+r*150;const on=hl===(r*3+c);s+=`<rect x="${x-115}" y="${y+18}" width="230" height="44" rx="10" fill="${on?'#3a2a14':'#1d2533'}" stroke="${on?YEL:'#2a3444'}" stroke-width="${on?6:3}"/>`;}
+ // Kinder
+ const seg=shuffle>0?Math.floor(t/0.32):0;const fr=shuffle>0?eio(cl((t%0.32)/0.22)):1;const p0=perm(seg),p1=perm(seg+1);
+ for(let k=0;k<18;k++){const a=SEATS[p0.indexOf(k)],b=SEATS[(shuffle>0?p1:p0).indexOf(k)];const x=a[0]+(b[0]-a[0])*fr*(shuffle>0?1:0),y=a[1]+(b[1]-a[1])*fr*(shuffle>0?1:0)-(shuffle>0?30*Math.sin(Math.PI*fr):0);
+  const isBen=k===0;s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="30" fill="${isBen?'#05070c':KC[k%9]}" stroke="${isBen?WHITE:'none'}" stroke-width="7"/>`;if(isBen)s+=txt(x,y+10,'B',30,WHITE,900);}
+ if(linkAll>0){for(let d=0;d<9;d++){const a=SEATS[d*2],b=SEATS[d*2+1];const show=rnd(d+7)<0.45;if(show)s+=`<path d="M${a[0]+30},${a[1]-30} Q${(a[0]+b[0])/2},${a[1]-80} ${b[0]-30},${b[1]-30}" fill="none" stroke="${PINK}" stroke-width="7" opacity="${linkAll}"/>`;}}
+ return s+'</g>';}
+function heart(x,y,sc,col,o=1){return `<g opacity="${o}" transform="translate(${x},${y}) scale(${sc})"><path d="M0,30 C-60,-10 -40,-60 0,-30 C40,-60 60,-10 0,30Z" fill="${col}"/></g>`}
+function bar(x,y,w,v,max,col,label,val,o=1){if(o<=0)return'';return `<g opacity="${o}"><rect x="${x}" y="${y}" width="${w}" height="70" rx="14" fill="#1d2533"/><rect x="${x}" y="${y}" width="${w*cl(v/max)}" height="70" rx="14" fill="${col}"/>`+txt(x,y-18,label,30,'#cfd6e6',900,1,'start',2)+txt(x+w*cl(v/max)+16,y+50,val,48,col,900,1,'start')+'</g>';}
+// Teil 1: Klassenzimmer (bis S6)
+function partRoom(t){const o=env(t,-1,S[6]+0.1,0.001,0.3);if(o<=0)return'';let s='';
+ const shuffle=(t<S[1])||(t>=S[4]&&t<S[5])?1:0;const hl=(t>=S[1]&&t<S[3])?0:-1;
+ s+=room(t,shuffle,1,hl,t>=S[5]+1.2?env(t,S[5]+1.2,S[6]+0.1,0.4,0.2):0);
+ // Hook: Würfel + Fragezeichen
+ if(t<S[1]){const r=t*720;s+=`<g transform="translate(860,1120) rotate(${r})"><rect x="-60" y="-60" width="120" height="120" rx="20" fill="${WHITE}"/><circle cx="-28" cy="-28" r="12" fill="#111"/><circle cx="28" cy="28" r="12" fill="#111"/><circle cx="0" cy="0" r="12" fill="#111"/></g>`;
+  s+=`<g transform="translate(465,1120)">`+tag(0,0,'SITZPLAN: ZUFALL',RED,'#fff',44)+'</g>';}
+ // Bester Freund (S1..S3)
+ if(t>=S[1]&&t<S[3]){const q=env(t,S[1],S[3],0.2,0.2);const a=SEATS[0],b=SEATS[1];
+  s+=`<g opacity="${q}">`+heart((a[0]+b[0])/2,a[1]-70,0.9+0.1*Math.sin(t*8),PINK)+'</g>';
+  if(t>=S[2]){const q2=cl((t-S[2]-0.2)/0.3);s+=`<g opacity="${q2}" transform="translate(465,1120) scale(${0.7+0.3*eb(q2)})">`+tag(0,0,'ABSTAND: 0 TISCHE',PINK,'#05070c',44)+'</g>';}
+  else s+=`<g transform="translate(465,1120)">`+tag(0,0,'DEIN BESTER FREUND – WO SASS ER?',WHITE,'#05070c',34)+'</g>';}
+ // Studie (S3..S6)
+ if(t>=S[3]&&t<S[4]){const n=Math.round(182*eo(cl((t-S[3]-0.4)/2.2)));s+=txt(465,1170,n+' KLASSEN',96,YEL,900)+txt(465,1240,'UNGARN · 3.–8. KLASSE',36,'#cfd6e6',900,1,'middle',3);}
+ if(t>=S[4]&&t<S[5]){const n=Math.round(2996*eo(cl((t-S[4]-0.2)/1.8)));s+=txt(465,1170,fmt(n)+' SCHÜLER',90,WHITE,900)+`<g transform="translate(465,1260)">`+tag(0,0,'🎲 SITZPLATZ AUSGELOST',RED,'#fff',40)+'</g>';}
+ if(t>=S[5]&&t<S[6]+0.1){const m=['SEP','OKT','NOV','DEZ','JAN'];const k=Math.min(5,Math.floor((t-S[5])/0.35)+1);m.forEach((w,i)=>{s+=`<rect x="${85+i*160}" y="1110" width="140" height="80" rx="14" fill="${i<k?YEL:'#1d2533'}"/>`+txt(155+i*160,1165,w,36,i<k?'#05070c':'#8a93a3',900);});
+  const q=cl((t-S[5]-2.0)/0.3);s+=`<g opacity="${q}" transform="translate(465,1280)">`+tag(0,0,'„WER SIND DEINE BESTEN FREUNDE?“',WHITE,'#05070c',34)+'</g>';}
+ return `<g opacity="${o}">${s}</g>`+stampT(t,S[2]+1.4,S[3]+0.05,'KEIN ZUFALL.',RED,540,700,90,-8);}
+// Teil 2: Ergebnis-Balken (S6..S10)
+function partBars(t){const o=env(t,S[6],S[10]+0.1,0.3,0.3);if(o<=0)return'';let s='';
+ // zwei Tische oben: weit weg vs nebeneinander
+ s+=`<rect x="60" y="460" width="960" height="460" rx="28" fill="#0b0f16" stroke="#2a3444" stroke-width="5"/>`;
+ s+=`<circle cx="200" cy="600" r="40" fill="${KC[0]}"/><circle cx="460" cy="600" r="40" fill="${KC[1]}"/><line x1="250" y1="600" x2="410" y2="600" stroke="#5c6575" stroke-width="6" stroke-dasharray="12 12"/>`+txt(330,690,'WEIT AUSEINANDER',28,'#cfd6e6',900);
+ const nb=t>=S[7];s+=`<g opacity="${nb?1:0.25}"><rect x="610" y="625" width="300" height="44" rx="10" fill="#1d2533"/><circle cx="700" cy="600" r="40" fill="${KC[2]}"/><circle cx="820" cy="600" r="40" fill="${KC[3]}"/></g>`+txt(760,720,'NEBENEINANDER',28,nb?PINK:'#5c6575',900);
+ if(t>=S[8]+0.6)s+=heart(760,520,1.0+0.1*Math.sin(t*8),PINK);
+ if(t>=S[6]+2.4)s+=heart(330,525,0.6,KC[0],0.7);
+ // Balken
+ const k1=eo(cl((t-S[6]-2.0)/1.2)),k2=eo(cl((t-S[8]-0.1)/1.4));
+ s+=bar(85,1010,560,15.3*k1,25,'#5c6575','NICHT NEBENEINANDER',fmt(15.3*k1,1).replace(',',',')+' %');
+ const drum=t>=S[7]&&t<S[8];s+=bar(85,1170,560,t>=S[8]?22.3*k2:0,25,PINK,'SITZNACHBARN',t>=S[8]?fmt(22.3*k2,1)+' %':(drum&&Math.floor(t*6)%2?'?':''));
+ // Junge/Mädchen
+ if(t>=S[9]){const q=cl((t-S[9]-0.3)/0.3);s+=`<g opacity="${q}"><rect x="85" y="1290" width="800" height="150" rx="22" fill="#05070c" stroke="${PINK}" stroke-width="5"/>`+
+  `<circle cx="160" cy="1365" r="34" fill="${BLUE}"/><circle cx="240" cy="1365" r="34" fill="${PINK}"/>`+txt(300,1355,'JUNGE + MÄDCHEN',36,WHITE,900,1,'start')+txt(300,1405,'NEBENEINANDER: CHANCE VERDOPPELT',28,PINK,900,1,'start')+'</g>';
+  s+=stampT(t,S[9]+1.6,S[10]+0.1,'×2',PINK,770,1250,90,-10);}
+ return `<g opacity="${o}">${s}</g>`+stampT(t,S[8]+1.6,S[9]+0.05,'FAST 1,5×',PINK,540,860,96,-8);}
+// Teil 3: Formel + Warten (S10..PAY)
+function partWait(t){const o=env(t,S[10],PAY+0.05,0.3,0.15);if(o<=0)return'';let s='';
+ if(t<S[11]){const q1=cl((t-S[10]-0.2)/0.3),q2=cl((t-S[10]-1.6)/0.3),q3=cl((t-S[10]-2.8)/0.3);
+  s+=txt(540,640,'FREUNDSCHAFT',90,WHITE,900,q1)+txt(540,740,'=',90,YEL,900,q2)+`<g opacity="${q2}" transform="translate(540,860) scale(${0.7+0.3*eb(q2)})">`+txt(0,0,'NÄHE',110,PINK,900)+'</g>'+`<g opacity="${q3}" transform="translate(465,1060) scale(${0.7+0.3*eb(q3)})">`+txt(0,0,'× WIEDERHOLUNG',90,GREEN,900)+'</g>';
+  s+=txt(465,1200,'(UND NICHT NUR SCHICKSAL)',34,'#8a93a3',900,q3);}
+ else{// Ben wartet allein in der Ecke
+  s+=room(t,0,1,-1,0);const sec=Math.floor((t-S[11])*3);s+=`<g transform="translate(465,1160)">`+tag(0,0,'WARTEN … '+(sec%4===0?'':'.'.repeat(sec%4)),'#2a3444',WHITE,44)+'</g>';
+  s+=benAt(250,1450,P.slump,0.6,WHITE,0,1,true)+`<g transform="translate(640,1320)"><circle r="70" fill="#0b0f16" stroke="#5c6575" stroke-width="10"/><line x1="0" y1="0" x2="${50*Math.sin(t*4)}" y2="${-50*Math.cos(t*4)}" stroke="${WHITE}" stroke-width="8" stroke-linecap="round"/></g>`;}
+ return `<g opacity="${o}">${s}</g>`;}
+// Payoff
+function payoff(t){if(t<PAY)return'';let s='';const o=env(t,PAY,ENDC+0.3,0.001,0.3);s+=`<g opacity="${o}">`;
+ // Ben läuft zu einem Platz und setzt sich daneben
+ const k=eio(cl((t-PAY-0.2)/1.4));const bx=250+(560-250)*k;
+ s+=`<rect x="380" y="900" width="420" height="50" rx="12" fill="#1d2533"/>`;
+ s+=benAt(700,950,P.sit,0.75,KC[2],0,1,true);
+ s+=benAt(bx,950,k<1?(Math.floor(t*6)%2?P.walkA:P.walkB):P.sit,0.75,WHITE,0,1,false);
+ if(k>=1){const q=cl((t-PAY-1.7)/0.3);s+=heart(630,500,1.2*eb(q),PINK,q);}
+ if(t>=S[13]){[0,1,2].forEach(i=>{const q=cl((t-S[13]-1.0-i*1.1)/0.25);const x=265+i*200;s+=`<circle cx="${x}" cy="1160" r="62" fill="${q>0.5?GREEN:'#1d2533'}" stroke="${GREEN}" stroke-width="6"/>`+txt(x,1180,q>0.5?'✓':(i+1)+'×',52,q>0.5?'#05070c':GREEN,900);});
+  s+=txt(465,1290,'GLEICHER ORT · GLEICHE PERSON',36,WHITE,900,cl((t-S[13]-0.4)/0.3));}
+ return s+'</g>';}
+function endCard(t){if(t<ENDC)return'';const o=cl((t-ENDC)/0.25);const sc=0.9+0.1*eb((t-ENDC)/0.4);
+ return `<g opacity="${o}"><rect width="1080" height="1920" fill="#05070c" opacity=".93"/>`+txt(540,300,'NÄCHSTES VIDEO · 21:00',64,YEL,900,1,'middle',2)+
+ txt(540,560,'WIE VIELE DEINER',84,WHITE,900)+txt(540,660,'SORGEN SIND',84,WHITE,900)+txt(540,760,'WIRKLICH PASSIERT?',84,ORANGE,900)+
+ `<g transform="translate(465,1100) scale(${sc})">`+pill(0,0,'FOLG BEN →',GREEN,'#05070c',70)+'</g>'+benAt(465,1460,P.cheer,0.7,WHITE,0,1,true)+'</g>';}
+window.SFXC=()=>{const c=[[0,'whoosh'],[0.05,'boom'],[0.1,'buzz']];for(let k=0;k<10;k++)c.push([k*0.32,'pop']);
+ c.push([S[1],'whoosh'],[S[1]+0.2,'ding'],[S[2],'whoosh'],[S[2]+0.2,'pop'],[S[2]+1.4,'boom']);
+ c.push([S[3],'whoosh']);for(let k=0;k<9;k++)c.push([S[3]+0.4+k*0.24,'tick']);
+ c.push([S[4],'whoosh']);for(let k=0;k<14;k++)c.push([S[4]+k*0.32,'pop']);
+ c.push([S[5],'whoosh']);for(let k=0;k<5;k++)c.push([S[5]+k*0.35,'tick']);c.push([S[5]+2.0,'pop']);
+ c.push([S[6],'whoosh']);for(let k=0;k<6;k++)c.push([S[6]+2.0+k*0.2,'tick']);c.push([S[6]+3.2,'ding']);
+ for(let k=0;k<9;k++)c.push([S[7]+k*0.17,'tick']);
+ c.push([S[8],'whoosh']);for(let k=0;k<7;k++)c.push([S[8]+0.1+k*0.2,'tick']);c.push([S[8]+1.6,'boom'],[S[8]+1.65,'ding']);
+ c.push([S[9],'whoosh'],[S[9]+0.3,'pop'],[S[9]+1.6,'boom']);
+ c.push([S[10],'whoosh'],[S[10]+0.2,'pop'],[S[10]+1.6,'pop'],[S[10]+2.8,'ding']);
+ c.push([S[11],'whoosh']);for(let k=0;k<12;k++)c.push([S[11]+k*0.4,'tick']);
+ c.push([PAY-0.4,'whoosh'],[PAY,'boom'],[PAY+0.05,'ding'],[PAY+1.7,'pop'],[S[13],'whoosh']);for(let k=0;k<3;k++)c.push([S[13]+1.0+k*1.1,'ding']);
+ c.push([S[14],'whoosh'],[S[14]+0.8,'pop'],[ENDC,'whoosh'],[ENDC+0.3,'ding']);return c;};
+window.render=function(t){let s='';
+ const shake=Math.max(env(t,-0.1,0.8,0.001,0.7),env(t,PAY,PAY+0.6,0.001,0.5),env(t,S[8]+1.6,S[8]+2.0,0.001,0.3)*0.6,env(t,S[2]+1.4,S[2]+1.8,0.001,0.3)*0.5);
+ const jx=Math.sin(t*91)*18*shake,jy=Math.cos(t*67)*14*shake;
+ const red=Math.max(env(t,-1,S[1],0.1,0.6)*0.55,env(t,S[11],PAY,0.3,0.1)*0.45);
+ const green=env(t,PAY,PAY+2.6,0.05,1.2);
+ s+=bg(red,green);
+ s+=`<g transform="translate(${jx},${jy})">`;
+ const z=H==='C'&&t<0.9?1.6-0.6*eio(t/0.9):(t<0.5?1.12-0.12*eio(t/0.5):1);
+ s+=`<g transform="translate(540,700) scale(${z}) translate(-540,-700)">`+partRoom(t)+'</g>';
+ s+=partBars(t)+partWait(t)+payoff(t);
+ if(H==='B'&&t<1.2){for(let i=0;i<8;i++){const x=120+((i*157)%820),y=460+((t*900+i*230)%980);s+=heart(x,y,0.8,PINK,0.85);}}
+ s+='</g>';
+ s+=head();
+ s+=LH(t,-1,S[1],300,'WIE VIELE DEINER FREUNDE',70,WHITE)+LH(t,-1,S[1],378,'HAST DU DIR SELBST AUSGESUCHT?',50,YEL);
+ s+=L(t,S[1],S[2],300,'DEIN BESTER FREUND:',84,WHITE)+L(t,S[1]+1.4,S[2],378,'WO SASS ER?',66,PINK);
+ s+=L(t,S[2],S[3],300,'GANZ NAH BEI DIR.',90,WHITE)+L(t,S[2]+1.2,S[3],378,'UND DAS HAT EINEN GRUND.',56,YEL);
+ s+=L(t,S[3],S[4],300,'DAS EXPERIMENT:',96,WHITE)+L(t,S[3]+1.0,S[4],378,'SITZORDNUNG AUSGELOST.',58,RED);
+ s+=L(t,S[4],S[5],300,'FAST 3.000 SCHÜLER.',84,WHITE)+L(t,S[4]+1.6,S[5],378,'NUR DER ZUFALL ENTSCHIED.',54,RED);
+ s+=L(t,S[5],S[6],300,'5 MONATE SPÄTER:',90,WHITE)+L(t,S[5]+1.6,S[6],378,'WER IST BEFREUNDET?',58,YEL);
+ s+=L(t,S[6],S[7],300,'NICHT NEBENEINANDER:',76,WHITE)+L(t,S[6]+2.0,S[7],378,'NUR 15 % WURDEN FREUNDE.',56,'#cfd6e6');
+ s+=L(t,S[7],S[8],300,'UND JETZT …',110,WHITE)+L(t,S[7]+0.4,S[8],378,'DIE SITZNACHBARN.',62,PINK);
+ s+=L(t,S[8],S[9],300,'22 %.',130,PINK)+L(t,S[8]+1.6,S[9],378,'NUR WEGEN EINES TISCHES.',58,WHITE);
+ s+=L(t,S[9],S[10],300,'SOGAR JUNGE + MÄDCHEN:',70,WHITE)+L(t,S[9]+1.6,S[10],378,'DOPPELT SO OFT.',66,PINK);
+ s+=L(t,S[10],S[11],300,'NICHT NUR SCHICKSAL.',80,WHITE)+L(t,S[10]+1.6,S[11],378,'SONDERN NÄHE. UND WIEDERHOLUNG.',50,GREEN);
+ s+=L(t,S[11],PAY,300,'DIE MEISTEN WARTEN,',84,WHITE)+L(t,S[11]+1.2,PAY,378,'DASS SIE GEFUNDEN WERDEN.',56,RED);
+ if(t>=PAY){const o=env(t,PAY,S[13],0.001,0.25),sc=1.5-0.5*eb((t-PAY)/0.35);s+=`<g opacity="${o}" transform="translate(540,300) scale(${sc})">${txt(0,0,'SETZ DICH DANEBEN.',80,GREEN,900,1,'middle',1)}</g>`+L(t,PAY+1.0,S[13],378,'DU MUSST NIEMANDEN FINDEN.',54,WHITE);}
+ s+=L(t,S[13],S[14],300,'DIESE WOCHE: 3×',96,GREEN)+L(t,S[13]+1.0,S[14],378,'GLEICHER ORT. GLEICHE PERSON.',52,WHITE);
+ s+=L(t,S[14],ENDC+0.2,300,'SCHICK DAS DEINEM',84,WHITE)+L(t,S[14]+0.4,ENDC+0.2,378,'ALTEN SITZNACHBARN.',62,PINK);
+ if(t>S[14]+0.6&&t<ENDC){const o=env(t,S[14]+0.6,ENDC,0.25,0.2),sc=0.85+0.15*eb((t-S[14]-0.6)/0.4);s+=pill(465,1440,'MARKIER IHN – ODER SCHREIB 48.',WHITE,'#000',30,o,sc);}
+ if(t>=S[1]+0.4&&t<S[4])s+=cpill(t,S[1]+0.4,S[4],'WO SASS DEIN BESTER FREUND? → KOMMENTARE');
+ s+=SRC(t,S[3],PAY,'Rohrer, Keller & Elwert (2021), PLOS ONE 16(8): 182 Klassen, N = 2.996,','Sitzplätze zufällig, 1 Halbjahr · gegenseitige Freundschaft 15,3 % vs. 22,3 %');
+ s+=endCard(t);
+ s+=brand();
+ document.getElementById('stage').innerHTML=s;
+ const fl=document.getElementById('flash');const w=env(t,-0.1,0.3,0.001,0.25),g=env(t,PAY,PAY+0.7,0.001,0.6),r=env(t,S[8]+1.6,S[8]+2.0,0.001,0.3);
+ fl.style.background=g>0?GREEN:(r>0?PINK:RED);fl.style.opacity=Math.max(0.22*w,0.38*g,0.3*r);
+};
+render(0);
+</script></body></html>
