@@ -41,3 +41,24 @@
   - TikTok: wer war dein sitznachbar in der 5. klasse? 👀
   - YouTube: Schätz mal: Wie viele deiner engsten Freunde hast du über Schule, Arbeit oder Nachbarschaft kennengelernt – also durch Nähe?
   - Instagram: Mit wem hast du seit Jahren nicht mehr geredet, obwohl ihr früher nebeneinander saßt? Heute ist ein guter Tag.
+
+## 21:00 – Sorgen-Wetter (tmp/2026-11-26_2100.mp4, vidIQ uploadId 933996f5-bcd2-4089-95b7-664ebc3f4541)
+- TikTok (vidIQ-Post 6ee944af, publishAt 21:00): sorgen.. 91 % davon sind nie passiert ⛈️→☀️ für alle die nachts zu viel nachdenken #overthinking #sorgen #psychologie #mentalhealth #motivation
+- YouTube (vidIQ zur Slot-Zeit, nur YOUTUBE, ohne publishAt, public, Kategorie 27 Bildung):
+  - Titel: 91 % deiner Sorgen passieren nie ⛈️ #shorts
+  - Beschreibung:
+    In einer Studie schrieben Menschen, die sich ständig Sorgen machen, 10 Tage lang jede Sorge auf – und prüften 30 Tage später nach. 91,4 % waren nie eingetreten. Bei 7 von 29 keine einzige.
+    Dein Kopf meldet Sturm. Prüf nach: Schreib deine Sorge heute mit Datum auf und schau in 30 Tagen nach.
+    Quelle: LaFreniere & Newman (2020), Behavior Therapy 51(3), 413–423 – 29 Studierende mit generalisierter Angststörung. Sorgen-Raster im Video schematisch.
+    #sorgen #overthinking #psychologie #angst #shorts
+  - Tags: sorgen, overthinking, grübeln, psychologie, angst, einschlafen, sorgen tagebuch, mental health
+- Instagram:
+  Speicher dir das für die nächste Nacht, in der dein Kopf nicht aufhört.
+  Forscher ließen Menschen jede Sorge aufschreiben und 30 Tage später nachprüfen: 91 % sind nie passiert. Und von den restlichen lief fast jede dritte besser als befürchtet.
+  Dein Kopf ist ein Wetterbericht, der fast immer Sturm meldet. Schreib deine Sorge heute mit Datum auf – und prüf nach.
+  Schreib 48, wenn du sie heute aufschreibst. ☀️
+  #sorgen #overthinking #psychologie #mentalhealth #motivation
+- Kommentare:
+  - TikTok: welche sorge war bei dir am ende komplett umsonst? 👀
+  - YouTube: Prüf mal selbst: Welche deiner Sorgen vom letzten Monat ist wirklich passiert – und welche nicht?
+  - Instagram: Schreib mir deine Sorge von heute Nacht – in 30 Tagen schauen wir gemeinsam nach. 💛
