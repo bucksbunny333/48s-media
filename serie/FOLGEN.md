@@ -233,3 +233,5 @@ QC gegen Referenzen („Wochen“, „150 €“, Hook „1 neue Nachricht“) u
 > **HINWEIS für den 10:31-/Abend-Lauf 26.11.:** vidIQ-YouTube-Kontingent ist heute voll → 16:30/18:30/21:00 YouTube als Datei an Lukas (oder Chrome, falls erreichbar).
 
 > 26.11. 16:33: „Autopilot“ live – TikTok vidIQ-Post 6d6096e2 zugestellt (completed, kein Link geliefert) · Instagram DgNbpYtBBZ3 (KI-Label) · YouTube: Datei + Texte an Lukas (vidIQ-Kontingent für 18:30/21:00, kein Chrome). Kommentare an Lukas geschickt.
+
+> 26.11. 18:33: „Sitzplan“ live – TikTok 7712534017245056289 · Instagram DgNpe24iqwc (KI-Label) · YouTube: vidIQ lehnte ab (3 Uploads/Tag seit 09:00 bereits verbraucht) → Datei + Texte an Lukas. vidIQ-YouTube-Entwurf 9ecf092c bleibt unveröffentlicht liegen – NICHT mehr veröffentlichen (Lukas lädt selbst hoch, sonst Duplikat). Kommentare an Lukas geschickt.
