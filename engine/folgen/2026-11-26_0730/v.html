@@ -1,0 +1,165 @@
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#flash{position:absolute;inset:0;opacity:0}
+</style></head><body>
+<svg id="stage" viewBox="0 0 1080 1920"></svg><div id="flash"></div>
+<script src="rig.js"></script><script src="poses.js"></script><script src="kit.js"></script><script src="h.js"></script><script src="timing.js"></script>
+<script>
+// „Silber oder Bronze?“ – Medvec, Madey & Gilovich (1995), JPSP 69(4); Hedgcock, Luangrath & Webster (2021), JEP:General
+window.DUR=61.0; const PAY=S[13]; const H=(location.hash||'#A').slice(1);
+const SIL='#c9d1dc', BRZ='#d9894a', GLD='#ffd60a', OTH='#e8b07a';
+const ENDC=59.0; // M16 Schlussbild
+function medal(x,y,r,col,num,rot=0,glow=0){return `<g transform="rotate(${rot} ${x} ${y-r-150})">`+
+ `<path d="M${x-r*0.55},${y-r-150} L${x-r*0.2},${y-r+6} M${x+r*0.55},${y-r-150} L${x+r*0.2},${y-r+6}" stroke="${col==SIL?'#4da3ff':'#e5484d'}" stroke-width="${r*0.32}" stroke-linecap="round"/>`+
+ (glow?`<circle cx="${x}" cy="${y}" r="${r*1.35}" fill="${col}" opacity="${0.25*glow}"/>`:'')+
+ `<circle cx="${x}" cy="${y}" r="${r}" fill="${col}"/><circle cx="${x}" cy="${y}" r="${r*0.78}" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="${r*0.08}"/>`+
+ txt(x,y+r*0.36,num,r*1.0,'#1a1a1a',900)+'</g>';}
+function face(x,y,r,m,col,op=1){const my=y+r*0.32;return `<g opacity="${op}"><circle cx="${x}" cy="${y}" r="${r}" fill="#0b0f16" stroke="${col}" stroke-width="${Math.max(3,r*0.12)}"/><circle cx="${x-r*0.35}" cy="${y-r*0.2}" r="${r*0.1}" fill="${col}"/><circle cx="${x+r*0.35}" cy="${y-r*0.2}" r="${r*0.1}" fill="${col}"/><path d="M${x-r*0.45},${my} Q${x},${my+m*r*0.6} ${x+r*0.45},${my}" fill="none" stroke="${col}" stroke-width="${Math.max(3,r*0.12)}" stroke-linecap="round"/></g>`}
+// Podest
+function podium(t,o,sil=1,brz=1){if(o<=0)return'';let s=`<g opacity="${o}">`;
+ const B=1360;[[165,190,SIL,'2'],[365,260,GLD,'1'],[565,130,BRZ,'3']].forEach(([x,h,c,n])=>{s+=`<rect x="${x}" y="${B-h}" width="200" height="${h}" fill="#141a26" stroke="${c}" stroke-width="6"/>`+txt(x+100,B-h+Math.min(110,h*0.7),n,90,c,900,0.9);});
+ return s+'</g>';}
+function athletes(t,o,benPose,brzPose,bm){if(o<=0)return'';let s=`<g opacity="${o}">`;
+ s+=benAt(465,1100,P.cheer,0.55,'#6b6b6b',0,0.55,true)+`<circle cx="465" cy="${1100-0.55*270}" r="14" fill="${GLD}" opacity=".7"/>`;
+ const sw=Math.sin(t*7)*3*bm;
+ s+=benAt(265,1170,benPose,0.6,WHITE,sw,1,true)+`<circle cx="265" cy="${1170-0.6*270}" r="16" fill="${SIL}"/>`;
+ s+=benAt(665,1230,brzPose,0.6,OTH,0,1,false)+`<circle cx="665" cy="${1230-0.6*270}" r="16" fill="${BRZ}"/>`;
+ return s+'</g>';}
+// Freude-Skala
+function bar(y,v,col,lbl,show,t){let s=txt(160,y-22,lbl,32,col,900,1,'start',3);
+ for(let i=0;i<10;i++){const f=cl(v-i);s+=`<rect x="${160+i*68}" y="${y}" width="60" height="54" rx="10" fill="#1a2030" stroke="#2a3444" stroke-width="3"/>`;if(f>0)s+=`<rect x="${160+i*68}" y="${y}" width="${60*f}" height="54" rx="10" fill="${col}"/>`;}
+ s+=txt(1000,y+46,show?fmt(v,1):'?',58,col,900,1,'end');return s;}
+function meter(t,o){if(o<=0)return'';let s=`<g opacity="${o}"><rect x="110" y="470" width="910" height="380" rx="32" fill="#0b0f16" stroke="#2a3444" stroke-width="6"/>`;
+ s+=face(150,800,26,-1,RED)+txt(190,810,'1 = QUAL',26,'#cfd6e6',800,1,'start')+txt(820,810,'10 = PURE FREUDE',26,'#cfd6e6',800,1,'end')+face(860,800,26,1,GREEN);
+ let vs,vb,ss=false,sb=false;
+ if(t<S[5]){vs=3+3*Math.abs(Math.sin(t*3.1));vb=3+3*Math.abs(Math.cos(t*2.7));}
+ else{const k=eo(cl((t-S[5]-1.2)/1.2));vs=4.8*k+(1-k)*5;ss=t>S[5]+1.2;
+  if(t<S[6]){vb=3+3*Math.abs(Math.cos(t*2.7));}else{const q=eo(cl((t-S[6]-0.4)/1.0));vb=7.1*q+(1-q)*4;sb=t>S[6]+0.4;}}
+ s+=bar(560,vs,SIL,'SILBER · PLATZ 2',ss,t)+bar(690,vb,BRZ,'BRONZE · PLATZ 3',sb,t);
+ return s+'</g>';}
+// Hook: zwei Medaillen schwingen
+function hookMedals(t){const o=env(t,-1,S[3]+0.2,0.001,0.3);if(o<=0)return'';let s=`<g opacity="${o}">`;
+ const sw=(H==='A'?22:8)*Math.sin(t*5.5)*Math.exp(-t*0.12);
+ const tip=t>=S[1]&&t<S[3];const gl=tip?env(t,S[1],S[3],0.2,0.2):0;
+ s+=medal(310,690,118,SIL,'2',sw,gl)+medal(770,690,118,BRZ,'3',-sw*0.8,0);
+ s+=txt(310,880,'SILBER',40,SIL,900)+txt(770,880,'BRONZE',40,BRZ,900);
+ const q=0.5+0.5*Math.sin(t*8);if(t<S[1])s+=txt(540,720,'?',140+20*q,YEL,900);
+ if(tip){s+=`<g transform="translate(310,945) scale(${0.85+0.15*eb((t-S[1])/0.4)})">`+tag(0,0,'DEIN TIPP?',YEL,'#111',34)+'</g>';}
+ if(t>=S[2]&&t<S[3]){const k=cl((t-S[2]-0.3)/0.3);s+=`<g opacity="${k}" transform="translate(540,700) scale(${0.7+0.3*eb(k)})"><rect x="-46" y="-10" width="92" height="76" rx="12" fill="${YEL}"/><path d="M-28,-10 L-28,-38 Q-28,-70 0,-70 Q28,-70 28,-38 L28,-10" fill="none" stroke="${YEL}" stroke-width="14"/><circle cx="0" cy="24" r="10" fill="#111"/></g>`;}
+ return s+'</g>';}
+function filmFrame(t){const o=env(t,S[3],S[4]+0.3,0.2,0.3);if(o<=0)return'';const c='#e8e8e8';let s=`<g opacity="${o}" stroke="${c}" stroke-width="10" fill="none">`;
+ [[90,830,1],[990,830,-1]].forEach(([x,y,d])=>{s+=`<path d="M${x},${y+80} L${x},${y} L${x+d*80},${y}"/><path d="M${x},${y+560} L${x},${y+640} L${x+d*80},${y+640}"/>`;});
+ s+='</g>';const bl=Math.floor(t*2)%2?1:0.25;s+=`<g opacity="${o}"><circle cx="160" cy="900" r="16" fill="${RED}" opacity="${bl}"/>${txt(190,912,'REC',34,RED,900,1,'start',2)}</g>`;
+ s+=`<g opacity="${o}">`+tag(465,1440,'OLYMPIA BARCELONA 1992',WHITE,'#111',32)+'</g>';return s;}
+// Gedankenblasen
+function bubbles(t){let s='';
+ if(t>=S[8]&&t<S[10]){const q=cl((t-S[8]-0.2)/0.3);const oo=t>=S[9]?0.45:1;s+=`<g opacity="${q*oo}">`;
+  s+=`<path d="M265,880 L410,760" stroke="${RED}" stroke-width="12" stroke-linecap="round"/><path d="M410,760 l-46,6 m46,-6 l-12,44" stroke="${RED}" stroke-width="12" stroke-linecap="round" fill="none"/>`;
+  s+=`<g transform="translate(230,920) scale(${0.6+0.4*eb(q)})">`+tag(0,0,'„FAST GOLD!“',RED,'#fff',38)+'</g></g>';}
+ if(t>=S[9]&&t<S[10]){const q=cl((t-S[9]-0.2)/0.3);s+=`<g opacity="${q}">`;
+  s+=`<path d="M720,1000 L800,1300" stroke="${GREEN}" stroke-width="12" stroke-linecap="round"/><path d="M800,1300 l-38,-30 m38,30 l14,-46" stroke="${GREEN}" stroke-width="12" stroke-linecap="round" fill="none"/>`;
+  s+=`<g transform="translate(660,920) scale(${0.6+0.4*eb(q)})">`+tag(0,0,'„PUH, MEDAILLE!“',GREEN,'#05070c',38)+'</g>';
+  s+=`<g transform="translate(700,1440)">`+tag(0,0,'PLATZ 4 = NICHTS',GREY,'#fff',30)+'</g></g>';}
+ return s;}
+// 413 Athleten, Software-Scan
+function scan(t){const o=env(t,S[10],S[11]+0.1,0.3,0.3);if(o<=0)return'';let s=`<g opacity="${o}">`;
+ const n=Math.round(413*eo(cl((t-S[10]-0.3)/2.0)));
+ s+=txt(540,560,fmt(n),150,WHITE,900)+txt(540,630,'ATHLETEN · 5 SPIELE · 2000–2016',36,'#cfd6e6',900,1,'middle',2);
+ const sx=120+800*cl((t-S[10]-1.6)/3.0);
+ [[SIL,'SILBER',150,[0,3,5,9,12,14,17,20,22,26]],[BRZ,'BRONZE',560,[0,1,2,4,5,6,8,9,10,11,13,14,15,16,18,19,20,21,23,24,25,27]]].forEach(([c,l,x0,smile])=>{
+  s+=txt(x0+180,730,l,40,c,900);
+  for(let i=0;i<28;i++){const cx=x0+30+(i%7)*55,cy=790+Math.floor(i/7)*62;const hit=sx>cx;const m=hit?(smile.includes(i)?1:-0.6):0;s+=face(cx,cy,22,m,hit?c:'#3a4454');}});
+ if(sx<920&&t>S[10]+1.6)s+=`<rect x="${sx-4}" y="750" width="8" height="270" fill="${GREEN}" opacity=".8"/>`;
+ s+=`<g transform="translate(465,1130)">`+tag(0,0,'AUTOMATISCHE MIMIK-ANALYSE',WHITE,'#111',30)+'</g>';
+ s+=txt(465,1185,'Darstellung schematisch',22,'#8a93a3',600);
+ return s+'</g>'+stampT(t,S[10]+4.4,S[11]+0.1,'BRONZE LÄCHELT ÖFTER',BRZ,465,1330,48,-5);}
+// Du vs. der Beste
+function you(t){if(t<S[11]-0.05)return'';let s='';const o=env(t,S[11],DUR+1,0.3,0.3);
+ const pay=t>=PAY;const gk=pay?eio(cl((t-PAY)/0.8)):0;
+ // Riese (der Beste)
+ const go=env(t,S[11],PAY+0.5,0.3,0.5);if(go>0){const k=eb(cl((t-S[11]-0.2)/0.6));s+=`<g opacity="${go}"><circle cx="720" cy="900" r="${230*k}" fill="${GLD}" opacity=".12"/>`+benAt(720,1360,P.cheer,1.05*k,GLD,0,1,false)+'</g>';
+  s+=`<g opacity="${go}" transform="translate(720,560)">`+tag(0,0,'DER BESTE UM DICH',GLD,'#111',34)+'</g>';}
+ // Vergangenheits-Ben
+ if(pay){const q=cl((t-PAY-0.4)/0.5);s+=`<g opacity="${q*o}">`+`<rect x="560" y="1300" width="240" height="60" fill="#141a26" stroke="${GREY}" stroke-width="5"/>`+benAt(680,1300,P.slump,0.55,'#7d8796',0,1,false)+'</g>';
+  s+=`<g opacity="${q*o}" transform="translate(680,1025)">`+tag(0,0,'DU VOR 1 JAHR',GREY,'#fff',30)+'</g>';
+  const a=cl((t-PAY-0.9)/0.4);s+=`<g opacity="${a*o}"><path d="M470,1080 Q600,1000 640,1100" stroke="${GREEN}" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M640,1100 l-40,-10 m40,10 l6,-42" stroke="${GREEN}" stroke-width="12" stroke-linecap="round" fill="none"/></g>`;}
+ else{const a=cl((t-S[11]-0.8)/0.4);s+=`<g opacity="${a*o}"><path d="M380,1000 L560,760" stroke="${RED}" stroke-width="12" stroke-linecap="round"/><path d="M560,760 l-46,10 m46,-10 l-6,46" stroke="${RED}" stroke-width="12" stroke-linecap="round" fill="none"/></g>`;}
+ // Ben
+ const bp=t>=S[14]?P.cheer:(pay?FIG.mix(P.slump,P.cheer,gk*0.6):P.slump);
+ s+=`<g opacity="${o}"><rect x="200" y="1300" width="240" height="60" fill="#141a26" stroke="${pay?GREEN:'#2a3444'}" stroke-width="5"/>`+txt(320,1345,'DU',36,pay?GREEN:'#8a93a3',900)+benAt(320,1300,bp,0.75,WHITE,0,1,true);
+ const mc=t>=S[12]&&!pay?SIL:(pay?BRZ:'#5c6678');const my=1300-0.75*270;s+=`<circle cx="320" cy="${my}" r="${pay?24:18}" fill="${mc}"/>`;
+ if(pay)s+=`<circle cx="320" cy="${my}" r="${40+8*Math.sin(t*6)}" fill="${BRZ}" opacity=".25"/>`;
+ // Mini-Freude
+ if(t>=S[12]){const v=pay?4.8+2.3*eo(cl((t-PAY-0.3)/0.9)):4.8;const c=pay?GREEN:SIL;s+=`<g transform="translate(160,915)">`+tag(160,0,'FREUDE '+fmt(v,1),c,'#111',34)+'</g>';}
+ s+='</g>';
+ if(t>=S[14]){for(let i=0;i<26;i++){const x=80+((i*197)%900),y=-60+((t-S[14])*700+i*131)%1500;s+=`<rect x="${x}" y="${y}" width="16" height="26" rx="3" fill="${[GREEN,BRZ,YEL,WHITE][i%4]}" transform="rotate(${(t*200+i*40)%360} ${x} ${y})" opacity=".85"/>`;}}
+ return s+stampT(t,S[12]+0.4,PAY,'WIE SILBER',RED,465,780,62,-6);}
+function endCard(t){if(t<ENDC)return'';const o=cl((t-ENDC)/0.25);const sc=0.9+0.1*eb((t-ENDC)/0.4);
+ return `<g opacity="${o}"><rect width="1080" height="1920" fill="#05070c" opacity=".93"/>`+txt(540,300,'NÄCHSTES VIDEO · 12:30',64,YEL,900,1,'middle',2)+
+ txt(540,560,'WARUM FÜHLT SICH',80,WHITE,900)+txt(540,660,'LERNEN RICHTIG AN –',80,WHITE,900)+txt(540,760,'UND IST FALSCH?',80,RED,900)+
+ `<g transform="translate(465,1100) scale(${sc})">`+pill(0,0,'FOLG BEN →',GREEN,'#05070c',70)+'</g>'+benAt(465,1460,P.cheer,0.7,WHITE,0,1,true)+'</g>';}
+window.SFXC=()=>{const c=[[0,'whoosh'],[0.05,'boom']];for(let k=0;k<10;k++)c.push([0.15+k*0.3,'tick']);
+ c.push([S[1],'pop'],[S[1]+0.3,'ding'],[S[2],'whoosh'],[S[2]+0.35,'pop'],[S[3],'whoosh'],[S[3]+0.3,'buzz']);
+ c.push([S[4],'whoosh']);for(let k=0;k<12;k++)c.push([S[4]+0.4+k*0.4,'tick']);
+ c.push([S[5],'whoosh']);for(let k=0;k<5;k++)c.push([S[5]+1.2+k*0.24,'tick']);c.push([S[5]+2.4,'buzz']);
+ for(let k=0;k<7;k++)c.push([S[6]+0.4+k*0.14,'tick']);c.push([S[6]+1.4,'ding']);
+ c.push([S[7],'boom'],[S[7]+0.1,'buzz'],[S[8]+0.2,'pop'],[S[8]+0.5,'buzz'],[S[9]+0.2,'pop'],[S[9]+0.5,'ding']);
+ c.push([S[10],'whoosh']);for(let k=0;k<10;k++)c.push([S[10]+0.3+k*0.2,'tick']);c.push([S[10]+1.6,'whoosh']);for(let k=0;k<9;k++)c.push([S[10]+1.8+k*0.33,'pop']);c.push([S[10]+4.4,'boom']);
+ c.push([S[11],'whoosh'],[S[11]+0.8,'buzz'],[S[12],'whoosh'],[S[12]+0.4,'boom']);
+ c.push([PAY-0.4,'whoosh'],[PAY,'boom'],[PAY+0.05,'ding'],[PAY+0.9,'pop'],[S[14],'ding'],[S[14]+0.2,'pop'],[S[15],'whoosh'],[S[15]+1.0,'pop'],[ENDC,'whoosh'],[ENDC+0.3,'ding']);return c;};
+window.render=function(t){let s='';
+ const shake=Math.max(env(t,-0.1,0.7,0.001,0.6),env(t,PAY,PAY+0.6,0.001,0.5),env(t,S[7],S[7]+0.5,0.001,0.3)*0.7,env(t,S[10]+4.4,S[10]+4.8,0.001,0.3)*0.5,env(t,S[12]+0.4,S[12]+0.8,0.001,0.3)*0.5);
+ const jx=Math.sin(t*91)*18*shake,jy=Math.cos(t*67)*14*shake;
+ const red=Math.max(env(t,-1,1.5,0.1,0.8)*0.6,env(t,S[7],S[8],0.05,0.4)*0.55,env(t,S[11],PAY,0.3,0.1)*0.4);
+ const green=env(t,PAY,PAY+2.6,0.05,1.2)+env(t,S[9],S[10],0.2,0.3)*0.2;
+ s+=bg(red,green);
+ s+=`<g transform="translate(${jx},${jy})">`;
+ // Szene 1: Hook bis S3; Podest S0–S10
+ const zoom=H==='C'&&t<0.9?2.2-1.2*eio(t/0.9):(t<0.5?1.12-0.12*eio(t/0.5):1);
+ s+=`<g transform="translate(540,1000) scale(${zoom}) translate(-540,-1000)">`;
+ const po=env(t,-1,S[10]+0.1,0.001,0.3);
+ const zk=(t>=S[7]&&t<S[8])?eio(cl((t-S[7])/0.5))*env(t,S[7],S[8],0.01,0.4):0; // Zoom auf Ben
+ s+=`<g transform="translate(265,1100) scale(${1+0.3*zk}) translate(-265,-1100)">`;
+ s+=podium(t,po);
+ const bpose=t<S[1]?FIG.mix(P.stand,P.slump,0.3+0.2*Math.sin(t*6)):(t>=S[5]+1.2?P.slump:FIG.mix(P.stand,P.slump,0.3));
+ const zpose=t>=S[6]+0.4?P.cheer:P.stand;
+ s+=athletes(t,po,bpose,zpose,t<S[1]?1:0.3);
+ s+='</g></g>';
+ if(zk>0)s+=`<g opacity="${zk}" transform="translate(330,1440)">`+tag(0,0,'PLATZ 2 DER WELT',SIL,'#111',34)+'</g>';
+ s+=hookMedals(t)+filmFrame(t);
+ s+=meter(t,env(t,S[4],S[10]+0.1,0.3,0.3));
+ s+=stampT(t,S[7]+0.9,S[8]+0.05,'VERLIERER?',RED,465,960,70,-7);
+ s+=bubbles(t)+scan(t)+you(t);
+ if(H==='B'&&t<1.0){for(let i=0;i<10;i++){const x=120+((i*137)%840),y=-150+((t*1500+i*190)%1300);s+=medal(x,y,40,i%2?SIL:BRZ,i%2?'2':'3',0,0);}}
+ s+='</g>';
+ s+=head();
+ s+=LH(t,-1,S[1],300,'WER IST GLÜCKLICHER?',84,WHITE)+LH(t,-1,S[1],378,'PLATZ 2 ODER PLATZ 3?',56,YEL);
+ s+=L(t,S[1],S[2],300,'DU SAGST:',100,WHITE)+L(t,S[1]+0.6,S[2],378,'„SILBER. IST JA BESSER.“',58,SIL);
+ s+=L(t,S[2],S[3],300,'MERK DIR DEINE ANTWORT.',72,WHITE)+L(t,S[2]+1.4,S[3],378,'SIE VERRÄT, WIE DU DICH SIEHST.',48,YEL);
+ s+=L(t,S[3],S[4],300,'OLYMPIA:',100,WHITE)+L(t,S[3]+1.0,S[4],378,'KAMERAS DIREKT NACH DEM FINALE',50,YEL);
+ s+=L(t,S[4],S[5],300,'FREMDE BEWERTEN',90,WHITE)+L(t,S[4]+1.0,S[5],378,'NUR DIE GESICHTER',62,YEL);
+ s+=L(t,S[5],S[6],300,'UND JETZT DIE ZAHLEN …',70,WHITE)+L(t,S[5]+1.2,S[6],378,'SILBER: 4,8',72,SIL);
+ s+=L(t,S[6],S[7],300,'BRONZE:',100,WHITE)+L(t,S[6]+0.4,S[7],378,'7,1',84,BRZ);
+ s+=L(t,S[7],S[8],300,'ZWEITBESTER DER WELT',76,WHITE)+L(t,S[7]+0.9,S[8],378,'… UND SIEHT AUS WIE EIN VERLIERER.',44,RED);
+ s+=L(t,S[8],S[9],300,'SILBER DENKT:',96,WHITE)+L(t,S[8]+0.4,S[9],378,'„FAST HÄTTE ICH GOLD GEHABT.“',50,RED);
+ s+=L(t,S[9],S[10],300,'BRONZE DENKT:',96,WHITE)+L(t,S[9]+0.4,S[10],378,'„FAST HÄTTE ICH NICHTS GEHABT.“',48,GREEN);
+ s+=L(t,S[10],S[11],300,'20 JAHRE SPÄTER:',96,WHITE)+L(t,S[10]+4.4,S[11],378,'GLEICHES ERGEBNIS.',62,BRZ);
+ s+=L(t,S[11],S[12],300,'UND DU?',110,WHITE)+L(t,S[11]+0.8,S[12],378,'DU VERGLEICHST DICH MIT GOLD.',52,RED);
+ s+=L(t,S[12],PAY,300,'DANN FÜHLT SICH',90,WHITE)+L(t,S[12]+0.4,PAY,378,'JEDER ERFOLG AN WIE SILBER.',54,SIL);
+ if(t>=PAY){const o=env(t,PAY,S[14],0.001,0.25),sc=1.5-0.5*eb((t-PAY)/0.35);s+=`<g opacity="${o}" transform="translate(540,300) scale(${sc})">${txt(0,0,'DREH DEN VERGLEICH UM.',62,GREEN,900,1,'middle',1)}</g>`+L(t,PAY+0.6,S[14],378,'WO STANDEST DU VOR 1 JAHR?',56,WHITE);}
+ s+=L(t,S[14],S[15],300,'DEIN BRONZE-MOMENT.',80,BRZ)+L(t,S[14]+1.4,S[15],378,'FÜHLT SICH BESSER AN.',62,GREEN);
+ s+=L(t,S[15],ENDC+0.2,300,'SCHICK DAS JEMANDEM,',80,WHITE)+L(t,S[15]+0.5,ENDC+0.2,378,'DER IMMER NUR SIEHT, WAS FEHLT.',46,YEL);
+ if(t>S[14]+0.3&&t<ENDC){const o=env(t,S[14]+0.3,ENDC,0.25,0.2),sc=0.85+0.15*eb((t-S[14]-0.3)/0.4);s+=pill(465,1580-140,'SCHREIB 48, WENN DU HEUTE ZURÜCKSCHAUST.',WHITE,'#000',26,o,sc);}
+ {const o=env(t,S[2]+0.4,S[4]+3.0,0.25,0.3);if(o>0&&t<S[3]||o>0&&t>=S[4])s+=cpill(t,S[2]+0.4,S[4]+3.0,'2 ODER 3? SCHREIB DEINEN TIPP IN DIE KOMMENTARE');}
+ s+=SRC(t,S[4],S[10],'Medvec, Madey & Gilovich (1995), J. Pers. Soc. Psychol. 69(4)','Olympia 1992 · Skala 1–10 direkt nach dem Wettkampf: Silber 4,8 · Bronze 7,1');
+ s+=SRC(t,S[10],S[11]+0.1,'Hedgcock, Luangrath & Webster (2021), J. Exp. Psychol.: General','413 Athleten, Sommerspiele 2000–2016, automatische Mimik-Analyse');
+ s+=endCard(t);
+ s+=brand();
+ document.getElementById('stage').innerHTML=s;
+ const fl=document.getElementById('flash');const w=env(t,-0.1,0.3,0.001,0.25),g=env(t,PAY,PAY+0.7,0.001,0.6),r=env(t,S[7],S[7]+0.4,0.001,0.3);
+ fl.style.background=g>0?GREEN:RED;fl.style.opacity=Math.max(0.22*w,0.38*g,0.3*r);
+};
+render(0);
+</script></body></html>

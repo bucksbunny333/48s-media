@@ -1,0 +1,6 @@
+const {chromium}=require('playwright');
+(async()=>{const [page,...ts]=process.argv.slice(2);const b=await chromium.launch({executablePath:'/usr/bin/google-chrome'});
+const p=await b.newPage({viewport:{width:1080,height:1920}});p.on('pageerror',e=>console.log('ERR',e.message));
+await p.goto('file://'+require('path').resolve(page));await p.evaluate(()=>document.fonts.ready);
+for(const t of ts){await p.evaluate(t=>window.render(+t),t);await p.screenshot({path:`s_${t}.png`,type:'png'});}
+await b.close();})();
