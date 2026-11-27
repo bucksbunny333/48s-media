@@ -265,3 +265,5 @@ QC gegen Referenzen („Wochen“, „150 €“, Hook „1 neue Nachricht“, B
 - YouTube-Hinweis: Mac-Erinnerung „Wer kommt zuerst raus?“ 09:05 könnte einen der 3 vidIQ-Plätze belegen → 21:00 YouTube evtl. abgelehnt (dann nicht erzwingen).
 
 > 27.11. 12:31: „Ideen beim Gehen“ live – YouTube itkkVVv_pzQ · TikTok 7712812093476457761 · Instagram DgPk-WLRKP6 (KI-Label). vidIQ-YouTube: „Wer kommt zuerst raus?“ lief 09:06 (Wu7wHT8J-Vk) → nach 12:30 nur noch 1 Platz (18:30); 21:00 „Fünf Dollar“ bekommt heute kein YouTube. Kommentare an Lukas geschickt (kein Chrome).
+
+> 27.11. 18:32: „Du in 10 Jahren“ live – YouTube RlK4emvdlqU · TikTok vidIQ-Post 057e552a zugestellt (completed, kein Link geliefert) · Instagram DgQOPQzBypL (KI-Label). vidIQ-YouTube-Kontingent damit für heute verbraucht (Reset 28.11. 09:00). Kommentare an Lukas geschickt.
