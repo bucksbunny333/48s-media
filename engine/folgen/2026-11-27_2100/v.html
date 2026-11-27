@@ -1,0 +1,114 @@
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#flash{position:absolute;inset:0;opacity:0}
+</style></head><body>
+<svg id="stage" viewBox="0 0 1080 1920"></svg><div id="flash"></div>
+<script src="rig.js"></script><script src="poses.js"></script><script src="kit.js"></script><script src="h.js"></script><script src="k27.js"></script><script src="timing.js"></script>
+<script>
+// „Fünf Dollar“ – Dunn, Aknin & Norton (2008), Science 319, 1687–1688
+window.DUR=61.0; const PAY=S[10]; const SAVE=58.45; const HV=(location.hash||'#A').slice(1); const PINK='#ff6fae';
+const OPT=[['20 $','FÜR DICH'],['5 $','FÜR DICH'],['5 $','FÜR ANDERE']];
+function face(x,y,r,mood,col,o=1){if(o<=0)return'';const m=mood*r*0.45;return `<g opacity="${o}" transform="translate(${x},${y})"><circle r="${r}" fill="${col}"/><circle cx="${-r*0.33}" cy="${-r*0.22}" r="${r*0.11}" fill="#05070c"/><circle cx="${r*0.33}" cy="${-r*0.22}" r="${r*0.11}" fill="#05070c"/><path d="M${-r*0.45},${r*0.3} Q0,${r*0.3+m} ${r*0.45},${r*0.3}" fill="none" stroke="#05070c" stroke-width="${r*0.1}" stroke-linecap="round"/></g>`}
+function bill(x,y,v,rot,sc=1,o=1){return `<g opacity="${o}" transform="translate(${x},${y}) rotate(${rot}) scale(${sc})"><rect x="-80" y="-40" width="160" height="80" rx="8" fill="#3d8b4f" stroke="#a8e6b5" stroke-width="4"/><circle r="24" fill="none" stroke="#a8e6b5" stroke-width="4"/>${txt(0,12,v,32,'#e9ffe9',900)}</g>`}
+function env1(x,y,sc,col='#e9e9e9',open=0,o=1){return `<g opacity="${o}" transform="translate(${x},${y}) scale(${sc})"><rect x="-110" y="-70" width="220" height="140" rx="10" fill="${col}"/><path d="M-110,-70 L0,${-70+70*(1-open)-60*open} L110,-70" fill="${col}" stroke="#9aa0aa" stroke-width="4"/><path d="M-110,70 L-20,0 M110,70 L20,0" stroke="#9aa0aa" stroke-width="4"/></g>`}
+function gift(x,y,sc,o=1){return `<g opacity="${o}" transform="translate(${x},${y}) scale(${sc})"><rect x="-40" y="-30" width="80" height="60" rx="6" fill="${PINK}"/><rect x="-6" y="-30" width="12" height="60" fill="${YEL}"/><rect x="-40" y="-6" width="80" height="12" fill="${YEL}"/><path d="M0,-30 Q-26,-56 -30,-34 Z M0,-30 Q26,-56 30,-34Z" fill="${YEL}"/></g>`}
+function heart(x,y,sc,col,o=1){return `<g opacity="${o}" transform="translate(${x},${y}) scale(${sc})"><path d="M0,30 C-60,-10 -40,-60 0,-30 C40,-60 60,-10 0,30Z" fill="${col}"/></g>`}
+function dots(t,a,n,split,cA,cB,labA,labB,o=1){if(o<=0)return'';let s=`<g opacity="${o}">`;const k=eio(cl((t-a)/1.6));
+ for(let i=0;i<n;i++){const gA=i<split;const c0=i%11,r0=Math.floor(i/11);const x0=210+c0*60,y0=470+r0*44;
+  const j=gA?i:i-split;const cc=gA?j%8:j%5,rr=gA?Math.floor(j/8):Math.floor(j/5);const x1=gA?90+cc*46:700+cc*46,y1=480+rr*36;
+  s+=`<circle cx="${(x0+(x1-x0)*k).toFixed(1)}" cy="${(y0+(y1-y0)*k).toFixed(1)}" r="15" fill="${k>0.02?(gA?cA:cB):'#8a93a3'}"/>`;}
+ if(k>0.9){s+=txt(260,930,labA,38,cA,900)+txt(800,930,labB,38,cB,900);}
+ return s+'</g>';}
+// ---------- Hook (bis S2)
+function partHook(t){const o=env(t,-1,S[2]+0.1,0.001,0.3);if(o<=0)return'';let s='';
+ const sh=t<1.0?shakeT(t,0,1.0,12):'';
+ const mood=Math.sin(t*7);s+=`<g transform="${sh}">`+face(540,640,170,mood,mood>0?YEL:'#ff9f0a')+'</g>';
+ // Scheine fliegen aus dem Umschlag
+ s+=env1(540,880,0.9,'#e9e9e9',1);
+ for(let i=0;i<6;i++){const ph=((t*0.9+i/6)%1);const x=540+Math.sin(i*2.1)*360*ph,y=860-380*ph+200*ph*ph;s+=bill(x,y,i%2?'5 $':'20 $',ph*400+i*50,0.7,1-ph*0.6);}
+ if(HV==='C'&&t<2.2)s+=`<rect x="60" y="430" width="960" height="520" fill="#05070c"/>`+[0,1,2].map(i=>env1(240+i*300,690+Math.sin(t*9+i)*20,0.9,'#e9e9e9',0)+txt(240+i*300,700,'ABC'[i],60,'#05070c',900)).join('');
+ if(HV==='B'&&t<2.2)s+=`<rect x="60" y="430" width="960" height="520" fill="#05070c"/>`+env1(540,700,1.6,'#e9e9e9',0);
+ s+=optCards(t,OPT,1080,1,{hl:t<S[1]?Math.floor(t/0.42)%3:Math.floor(t*3)%3});
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- Prognosen (S2..S4)
+function partPred(t){const o=env(t,S[2],S[4]+0.1,0.25,0.3);if(o<=0)return'';let s='';
+ if(t<S[3]){s+=dots(t,S[2]+0.6,109,94,GREEN,'#5c5c5c','94 × „20 $“','15 × „5 $“');
+  if(t>S[2]+2.6){const q=eb(cl((t-S[2]-2.6)/0.3));s+=`<g transform="translate(465,1140) scale(${q})">`+tag(0,0,'86 % TIPPEN: MEHR GELD = MEHR GLÜCK',YEL,'#05070c',36)+'</g>';}}
+ else{s+=dots(t,S[3]+0.3,109,69,BLUE,PINK,'69 × „FÜR MICH“','40 × „FÜR ANDERE“');
+  if(t>S[3]+2.3){const q=eb(cl((t-S[3]-2.3)/0.3));s+=`<g transform="translate(465,1140) scale(${q})">`+tag(0,0,'63 % TIPPEN: FÜR MICH SELBST',BLUE,'#05070c',36)+'</g>';}}
+ s+=txt(465,1240,'PROGNOSE · 109 STUDIERENDE',30,'#cfd6e6',900);
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- 46 Umschläge (S4..S5)
+function partEnv(t){const o=env(t,S[4],S[5]+0.1,0.25,0.3);if(o<=0)return'';let s='';
+ const n=Math.min(46,Math.floor((t-S[4]-0.2)/0.05));
+ for(let i=0;i<46;i++){if(i>=n)break;const c=i%8,r=Math.floor(i/8);s+=env1(140+c*115,480+r*80,0.42,i%2?'#e9e9e9':'#cfe8d4',0)+txt(140+c*115,490+r*80,i%2?'5 $':'20 $',22,'#05070c',900);}
+ s+=txt(465,1060,Math.max(0,n)+' MENSCHEN',96,WHITE,900)+txt(465,1140,'MORGENS: 1 UMSCHLAG · 5 $ ODER 20 $',34,'#cfd6e6',900,cl((t-S[4]-1.5)/0.3));
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- Split: für sich / für andere (S5..S8)
+function partSplit(t){const o=env(t,S[5],S[8]+0.1,0.25,0.3);if(o<=0)return'';let s='';
+ const BX=env(t,S[5]+2.2,99,0.3,0.1);if(t<S[6]){const h=Math.min(17,8+Math.floor((t-S[5])*4));const cy=t<S[5]+2.2?690:1210,cs=t<S[5]+2.2?2.2:1;s+=`<g transform="translate(${t<S[5]+2.2?540:465},${cy}) scale(${cs})"><circle r="70" fill="#0b0f16" stroke="${WHITE}" stroke-width="8"/><line x1="0" y1="0" x2="${48*Math.sin(t*6)}" y2="${-48*Math.cos(t*6)}" stroke="${WHITE}" stroke-width="8" stroke-linecap="round"/></g>`+txt(465,t<S[5]+2.2?1060:1340,(h<17?h+':00 → ':'')+'BIS 17:00 UHR',t<S[5]+2.2?54:40,YEL,900);}
+ s+=`<g opacity="${BX}">`;
+ s+=`<rect x="60" y="440" width="460" height="500" rx="28" fill="#0b0f16" stroke="${BLUE}" stroke-width="5"/><rect x="560" y="440" width="460" height="500" rx="28" fill="#0b0f16" stroke="${PINK}" stroke-width="5"/>`;
+ s+=txt(290,500,'FÜR SICH SELBST',34,BLUE,900)+txt(790,500,'FÜR JEMAND ANDEREN',34,PINK,900);
+ const qa=cl((t-S[5]-2.4)/0.3),qb=cl((t-S[5]-3.8)/0.3);
+ s+=benAt(260,900,P.stand,0.5,WHITE,0,qa,false)+`<g opacity="${qa}"><rect x="330" y="760" width="90" height="100" rx="8" fill="${BLUE}"/><path d="M350,760 Q375,720 400,760" fill="none" stroke="${BLUE}" stroke-width="8"/></g>`;
+ s+=benAt(680,900,P.reach,0.5,WHITE,0,qb,true)+benAt(900,900,P.stand,0.5,PINK,0,qb,false)+gift(790,780,1,qb)+'</g>';
+ // Ergebnis-Gesichter
+ if(t>=S[6]){const q=cl((t-S[6]-0.2)/0.3);s+=face(290,1080+0*q,90,0,'#8a93a3',q)+`<g opacity="${q}" transform="translate(290,1220)">`+tag(0,0,'KEIN PLUS',GREY,WHITE,36)+'</g>';}
+ if(t>=S[7]){const q=cl((t-S[7]-0.2)/0.3);const m=eb(cl((t-S[7]-0.2)/0.6));s+=face(640,1080,90+10*m,m,GREEN,q)+`<g opacity="${q}" transform="translate(640,1220)">`+tag(0,0,'GLÜCKLICHER',GREEN,'#05070c',36)+'</g>';}
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- 5 $ = 20 $ (S8..PAY)
+function partEqual(t){const o=env(t,S[8],PAY+0.05,0.25,0.15);if(o<=0)return'';let s='';
+ const k=eb(cl((t-S[8]-0.3)/0.4));const ob=t<S[9]?1:cl(1-(t-S[9])/0.3);s+=bill(280,690,'5 $',-8,1.6*k,ob)+bill(800,690,'20 $',8,1.6*k,ob);
+ const q=eb(cl((t-S[8]-1.6)/0.3));s+=`<g opacity="${ob}" transform="translate(540,700) scale(${q})">`+txt(0,40,'=',160,YEL,900)+'</g>';
+ s+=stampT(t,S[8]+2.4,S[9]+0.05,'BETRAG EGAL',RED,540,900,90,-8);
+ if(t>=S[9]){const q2=cl((t-S[9]-0.2)/0.3);s+=`<g opacity="${q2}">`+benAt(330,940,P.reach,0.55,WHITE,0,1,true)+benAt(760,940,P.stand,0.55,PINK,0,1,false)+gift(545,800,1.2)+heart(760,560,0.9+0.1*Math.sin(t*8),PINK)+'</g>';
+  // Trommelwirbel: Karte C wackelt
+  const sh=t>S[9]+2.2?`translate(${Math.sin(t*60)*6},0)`:'';s+=`<g transform="${sh}">`+optCards(t,OPT,1110,cl((t-S[9]-1.6)/0.3),{hl:2})+'</g>';}
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- Payoff
+function payoff(t){if(t<PAY||t>=SAVE+0.3)return'';let s='';const o=env(t,PAY,SAVE+0.3,0.001,0.3);
+ if(t<S[11]){const m=eb(cl((t-PAY)/0.5));s+=face(540,640,150+20*m,m,GREEN);for(let i=0;i<8;i++){const ph=((t-PAY)*0.6+i/8)%1;s+=heart(540+Math.cos(i*0.8)*300*ph,640-260*ph,0.6,PINK,1-ph);}
+  s+=env1(540,880,0.8,'#cfe8d4',1);}
+ else{const k=eio(cl((t-S[11]-0.2)/1.0));s+=benAt(380,930,P.reach,0.6,WHITE,0,1,true)+benAt(760,930,k<1?P.stand:P.cheer,0.6,PINK,0,1,false);
+  s+=`<g transform="translate(${470+120*k},760)"><path d="M-40,-50 L40,-50 L30,40 L-30,40Z" fill="#e9e9e9"/><path d="M40,-30 Q70,-20 40,10" fill="none" stroke="#e9e9e9" stroke-width="8"/>`+txt(0,5,'5 €',24,'#05070c',900)+'</g>';
+  if(k>=1)s+=heart(760,520,1.0+0.1*Math.sin(t*8),PINK);}
+ s+=optCards(t,OPT,1110,1,{win:2,pop:PAY});
+ if(t>=S[11]&&t<S[12]){const q=cl((t-S[11]-0.3)/0.3);s+=`<g opacity="${q}" transform="translate(465,1320)">`+tag(0,0,'MORGEN: 5 € FÜR JEMANDEN',GREEN,'#05070c',40)+'</g>';}
+ if(t>=S[12]){const q=cl((t-S[12])/0.3);s+=`<g opacity="${q}" transform="translate(465,1320)">`+tag(0,0,'SCHICK DAS JEMANDEM, DEM DU WAS GUTES TUN WILLST',WHITE,'#05070c',24)+'</g>';}
+ return `<g opacity="${o}">${s}</g>`;}
+window.SFXC=()=>{const c=[[0,'whoosh'],[0.05,'boom'],[0.1,'pop']];for(let k=1;k<12;k++)c.push([k*0.45,'pop']);
+ c.push([S[1],'whoosh'],[S[1]+0.2,'ding'],[S[2],'whoosh'],[S[2]+0.6,'whoosh'],[S[2]+2.6,'boom'],[S[3],'whoosh'],[S[3]+0.3,'whoosh'],[S[3]+2.3,'pop']);
+ c.push([S[4],'whoosh']);for(let k=0;k<12;k++)c.push([S[4]+0.2+k*0.2,'tick']);
+ c.push([S[5],'whoosh']);for(let k=0;k<8;k++)c.push([S[5]+0.25*k,'tick']);c.push([S[5]+1.6,'pop'],[S[5]+3.4,'pop']);
+ c.push([S[6],'buzz'],[S[7],'ding'],[S[7]+0.2,'pop'],[S[8],'whoosh'],[S[8]+0.3,'pop'],[S[8]+1.6,'pop'],[S[8]+2.4,'boom']);
+ c.push([S[9],'whoosh'],[S[9]+1.6,'pop']);for(let k=0;k<12;k++)c.push([S[9]+2.2+k*0.12,'tick']);
+ c.push([PAY,'boom'],[PAY+0.05,'ding']);for(let k=0;k<6;k++)c.push([PAY+0.2+k*0.2,'pop']);
+ c.push([S[11],'whoosh'],[S[11]+1.2,'ding'],[S[12],'whoosh'],[SAVE,'whoosh'],[SAVE+0.2,'pop'],[SAVE+0.42,'pop'],[SAVE+0.64,'pop'],[SAVE+0.8,'ding']);
+ return c;};
+window.render=function(t){let s=bg(t<0.6?0.8*(1-t/0.6)+0.2:(t>S[9]+2.2&&t<PAY?0.3:0),t>=PAY&&t<SAVE?0.6:0);
+ s+=head();
+ s+=partHook(t)+partPred(t)+partEnv(t)+partSplit(t)+partEqual(t)+payoff(t);
+ s+=LH(t,-1,S[1],300,'WAS MACHT DICH',86,WHITE)+LH(t,-1,S[1],378,'HEUTE GLÜCKLICHER?',62,YEL);
+ s+=L(t,S[1],S[2],300,'DEIN TIPP: A, B ODER C?',80,YEL)+L(t,S[1]+0.6,S[2],378,'SCHREIB ES IN DIE KOMMENTARE.',50,WHITE);
+ s+=L(t,S[2],S[3],300,'FAST 9 VON 10 TIPPEN:',80,WHITE)+L(t,S[2]+1.4,S[3],378,'20 $ MACHEN GLÜCKLICHER.',58,GREEN);
+ s+=L(t,S[3],S[4],300,'FAST 2 VON 3 TIPPEN:',80,WHITE)+L(t,S[3]+1.4,S[4],378,'GELD FÜR MICH SELBST.',58,BLUE);
+ s+=L(t,S[4],S[5],300,'DANN DER ECHTE TEST:',80,WHITE)+L(t,S[4]+1.0,S[5],378,'46 UMSCHLÄGE MIT GELD.',58,YEL);
+ s+=L(t,S[5],S[6],300,'DIE REGEL:',100,WHITE)+L(t,S[5]+1.0,S[6],378,'BIS 17 UHR AUSGEBEN.',60,YEL);
+ s+=L(t,S[6],S[7],300,'FÜR SICH SELBST:',90,BLUE)+L(t,S[6]+0.8,S[7],378,'KEIN PLUS.',66,'#cfd6e6');
+ s+=L(t,S[7],S[8],300,'FÜR JEMAND ANDEREN:',80,PINK)+L(t,S[7]+0.8,S[8],378,'DEUTLICH GLÜCKLICHER.',62,GREEN);
+ s+=L(t,S[8],S[9],300,'5 $ ODER 20 $?',100,WHITE)+L(t,S[8]+1.6,S[9],378,'VÖLLIG EGAL.',70,RED);
+ s+=L(t,S[9],PAY,300,'NICHT WIE VIEL –',96,WHITE)+L(t,S[9]+1.0,PAY,378,'SONDERN FÜR WEN.',70,PINK);
+ if(t>=PAY&&t<SAVE){const o=env(t,PAY,SAVE,0.001,0.25),sc=1.5-0.5*eb((t-PAY)/0.35);s+=`<g opacity="${o}" transform="translate(540,300) scale(${sc})">${txt(0,0,'ANTWORT C.',100,GREEN,900,1,'middle',1)}</g>`+L(t,PAY+1.0,SAVE,378,'MEHR GLÜCK KOSTET KEIN GELD.',54,WHITE);}
+ if(t>=0.3&&t<S[2])s+=tipPill(t,0.3,S[2]);
+ s+=SRC(t,S[2],PAY,'Dunn, Aknin & Norton (2008), Science 319, 1687–1688','Prognose N = 109 · Feldexperiment N = 46 (Vancouver)');
+ s+=saveCard(t,SAVE,'FÜR MORGEN:',['EINE PERSON AUSSUCHEN','KLEINIGKEIT FÜR SIE','GEFÜHL DANACH MERKEN']);
+ s+=brand();
+ document.getElementById('stage').innerHTML=s;
+ const fl=document.getElementById('flash');const g=env(t,PAY,PAY+0.7,0.001,0.6);
+ fl.style.background=GREEN;fl.style.opacity=0.38*g;
+};
+render(0);
+</script></body></html>
