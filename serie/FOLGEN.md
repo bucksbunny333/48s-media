@@ -263,3 +263,5 @@ QC gegen Referenzen („Wochen“, „150 €“, Hook „1 neue Nachricht“, B
 - Safe Zone: je 14–20 Standbilder mit Sperrzonen; korrigiert: Balken-Label „EXP. 4“ in der Button-Ecke (12:30), „FERTIG.“-Tag + Baublöcke rechts unten, Stempel zu breit (18:30), Gruppen-Labels + Uhrzeit-Zeile rechts unten (21:00), Speicher-Karte (Kästen jetzt x 65–865) → ok.
 - Ton: Tom Magic, eleven_v3, 1 Take/Satz (45 Takes + 4 Neuaufnahmen kürzerer Sätze, ~7.400 Zeichen), 3/2/2 Sätze gestrichen für 61 s; atempo 1,10; −13,9 / −14,1 / −14,1 LUFS; Musik Sidechain; SFX auf jedem Wechsel.
 - YouTube-Hinweis: Mac-Erinnerung „Wer kommt zuerst raus?“ 09:05 könnte einen der 3 vidIQ-Plätze belegen → 21:00 YouTube evtl. abgelehnt (dann nicht erzwingen).
+
+> 27.11. 12:31: „Ideen beim Gehen“ live – YouTube itkkVVv_pzQ · TikTok 7712812093476457761 · Instagram DgPk-WLRKP6 (KI-Label). vidIQ-YouTube: „Wer kommt zuerst raus?“ lief 09:06 (Wu7wHT8J-Vk) → nach 12:30 nur noch 1 Platz (18:30); 21:00 „Fünf Dollar“ bekommt heute kein YouTube. Kommentare an Lukas geschickt (kein Chrome).
