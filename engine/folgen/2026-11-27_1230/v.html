@@ -1,0 +1,155 @@
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#flash{position:absolute;inset:0;opacity:0}
+</style></head><body>
+<svg id="stage" viewBox="0 0 1080 1920"></svg><div id="flash"></div>
+<script src="rig.js"></script><script src="poses.js"></script><script src="kit.js"></script><script src="h.js"></script><script src="k27.js"></script><script src="timing.js"></script>
+<script>
+// „Ideen beim Gehen“ – Oppezzo & Schwartz (2014), J. Exp. Psychol.: Learning, Memory, and Cognition 40(4)
+window.DUR=61.0; const PAY=S[11]; const SAVE=58.45;
+const OPT=[['SCHREIBTISCH','SITZEN'],['SOFA','SITZEN'],['GEHEN','']];
+function desk(x,y,sc=1){return `<g transform="translate(${x},${y}) scale(${sc})" stroke="${GREY}" stroke-width="10" stroke-linecap="round" fill="none"><line x1="-150" y1="0" x2="150" y2="0"/><line x1="-130" y1="0" x2="-130" y2="140"/><line x1="130" y1="0" x2="130" y2="140"/><rect x="-60" y="-70" width="120" height="70" rx="8"/></g>`}
+function chair(x,y,sc=1){return `<g transform="translate(${x},${y}) scale(${sc})" stroke="${GREY}" stroke-width="10" stroke-linecap="round" fill="none"><path d="M-50,0 L50,0 M40,0 L40,-120 M-45,0 L-45,90 M45,0 L45,90"/></g>`}
+function tread(x,y,t,sc=1){const off=(t*160)%40;let s=`<g transform="translate(${x},${y}) scale(${sc})"><rect x="-190" y="0" width="380" height="40" rx="20" fill="#1d2533" stroke="${GREY}" stroke-width="6"/>`;for(let k=0;k<11;k++){const xx=-180+((k*40+off)%380);s+=`<line x1="${xx}" y1="8" x2="${xx}" y2="32" stroke="#3a4558" stroke-width="5"/>`;}
+ return s+`<path d="M150,0 L190,-200 L130,-200" stroke="${GREY}" stroke-width="10" fill="none" stroke-linecap="round"/></g>`}
+function walkPose(t,sp=6){return Math.floor(t*sp)%2?P.walkA:P.walkB}
+function bulbs(cx,y,n,on,t,r=26,gap=70,o=1){let s='';const w=(n-1)*gap;for(let i=0;i<n;i++){const k=cl(on-i);s+=bulb(cx-w/2+i*gap,y,r,k,o);}return s;}
+function park(o){if(o<=0)return'';let s=`<g opacity="${o}">`;[[220,760],[400,720],[700,740],[860,770]].forEach(([x,y],i)=>{s+=`<rect x="${x-12}" y="${y}" width="24" height="120" fill="#5a3d22"/><circle cx="${x}" cy="${y-30}" r="${70+i*6}" fill="#1f7a3a"/>`;});
+ s+=`<circle cx="880" cy="520" r="60" fill="${YEL}"/><rect x="60" y="880" width="960" height="40" rx="10" fill="#1f5a2a"/>`;return s+'</g>';}
+// ---------- Hook / Frage (bis S2)
+function partHook(t){const o=env(t,-1,S[2]+0.1,0.001,0.3);if(o<=0)return'';let s='';
+ const sc=Math.floor(t/0.42)%3; // Szene wechselt: Schreibtisch / Sofa / Gehen
+ const sh=t<1.2?shakeT(t,0,1.2,14):'';
+ s+=`<g transform="${sh}">`;
+ s+=`<rect x="60" y="440" width="960" height="500" rx="28" fill="#0b0f16" stroke="#2a3444" stroke-width="5"/>`;
+ const HV=(location.hash||'#A').slice(1);
+ if(t<S[1]&&HV==='B'&&t<2.2){const fl=Math.sin(t*30)>0?1:0.2;s+=bulb(540,690,130,fl)+txt(540,880,'?',90,YEL,900);}
+ else if(t<S[1]&&HV==='C'&&t<2.2){if(t<1.0){s+=desk(600,820,1.1)+chair(380,850)+benAt(400,940,P.slump,0.62,WHITE,0,1,true)+bulb(540,520,40,0);}else{s+=`<line x1="80" y1="900" x2="1000" y2="900" stroke="${GREY}" stroke-width="8"/>`+benAt(300+(t-1)*300,900,walkPose(t,8),0.62,WHITE,0,1,false)+bulb(540,520,40,1);}}
+ else if(t<S[1]){
+  if(sc===0){s+=desk(600,820,1.1)+chair(380,850)+benAt(400,940,P.sit,0.62,WHITE,0,1,true);}
+  else if(sc===1){s+=sofa(330,860,440)+benAt(520,900,P.slump,0.62,WHITE,0,1,false);}
+  else {s+=`<line x1="80" y1="900" x2="1000" y2="900" stroke="${GREY}" stroke-width="8"/>`+benAt(540+((t*120)%120-60),900,walkPose(t,8),0.62,WHITE,0,1,false);}
+  const fl=Math.sin(t*40)>0?1:0.3;s+=bulb(540,520,40,fl);
+  s+=`<g transform="translate(870,520)">`+tag(0,0,['A','B','C'][sc],[YEL,YEL,YEL][sc],'#05070c',60)+'</g>';
+ } else {s+=benAt(540,900,P.stand,0.62,WHITE,0,1,false)+txt(540,600,'?',160,YEL,900,0.6+0.4*Math.sin(t*6));}
+ s+='</g>';
+ s+=optCards(t,OPT,1080,1,{hl:t<S[1]?Math.floor(t/0.42)%3:Math.floor(t*3)%3});
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- doppelt so viele Ideen (S2..S3)
+function partDouble(t){const o=env(t,S[2],S[3]+0.1,0.25,0.3);if(o<=0)return'';let s='';
+ s+=`<rect x="60" y="440" width="460" height="500" rx="28" fill="#0b0f16" stroke="#2a3444" stroke-width="5"/><rect x="560" y="440" width="460" height="500" rx="28" fill="#0b0f16" stroke="${GREEN}" stroke-width="5"/>`;
+ s+=txt(290,500,'IM SITZEN',36,'#cfd6e6',900)+txt(790,500,'BEIM GEHEN',36,GREEN,900);
+ s+=chair(250,860,0.8)+benAt(270,930,P.sit,0.5,WHITE,0,1,false);
+ s+=tread(790,890,t,0.8)+benAt(790,890,walkPose(t,6),0.5,WHITE,0,1,false);
+ const k=cl((t-S[2]-0.4)/2.4);
+ s+=bulbs(290,620,3,3*cl(k*2),t,24,64)+bulbs(790,590,4,6*k,t,22,60)+bulbs(790,660,2,6*k-4,t,22,60);
+ if(t>S[2]+2.6){const q=eb(cl((t-S[2]-2.6)/0.3));s+=`<g transform="translate(465,1120) scale(${q})">`+txt(0,0,'×2',200,GREEN,900)+'</g>'+txt(465,1240,'NEUE IDEEN (IN EINEM VERSUCH)',36,WHITE,900,cl(q));}
+ s+=txt(465,1320,'Lämpchen schematisch',24,'#8a93a3',700,cl(k*3));
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- 176 Menschen (S3..S4)
+function partPeople(t){const o=env(t,S[3],S[4]+0.1,0.25,0.3);if(o<=0)return'';let s='';
+ const n=Math.round(176*eo(cl((t-S[3]-0.2)/2.0)));
+ for(let i=0;i<176;i++){const c=i%16,r=Math.floor(i/16);const x=130+c*55,y=480+r*40;const on=i<n;s+=`<circle cx="${x}" cy="${y}" r="15" fill="${on?(c<8?BLUE:GREEN):'#1d2533'}"/>`;}
+ s+=txt(465,1060,n+' MENSCHEN',96,WHITE,900);
+ if(t>S[3]+2.3){const q=cl((t-S[3]-2.3)/0.3);s+=`<g opacity="${q}">`+tag(300,1180,'SITZEN',BLUE,'#05070c',44)+txt(465,1195,'VS',44,'#8a93a3',900)+tag(630,1180,'GEHEN',GREEN,'#05070c',44)+'</g>';}
+ s+=txt(465,1280,'4 EXPERIMENTE · STANFORD',32,'#cfd6e6',900,cl((t-S[3]-0.8)/0.3));
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- Knopf-Aufgabe (S4..S5)
+function partButton(t){const o=env(t,S[4],S[5]+0.1,0.25,0.3);if(o<=0)return'';let s='';
+ const r=1+0.05*Math.sin(t*6);s+=`<g transform="translate(540,690) scale(${r})"><circle r="120" fill="#c8553d"/><circle r="92" fill="none" stroke="#9c3d2a" stroke-width="8"/>${[[-30,-30],[30,-30],[-30,30],[30,30]].map(([a,b])=>`<circle cx="${a}" cy="${b}" r="14" fill="#5a1f12"/>`).join('')}</g>`;
+ const ideas=['TÜRKNAUF FÜRS PUPPENHAUS','AUGE FÜR DEN TEDDY','SPIELSTEIN','MINI-FRISBEE','RÄDCHEN FÜRS SPIELZEUGAUTO'];
+ const pos=[[300,500],[780,520],[250,880],[820,860],[540,930]];
+ const k=Math.floor((t-S[4]-1.4)/0.75);
+ ideas.forEach((w,i)=>{if(i>k)return;const q=eb(cl((t-S[4]-1.4-i*0.75)/0.3));const [x,y]=pos[i];s+=`<g transform="translate(${x},${y}) scale(${q})">`+tag(0,0,w,i%2?BLUE:YEL,'#05070c',26)+'</g>';});
+ if(k>=0)s+=txt(465,1120,'IDEEN: '+Math.min(5,k+1),90,YEL,900);
+ s+=txt(465,1210,'Beispiel-Antwort aus der Studie: „Türknauf fürs Puppenhaus“',24,'#8a93a3',700);
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- Park? Nein: Laufband vor leerer Wand (S5..S7)
+function partWall(t){const o=env(t,S[5],S[7]+0.1,0.25,0.3);if(o<=0)return'';let s='';
+ if(t<S[6]){s+=park(1)+benAt(540+Math.sin(t*2)*40,900,walkPose(t,5),0.6,WHITE,0,1,false);
+  s+=stampT(t,S[5]+1.6,S[6]+0.05,'KEIN PARK',RED,540,690,110,-10);}
+ else{s+=`<rect x="380" y="450" width="560" height="460" fill="#e9e9e9"/>`+txt(660,690,'LEERE WAND',40,'#9aa0aa',900);
+  s+=tread(320,900,t,1)+benAt(300,900,walkPose(t,6),0.68,WHITE,0,1,true);
+  s+=stampT(t,S[6]+1.4,S[7]+0.05,'LAUFBAND',YEL,540,1100,90,-8);}
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- 81–100 % (S7..S8)
+function partBars(t){const o=env(t,S[7],S[8]+0.1,0.25,0.3);if(o<=0)return'';let s='';
+ const v=[100,95,88,81];s+=txt(540,500,'ANTEIL DER GEHER MIT MEHR KREATIVEN IDEEN',30,'#cfd6e6',900);
+ v.forEach((p,i)=>{const k=eo(cl((t-S[7]-0.5-i*0.45)/0.9));const x=105+i*195,h=360*p/100*k;s+=`<rect x="${x}" y="${920-h}" width="150" height="${h}" rx="14" fill="${GREEN}"/>`+txt(x+75,910-h,Math.round(p*k)+' %',44,WHITE,900,k>0?1:0)+txt(x+75,965,'EXP. '+(i+1),26,'#8a93a3',900);});
+ if(t>S[7]+3.0){const q=eb(cl((t-S[7]-3.0)/0.3));s+=`<g transform="translate(465,1130) scale(${q})">`+tag(0,0,'IN JEDEM VERSUCH',GREEN,'#05070c',52)+'</g>';}
+ s+=bulbs(465,1270,7,(t-S[7]-1)*3,t,20,64);
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- Danach hinsetzen (S8..S9)
+function partAfter(t){const o=env(t,S[8],S[9]+0.1,0.25,0.3);if(o<=0)return'';let s='';
+ const k=eio(cl((t-S[8]-0.3)/1.0));s+=chair(700,860,1)+benAt(500+200*k,940,k<1?walkPose(t,6):P.sit,0.62,WHITE,0,1,false);
+ const b1=eo(cl((t-S[8]-1.2)/1.0));
+ s+=`<rect x="85" y="1020" width="${560*b1}" height="60" rx="12" fill="${GREEN}"/>`+txt(85,1005,'ERST GEHEN, DANN SITZEN',30,GREEN,900,1,'start');
+ s+=`<rect x="85" y="1150" width="${380*b1}" height="60" rx="12" fill="#5c5c5c"/>`+txt(85,1135,'NUR SITZEN',30,'#cfd6e6',900,1,'start');
+ s+=txt(465,1270,'WIRKUNG BLEIBT TEILWEISE HÄNGEN · Balken schematisch',24,'#8a93a3',700);
+ s+=bulbs(540,520,3,3*b1*0.67+0.5,t,30,90);
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- Ehrliche Grenze (S9..S10)
+function partLimit(t){const o=env(t,S[9],S[10]+0.1,0.25,0.3);if(o<=0)return'';let s='';
+ const w=['HÜTTEN','SCHWEIZER','KUCHEN'];w.forEach((x,i)=>{const q=eb(cl((t-S[9]-0.3-i*0.3)/0.3));s+=`<g transform="translate(${230+i*310},560) scale(${q})">`+tag(0,0,x,'#1d2533',WHITE,40)+'</g>';});
+ s+=txt(540,700,'= ?',90,YEL,900,cl((t-S[9]-1.2)/0.3));
+ if(t>S[9]+2.0){s+=`<g transform="translate(540,830) scale(${eb(cl((t-S[9]-2.0)/0.3))})">`+tag(0,0,'KÄSE',YEL,'#05070c',70)+'</g>';}
+ s+=txt(465,1080,'NUR EINE RICHTIGE LÖSUNG?',52,WHITE,900,cl((t-S[9]-0.6)/0.3))+`<g transform="translate(465,1200)">`+tag(0,0,'GEHEN: KEIN VORTEIL',GREY,WHITE,44,cl((t-S[9]-2.4)/0.3))+'</g>';
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- Regel (S10..PAY)
+function partRule(t){const o=env(t,S[10],PAY+0.05,0.25,0.15);if(o<=0)return'';let s='';
+ s+=`<rect x="60" y="440" width="460" height="500" rx="28" fill="#0b0f16" stroke="${BLUE}" stroke-width="5"/>`+chair(240,840,0.9)+benAt(260,920,P.read,0.5,WHITE,0,1,false)+txt(290,500,'RECHNEN',44,BLUE,900)+txt(400,700,'1+1',60,BLUE,900);
+ const q=cl((t-S[10]-2.2)/0.3);s+=`<g opacity="${q}"><rect x="560" y="440" width="460" height="500" rx="28" fill="#0b0f16" stroke="${GREEN}" stroke-width="5"/>`+txt(790,500,'IDEEN',44,GREEN,900)+`<line x1="590" y1="900" x2="990" y2="900" stroke="${GREY}" stroke-width="8"/>`+benAt(790,900,walkPose(t,6),0.5,WHITE,0,1,false)+bulbs(790,600,3,3,t,22,64)+'</g>';
+ s+=`<g transform="translate(300,1100)">`+tag(0,0,'SETZ DICH HIN',BLUE,'#05070c',40)+'</g>'+`<g opacity="${q}" transform="translate(630,1100)">`+tag(0,0,'STEH AUF',GREEN,'#05070c',40)+'</g>';
+ // Spannung: Karte C wackelt vor der Auflösung
+ s+=optCards(t,OPT,1300,cl((t-S[10]-3.0)/0.3),{hl:2});
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- Payoff
+function payoff(t){if(t<PAY||t>=SAVE+0.3)return'';let s='';const o=env(t,PAY,SAVE+0.3,0.001,0.3);
+ const k=eio(cl((t-PAY-0.4)/1.6));
+ // Tür öffnet sich, Ben geht hinaus, Lampen gehen an
+ s+=`<rect x="60" y="440" width="960" height="500" rx="28" fill="#0b0f16" stroke="${GREEN}" stroke-width="6"/>`;
+ s+=`<rect x="640" y="560" width="200" height="340" fill="#0f2a17"/><rect x="640" y="560" width="${200*(1-k*0.85)}" height="340" fill="#3a2a14" stroke="${GREY}" stroke-width="6"/>`;
+ if(k>0.3)s+=`<rect x="${640+200*(1-k*0.85)}" y="560" width="${200*k*0.85}" height="340" fill="${GREEN}" opacity=".35"/>`;
+ s+=benAt(300+420*k,900,k<1?walkPose(t,6):P.cheer,0.62,WHITE,0,1,false);
+ s+=bulbs(540,500,7,(t-PAY)*6,t,22,70);
+ s+=optCards(t,OPT,1110,1,{win:2,pop:PAY});
+ if(t>=S[12]){const q=cl((t-S[12])/0.3);s+=`<g opacity="${q}" transform="translate(465,1320)">`+tag(0,0,'SCHICK DAS JEMANDEM, DER GRÜBELT',WHITE,'#05070c',32)+'</g>';}
+ return `<g opacity="${o}">${s}</g>`;}
+window.SFXC=()=>{const c=[[0,'whoosh'],[0.05,'boom'],[0.1,'buzz']];for(let k=1;k<11;k++)c.push([k*0.55,'pop']);
+ c.push([S[1],'whoosh'],[S[1]+0.2,'ding'],[S[2],'whoosh']);for(let k=0;k<6;k++)c.push([S[2]+0.4+k*0.4,'pop']);c.push([S[2]+2.6,'boom']);
+ c.push([S[3],'whoosh']);for(let k=0;k<9;k++)c.push([S[3]+0.2+k*0.22,'tick']);c.push([S[3]+2.3,'pop']);
+ c.push([S[4],'whoosh']);for(let k=0;k<5;k++)c.push([S[4]+1.4+k*0.75,'pop']);
+ c.push([S[5],'whoosh'],[S[5]+1.6,'buzz'],[S[6],'whoosh'],[S[6]+1.4,'boom']);
+ c.push([S[7],'whoosh']);for(let k=0;k<4;k++)c.push([S[7]+0.5+k*0.45,'tick']);c.push([S[7]+3.0,'ding']);
+ c.push([S[8],'whoosh'],[S[8]+1.2,'pop'],[S[9],'whoosh']);for(let k=0;k<3;k++)c.push([S[9]+0.3+k*0.3,'pop']);c.push([S[9]+2.0,'ding'],[S[9]+2.4,'buzz']);
+ c.push([S[10],'whoosh'],[S[10]+2.2,'pop'],[S[10]+3.0,'tick'],[S[10]+3.3,'tick'],[S[10]+3.6,'tick']);
+ c.push([PAY,'boom'],[PAY+0.05,'ding']);for(let k=0;k<7;k++)c.push([PAY+k/6,'pop']);
+ c.push([S[12],'whoosh'],[SAVE,'whoosh'],[SAVE+0.2,'pop'],[SAVE+0.42,'pop'],[SAVE+0.64,'pop'],[SAVE+0.8,'ding']);
+ return c;};
+window.render=function(t){let s=bg(t<0.6?0.8*(1-t/0.6)+0.2:(t>S[9]&&t<S[10]?0.25:0),t>=PAY&&t<SAVE?0.6:0);
+ s+=head();
+ s+=partHook(t)+partDouble(t)+partPeople(t)+partButton(t)+partWall(t)+partBars(t)+partAfter(t)+partLimit(t)+partRule(t)+payoff(t);
+ s+=LH(t,-1,S[1],300,'WO HAST DU DEINE',82,WHITE)+LH(t,-1,S[1],378,'BESTEN IDEEN?',64,YEL);
+ s+=L(t,S[1],S[2],300,'DEIN TIPP: A, B ODER C?',80,YEL)+L(t,S[1]+0.6,S[2],378,'SCHREIB ES IN DIE KOMMENTARE.',50,WHITE);
+ s+=L(t,S[2],S[3],300,'BEIM GEHEN:',96,GREEN)+L(t,S[2]+1.4,S[3],378,'DOPPELT SO VIELE NEUE IDEEN.',54,WHITE);
+ s+=L(t,S[3],S[4],300,'DER TEST:',100,WHITE)+L(t,S[3]+1.4,S[4],378,'SITZEN GEGEN GEHEN.',60,YEL);
+ s+=L(t,S[4],S[5],300,'DIE AUFGABE:',96,WHITE)+L(t,S[4]+1.0,S[5],378,'WAS KANN EIN KNOPF ALLES SEIN?',50,YEL);
+ s+=L(t,S[5],S[6],300,'DER TRICK:',100,WHITE)+L(t,S[5]+1.0,S[6],378,'SIE LIEFEN NICHT DURCH EINEN PARK.',46,RED);
+ s+=L(t,S[6],S[7],300,'SONDERN AUF EINEM',80,WHITE)+L(t,S[6]+0.8,S[7],378,'LAUFBAND VOR EINER LEEREN WAND.',48,YEL);
+ s+=L(t,S[7],S[8],300,'TROTZDEM:',100,WHITE)+L(t,S[7]+1.2,S[8],378,'81–100 % HATTEN MEHR IDEEN.',56,GREEN);
+ s+=L(t,S[8],S[9],300,'DANACH HINSETZEN?',86,WHITE)+L(t,S[8]+1.2,S[9],378,'EIN TEIL BLEIBT HÄNGEN.',58,GREEN);
+ s+=L(t,S[9],S[10],300,'EHRLICH GESAGT:',90,WHITE)+L(t,S[9]+1.0,S[10],378,'BEI EINER RICHTIGEN LÖSUNG: NICHTS.',44,'#cfd6e6');
+ s+=L(t,S[10],PAY,300,'ZUM RECHNEN: SITZEN.',80,BLUE)+L(t,S[10]+2.2,PAY,378,'ZUM IDEEN FINDEN: AUFSTEHEN.',52,GREEN);
+ if(t>=PAY&&t<SAVE){const o=env(t,PAY,SAVE,0.001,0.25),sc=1.5-0.5*eb((t-PAY)/0.35);s+=`<g opacity="${o}" transform="translate(540,300) scale(${sc})">${txt(0,0,'ANTWORT C: GEHEN.',86,GREEN,900,1,'middle',1)}</g>`+L(t,PAY+1.2,SAVE,378,'DEINE IDEE LIEGT VOR DEINER TÜR.',50,WHITE);}
+ if(t>=0.3&&t<S[2])s+=tipPill(t,0.3,S[2]);
+ s+=SRC(t,S[3],PAY,'Oppezzo & Schwartz (2014), J. Exp. Psychol.: LMC 40(4)','176 Teilnehmende, 4 Experimente · Stanford University');
+ s+=saveCard(t,SAVE,'WENN DU FESTSTECKST:',['PROBLEM IM KOPF BEHALTEN','AUFSTEHEN UND GEHEN','IDEEN SOFORT NOTIEREN']);
+ s+=brand();
+ document.getElementById('stage').innerHTML=s;
+ const fl=document.getElementById('flash');const w=env(t,-0.1,0.3,0.001,0.25),g=env(t,PAY,PAY+0.7,0.001,0.6);
+ fl.style.background=g>0?GREEN:YEL;fl.style.opacity=Math.max(0.15*w,0.38*g);
+};
+render(0);
+</script></body></html>

@@ -1,0 +1,3 @@
+# usage: mont.sh out.png files...
+out=$1; shift; n=$#; cols=6; 
+ffmpeg -v error -y $(for f in "$@"; do echo -i $f; done) -filter_complex "$(i=0; for f in "$@"; do echo -n "[$i]scale=300:533,drawtext=text='$(basename $f .png)':fontcolor=yellow:fontsize=28:x=5:y=5[v$i];"; i=$((i+1)); done; for j in $(seq 0 $((n-1))); do echo -n "[v$j]"; done; echo -n "xstack=inputs=$n:layout=$(for j in $(seq 0 $((n-1))); do c=$((j%cols)); r=$((j/cols)); echo -n "$((c*300))_$((r*533))|"; done | sed 's/|$//'):fill=gray")" $out
