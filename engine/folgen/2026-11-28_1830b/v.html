@@ -1,0 +1,123 @@
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#flash{position:absolute;inset:0;opacity:0}
+</style></head><body>
+<svg id="stage" viewBox="0 0 1080 1920"></svg><div id="flash"></div>
+<script src="rig.js"></script><script src="poses.js"></script><script src="kit.js"></script><script src="h.js"></script><script src="k27.js"></script><script src="timing.js"></script>
+<script>
+// „Welches Eiswasser?“ – Kahneman, Fredrickson, Schreiber & Redelmeier (1993), Psychological Science 4(6), 401–405 (Peak-End-Regel)
+window.DUR=61.0; const PAY=S[11]; const SAVE=58.5; const HV=(location.hash||'#A').slice(1);
+const ICE='#7fd3ff', WATER='#1e5a8a';
+const BX=[255,695], BW=300, WY=640, BB=860;
+function cards2(t,y,o=1,mode={}){if(o<=0)return'';const w=385,g=30,x0=465-(2*w+g)/2;const it=[['60','SEKUNDEN'],['90','SEKUNDEN']];let s=`<g opacity="${o}">`;
+ it.forEach((v,i)=>{const x=x0+i*(w+g);const hl=mode.hl===i,win=mode.win===i,dim=mode.win!=null&&!win;const col=win?GREEN:(hl?YEL:'#2a3444');
+  s+=`<g transform="translate(${x+w/2},${y}) scale(${hl?1.04:1})" opacity="${dim?0.35:1}"><rect x="${-w/2}" y="-95" width="${w}" height="190" rx="26" fill="${win?'#0f2a17':'#0b0f16'}" stroke="${col}" stroke-width="${hl||win?9:5}"/><circle cx="${-w/2+50}" cy="-45" r="30" fill="${col}"/>`+txt(-w/2+50,-34,'AB'[i],34,(hl||win)?'#05070c':WHITE,900)+txt(20,20,v[0],86,WHITE,900)+txt(20,70,v[1],30,'#cfd6e6',900)+(mode.sub&&mode.sub[i]?txt(w/2-60,-50,mode.sub[i],30,win?GREEN:'#8a93a3',900):'')+(win?txt(w/2-34,-58,'✓',50,GREEN,900):'')+'</g>';});
+ return s+'</g>';}
+function thermo(x,y,v,col){const h=150,f=cl((v-10)/8);return `<g transform="translate(${x},${y})"><rect x="-12" y="${-h}" width="24" height="${h}" rx="12" fill="#0b0f16" stroke="${WHITE}" stroke-width="5"/><rect x="-6" y="${-h*f}" width="12" height="${h*f}" rx="6" fill="${col}"/><circle cx="0" cy="12" r="22" fill="${col}" stroke="${WHITE}" stroke-width="5"/></g>`}
+function bowl(i,t,o,sec,temp,active){if(o<=0)return'';const cx=BX[i];let s=`<g opacity="${o*(active?1:0.4)}">`;
+ s+=`<path d="M${cx-BW/2},560 L${cx+BW/2},560 L${cx+BW/2-30},${BB} Q${cx},${BB+20} ${cx-BW/2+30},${BB} Z" fill="${WATER}" opacity=".35" stroke="${WHITE}" stroke-width="7"/>`;
+ s+=`<path d="M${cx-BW/2+8},${WY} L${cx+BW/2-8},${WY} L${cx+BW/2-30},${BB} Q${cx},${BB+20} ${cx-BW/2+30},${BB} Z" fill="${WATER}" opacity=".85"/>`;
+ for(let k=0;k<4;k++){const bx=cx-100+k*62,by=WY-6+6*Math.sin(t*2+k*1.7+i);s+=`<rect x="${bx}" y="${by}" width="44" height="40" rx="8" fill="${ICE}" opacity=".9" transform="rotate(${8*Math.sin(t+k)} ${bx+22} ${by+20})"/>`;}
+ s+=thermo(cx+BW/2-58,800,temp,temp>14.4?ORANGE:BLUE)+txt(cx-20,820,fmt(temp,0)+' °C',54,temp>14.4?ORANGE:WHITE,900);
+ s+=`<rect x="${cx-95}" y="470" width="190" height="66" rx="14" fill="#0b0f16" stroke="${sec>60?ORANGE:'#2a3444'}" stroke-width="5"/>`+txt(cx,520,'0:'+String(Math.floor(sec)).padStart(2,'0').replace('60','60'),46,sec>60?ORANGE:WHITE,900);
+ if(sec>=60&&sec<90&&i===1)s+=txt(cx,455,'+30 SEK.',30,ORANGE,900);
+ return s+'</g>';}
+function secs(t,i){if(i===0){if(t<S[3])return 0;return Math.min(60,60*cl((t-S[3]-0.3)/3.4));}
+ if(t<S[4])return 0;return Math.min(90,60*cl((t-S[4]-0.3)/2.4)+30*cl((t-S[4]-2.8)/1.0));}
+function temps(t,i){return i===1?14+cl((t-S[5]-0.6)/1.6):14;}
+function benArms(t,o,shiver){if(o<=0)return'';const j=shiver?Math.sin(t*40)*3:0;let s=`<g opacity="${o}">`;
+ s+=benAt(475,BB+10,Object.assign({},P.stand,{lua:-25,rua:25,headTilt:-8}),0.55,WHITE,0,1,true);
+ s+=`<g stroke="${WHITE}" stroke-width="7" stroke-linecap="round" fill="none"><path d="M468,${708} Q420,${640+j} 370,${WY+40+j}"/><path d="M482,${708} Q530,${640-j} 580,${WY+40-j}"/></g>`;
+ return s+'</g>';}
+// Schmerz-Kurven (schematisch, Skala 0–14)
+const GX0=110,GX1=850,GY0=1390,GH=300;
+const gx=s=>GX0+(GX1-GX0)*s/90, gy=v=>GY0-GH*v/14;
+function painA(s){return s<8?8.5*s/8:8.5+0.3*Math.sin(s/6);}
+function painB(s){return s<=60?painA(s):painA(60)-2.6*cl((s-60)/30);}
+function curve(fn,smax,k,col,w=8){let d='';const n=Math.floor(60*k);for(let i=0;i<=n;i++){const s=smax*i/60;d+=(i?'L':'M')+gx(s).toFixed(1)+','+gy(fn(s)).toFixed(1);}return n>0?`<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`:''}
+function graph(t,o){if(o<=0)return'';let s=`<g opacity="${o}">`;
+ s+=`<line x1="${GX0}" y1="${GY0}" x2="${GX1}" y2="${GY0}" stroke="#5c6b85" stroke-width="4"/><line x1="${GX0}" y1="${GY0}" x2="${GX0}" y2="${GY0-GH-20}" stroke="#5c6b85" stroke-width="4"/>`;
+ s+=txt(GX0+10,GY0-GH-34,'SCHMERZ',26,'#8a93a3',900,1,'start')+txt(gx(60),GY0+40,'60 S',26,'#8a93a3',900)+txt(gx(90)-10,GY0+40,'90 S',26,'#8a93a3',900);
+ const fade=t>=S[10]+0.6?0.25:1;
+ const kA=cl((t-S[3]-0.3)/3.4),kB=t<S[4]?0:cl((t-S[4]-0.3)/3.6);
+ s+=`<g opacity="${fade}">`+curve(painA,60,kA,RED)+curve(painB,90,kB,ORANGE,6)+'</g>';
+ if(kA>=1)s+=txt(gx(60)+4,gy(painA(60))-20,'A',34,RED,900);
+ if(kB>=1)s+=txt(gx(90)-10,gy(painB(90))-20,'B',34,ORANGE,900);
+ if(t>=S[8]&&t<S[10]){const q=cl((t-S[8]-0.2)/0.4);let d=`M${gx(60)},${GY0}`;for(let i=0;i<=30;i++){const ss=60+i;d+=` L${gx(ss)},${gy(painB(ss))}`;}d+=` L${gx(90)},${GY0} Z`;s+=`<path d="${d}" fill="${ORANGE}" opacity="${0.35*q}"/>`+txt(gx(75),GY0-30,'MEHR',26,WHITE,900,q);}
+ if(t>=S[10]+0.6){const q=eb(cl((t-S[10]-0.6)/0.35)),q2=eb(cl((t-S[10]-2.4)/0.35));
+  s+=`<circle cx="${gx(40)}" cy="${gy(painA(40))}" r="${18*q}" fill="${RED}"/>`+txt(gx(40),gy(painA(40))-34,'SCHLIMMSTER MOMENT',26,RED,900,cl(q));
+  s+=`<circle cx="${gx(60)}" cy="${gy(painA(60))}" r="${14*q2}" fill="${RED}"/><circle cx="${gx(90)}" cy="${gy(painB(90))}" r="${18*q2}" fill="${GREEN}"/>`+txt(gx(84),gy(painB(90))+52,'ENDE',28,GREEN,900,cl(q2));}
+ s+=txt(GX0+130,GY0+40,'schematisch',22,'#8a93a3',700,1,'start');
+ return s+'</g>';}
+// ---------- Szene Schalen (bis S10)
+function partBowls(t){const o=env(t,-1,PAY+0.05,0.001,0.3);if(o<=0)return'';let s='';
+ const act0=t<S[4]||t>=S[6],act1=t<S[3]||t>=S[4];
+ s+=bowl(0,t,1,secs(t,0),temps(t,0),act0)+bowl(1,t,1,secs(t,1),temps(t,1),act1);
+ s+=benArms(t,t<S[2]||t>=S[3]?1:0.6,t<S[6]);
+ s+=txt(BX[0],915,'A · 60 SEK.',34,RED,900)+txt(BX[1],915,'B · 90 SEK.',34,ORANGE,900);
+ return `<g opacity="${o}">${s}</g>`;}
+function partCards(t){let s='';
+ const o1=env(t,-1,S[2]+0.1,0.001,0.3);if(o1>0){s+=cards2(t,1150,o1,{hl:Math.floor(t/1.0)%2});if(t>=S[1]+1.5)s+=`<g opacity="${cl((t-S[1]-1.5)/0.3)}" transform="translate(465,1330)">`+tag(0,0,'MERK DIR DEINE WAHL',WHITE,'#05070c',38)+'</g>';}
+ const o2=env(t,S[2],S[3]+0.1,0.25,0.3);if(o2>0){s+=`<g opacity="${o2}">`+txt(465,1120,'32',150,YEL,900)+txt(465,1185,'STUDENTEN · KALIFORNIEN',34,'#cfd6e6',900);
+  for(let i=0;i<32;i++){const q=cl((t-S[2]-0.3-i*0.05)/0.2);const c=i%16,r=Math.floor(i/16);s+=`<g opacity="${q}">`+benAt(110+c*47,1330+r*95,P.stand,0.22,WHITE,0,1,true)+'</g>';}s+='</g>';}
+ const o3=env(t,S[6],S[8]+0.1,0.25,0.3);if(o3>0){const rev=t>=S[7];s+=`<g opacity="${o3}"><rect x="40" y="960" width="860" height="580" fill="#05070c" opacity=".93"/>`+cards2(t,1100,1,rev?{win:1,sub:['10','22']}:{hl:Math.floor(t/0.6)%2});
+  if(rev){for(let i=0;i<32;i++){const q=cl((t-S[7]-0.3-i*0.04)/0.2);const c=i%16,r=Math.floor(i/16);s+=`<g opacity="${q}">`+benAt(110+c*47,1330+r*95,i<22?P.cheer:P.stand,0.22,i<22?ORANGE:'#5c6b85',0,1,true)+'</g>';}
+   s+=`<g transform="translate(465,1470) scale(${eb(cl((t-S[7]-1.6)/0.35))})">`+tag(0,0,'69 % WÄHLTEN MEHR SCHMERZ',ORANGE,'#05070c',40)+'</g>';}
+  else s+=txt(465,1330,'?',140,YEL,900,0.6+0.4*Math.sin(t*8));
+  s+='</g>';}
+ return s;}
+// ---------- Kipppunkt (PAY..SAVE)
+function dumbbell(x,y,sc,col){return `<g transform="translate(${x},${y}) scale(${sc})"><rect x="-70" y="-8" width="140" height="16" rx="6" fill="${WHITE}"/><rect x="-86" y="-34" width="22" height="68" rx="8" fill="${col}"/><rect x="64" y="-34" width="22" height="68" rx="8" fill="${col}"/></g>`}
+function payoff(t){const o=env(t,PAY,SAVE,0.001,0.25);if(o<=0)return'';let s='';
+ const u=cl((t-PAY)/1.0);s+=benAt(470,900,u<1?P.stand:P.cheer,0.75,WHITE,0,1,true)+dumbbell(470,u<1?720:520,0.9,GREEN);
+ for(let i=0;i<6;i++){const a=PAY+0.8+i*0.25;if(t<a)continue;const q=cl((t-a)/1.6);s+=txt(470+((i*67)%240)-120,520-q*80,'♥',48,GREEN,900,1-q);}
+ if(t<S[12])s+=`<g transform="translate(465,1150) scale(${eb(cl((t-PAY-0.4)/0.4))})">`+tag(0,0,'DAS ENDE KANNST DU STEUERN',GREEN,'#05070c',44)+'</g>';
+ if(t>=S[12]&&t<S[13]){const items=[['TRAINING','LEICHTESTE ÜBUNG ZULETZT'],['LERNEN','MIT ETWAS AUFHÖREN, DAS KLAPPT']];
+  items.forEach(([a,b],i)=>{const q=eb(cl((t-S[12]-0.2-i*2.2)/0.35));s+=`<g transform="translate(465,${1080+i*170}) scale(${q})"><rect x="-400" y="-70" width="800" height="140" rx="24" fill="#0f2a17" stroke="${GREEN}" stroke-width="5"/>${txt(-370,-14,a,30,GREEN,900,1,'start')}${txt(-370,40,b,b.length>26?34:40,WHITE,900,1,'start')}${txt(360,25,'✓',60,GREEN,900)}</g>`;});
+  s+=txt(465,1420,'Tipp, abgeleitet aus der Studie',24,'#8a93a3',700,cl((t-S[12]-1)/0.3));}
+ if(t>=S[13]){s+=cards2(t,1150,cl((t-S[13])/0.3),{win:1,sub:['10','22']});const q=cl((t-S[13]-2.2)/0.3);s+=`<g opacity="${q}" transform="translate(465,1370)">`+tag(0,0,'SCHICK DAS JEMANDEM, DER ZU FRÜH AUFHÖRT',WHITE,'#05070c',29)+'</g>';}
+ return `<g opacity="${o}">${s}</g>`;}
+window.SFXC=()=>{const c=[[0,'whoosh'],[0.05,'boom'],[0.1,'pop']];for(let k=1;k<6;k++)c.push([k*1.0,'tick']);
+ c.push([S[1],'whoosh'],[S[1]+1.5,'ding'],[S[2],'whoosh'],[S[2]+0.1,'pop']);for(let i=0;i<32;i+=4)c.push([S[2]+0.3+i*0.05,'tick']);
+ c.push([S[3],'whoosh']);for(let k=0;k<12;k++)c.push([S[3]+0.3+k*0.28,'tick']);c.push([S[3]+3.7,'buzz']);
+ c.push([S[4],'whoosh']);for(let k=0;k<12;k++)c.push([S[4]+0.3+k*0.2,'tick']);c.push([S[4]+2.8,'pop'],[S[4]+3.8,'ding']);
+ c.push([S[5],'whoosh'],[S[5]+0.6,'pop'],[S[5]+2.2,'ding']);
+ c.push([S[6],'whoosh']);for(let k=0;k<14;k++)c.push([S[6]+0.4+k*0.3,'tick']);
+ c.push([S[7],'boom'],[S[7]+0.1,'ding']);for(let i=0;i<22;i+=3)c.push([S[7]+0.3+i*0.04,'pop']);c.push([S[7]+1.6,'pop']);
+ c.push([S[8],'whoosh'],[S[8]+0.2,'buzz'],[S[9],'whoosh'],[S[9]+0.3,'pop'],[S[10],'whoosh'],[S[10]+0.6,'pop'],[S[10]+2.4,'ding']);
+ for(let k=0;k<10;k++)c.push([E[10]+0.2+k*((PAY-E[10]-0.3)/10),'tick']);
+ c.push([PAY,'boom'],[PAY+0.05,'ding'],[PAY+0.4,'pop'],[PAY+1.0,'whoosh']);
+ c.push([S[12],'whoosh'],[S[12]+0.2,'ding'],[S[12]+2.4,'ding'],[S[13],'whoosh'],[S[13]+0.3,'pop'],[S[13]+2.2,'pop']);
+ c.push([SAVE,'whoosh'],[SAVE+0.2,'pop'],[SAVE+0.42,'pop'],[SAVE+0.64,'pop'],[SAVE+0.8,'ding']);
+ return c;};
+window.render=function(t){let s=bg(t<0.6?0.5*(1-t/0.6)+0.15:(t>S[8]&&t<S[9]?0.3:0),t>=PAY&&t<SAVE?0.6:0);
+ s+=head();
+ const pb=partBowls(t); if(HV==='B'&&t<S[2])s+=`<g transform="translate(475,700) scale(1.3) translate(-475,-700)">${pb}</g>`; else if(HV==='C'&&t<S[2])s+=txt(260,760,'60',220,RED,900)+txt(465,700,'vs',60,WHITE,900)+txt(690,760,'90',220,ORANGE,900); else s+=pb;
+ s+=graph(t,env(t,S[3],PAY+0.05,0.3,0.25)*(t>=S[6]&&t<S[8]?0:1))+partCards(t)+payoff(t);
+ if(t>=S[9]&&t<S[10])s+=`<g transform="translate(465,995) scale(${eb(cl((t-S[9]-0.3)/0.35))})">`+tag(0,0,'GEFÜHLT: WENIGER SCHLIMM ?!',YEL,'#05070c',40)+'</g>';
+ s+=LH(t,-1,S[1],300,'WELCHES EISWASSER',80,WHITE)+LH(t,-1,S[2],378,'WÜRDEST DU NOCHMAL MACHEN?',54,YEL);
+ s+=L(t,S[1],S[2],300,'60 ODER 90 SEKUNDEN?',76,WHITE);
+ s+=L(t,S[2],S[3],300,'32 STUDENTEN.',90,WHITE)+L(t,S[2]+1.2,S[3],378,'ECHTE HÄNDE. ECHTES EISWASSER.',48,YEL);
+ s+=L(t,S[3],S[4],300,'HAND 1: 60 SEKUNDEN',72,RED)+L(t,S[3]+0.8,S[4],378,'14 °C KALTES WASSER.',58,WHITE);
+ s+=L(t,S[4],S[5],300,'HAND 2: DASSELBE',80,ORANGE)+L(t,S[4]+0.8,S[5],378,'PLUS 30 SEKUNDEN EXTRA.',56,WHITE);
+ s+=L(t,S[5],S[6],300,'NUR AM ENDE:',86,WHITE)+L(t,S[5]+0.6,S[6],378,'1 GRAD WÄRMER.',62,ORANGE);
+ s+=L(t,S[6],S[7],300,'WELCHEN VERSUCH',84,WHITE)+L(t,S[6]+0.4,S[7],378,'MACHST DU NOCHMAL?',60,YEL);
+ s+=L(t,S[7],S[8],300,'22 VON 32:',96,ORANGE)+L(t,S[7]+0.4,S[8],378,'DIE 90 SEKUNDEN.',62,WHITE);
+ s+=L(t,S[8],S[9],300,'MEHR SCHMERZ.',90,RED)+L(t,S[8]+1.2,S[9],378,'ABER EIN BESSERES ENDE.',56,GREEN);
+ s+=L(t,S[9],S[10],300,'UND DANACH?',90,WHITE)+L(t,S[9]+0.6,S[10],378,'„WAR GAR NICHT SO SCHLIMM.“',54,YEL);
+ s+=L(t,S[10],PAY,300,'DEIN KOPF SPEICHERT:',76,WHITE)+L(t,S[10]+1.2,PAY,378,'DEN SCHLIMMSTEN MOMENT + DAS ENDE.',44,YEL);
+ if(t>=PAY&&t<S[12]){const o=env(t,PAY,S[12],0.001,0.25),sc=1.5-0.5*eb((t-PAY)/0.35);s+=`<g opacity="${o}" transform="translate(540,300) scale(${sc})">${txt(0,0,'DIE GUTE NACHRICHT:',72,GREEN,900,1,'middle',1)}</g>`+L(t,PAY+0.8,S[12],378,'DAS ENDE KANNST DU STEUERN.',52,WHITE);}
+ s+=L(t,S[12],S[13],300,'HÖR GUT AUF.',96,GREEN)+L(t,S[12]+0.5,S[13],378,'DANN WILLST DU WIEDERKOMMEN.',50,WHITE);
+ s+=L(t,S[13],SAVE,300,'WAS HATTEST DU GEWÄHLT?',66,WHITE)+L(t,S[13]+0.5,SAVE,378,'SCHREIB’S IN DIE KOMMENTARE.',50,YEL);
+ s+=cpill(t,20.6,25.4,'WOMIT HÖRST DU AUF, WEIL DAS ENDE NERVT?');
+ s+=SRC(t,S[2],PAY,'Kahneman et al. (1993), Psychological Science 4(6), 401–405','N = 32 · 60 s bei 14 °C vs. 90 s (letzte 30 s ~15 °C) · 22 von 32: 90 s');
+ s+=saveCard(t,SAVE,'GUTES ENDE EINBAUEN:',['LETZTE ÜBUNG: LEICHT','LERNEN: MIT ERFOLG STOPP','ABENDS: SCHÖN ENDEN']);
+ s+=brand();
+ document.getElementById('stage').innerHTML=s;
+ const fl=document.getElementById('flash');const g=env(t,PAY,PAY+0.7,0.001,0.6);
+ fl.style.background=GREEN;fl.style.opacity=0.38*g;
+};
+render(0);
+</script></body></html>
