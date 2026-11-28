@@ -294,3 +294,5 @@ QC gegen Referenzen („Wochen“, „150 €“, Hook „1 neue Nachricht“, B
 - Safe Zone: je 16–17 Standbilder mit roten Sperrzonen + Hook-Neuprüfung; korrigiert: Tafel-Spalte „TATSÄCHLICH“ zu breit (→ „IST“), Koffer-Labels auf Quellenzeile, Optionskarten auf Quellenzeile, Frage-Karten auf Bahnsteig (12:30); Gedankenblase in Unterzeile, Kipppunkt-Überschrift zu breit (18:30); Label „KNAPP DRUNTER“ in Button-Ecke (21:00) → ok.
 - Ton: Tom Magic, eleven_v3, 1 Take/Satz (42 + 1 Neuaufnahme, ~2.600 Zeichen), Starts aus gemessenen Dauern (fit.py), atempo 1,10 / 1,10 / 1,06; −14,1 / −13,9 / −14,2 LUFS; Musik Sidechain; SFX auf jedem Wechsel.
 - Prozess: Cloud-Absicherungs-Tasks (create_trigger) im geplanten Lauf nicht erlaubt (braucht Lukas' Freigabe) → stattdessen Erinnerungen in dieser Sitzung um 12:50/18:50/21:20.
+
+> 28.11. 12:32: „Wie lange wirklich?“ live – YouTube AYICPevQ1qk · TikTok 7713183185340747047 · Instagram DgSJyoTh5Xa (KI-Label; vidIQ meldete „inconclusive“, Reel aber online – nicht erneut gepostet). vidIQ-YouTube: 2 Uploads heute übrig. Kommentare an Lukas geschickt (kein Chrome).
