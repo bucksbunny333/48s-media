@@ -1,0 +1,164 @@
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;background:#000;font-family:Inter;color:#fff;overflow:hidden;position:relative}
+svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#flash{position:absolute;inset:0;opacity:0}
+</style></head><body>
+<svg id="stage" viewBox="0 0 1080 1920"></svg><div id="flash"></div>
+<script src="rig.js"></script><script src="poses.js"></script><script src="kit.js"></script><script src="h.js"></script><script src="k27.js"></script><script src="timing.js"></script>
+<script>
+// „Knapp gescheitert“ – Wang, Jones & Wang (2019), Nature Communications 10, 4331
+window.DUR=61.0; const PAY=S[11]; const SAVE=58.5; const HV=(location.hash||'#A').slice(1);
+const GY=930;
+// zwei Optionskarten (zentriert x 465, Gesamtbreite 800)
+function cards2(t,y,o=1,mode={}){if(o<=0)return'';const w=385,g=30,x0=465-(2*w+g)/2;const it=[['KNAPP','GESCHAFFT'],['KNAPP','GESCHEITERT']];let s=`<g opacity="${o}">`;
+ it.forEach((v,i)=>{const x=x0+i*(w+g);const hl=mode.hl===i,win=mode.win===i,dim=mode.win!=null&&!win;const col=win?GREEN:(hl?YEL:'#2a3444');
+  s+=`<g transform="translate(${x+w/2},${y}) scale(${hl?1.04:1})" opacity="${dim?0.35:1}"><rect x="${-w/2}" y="-95" width="${w}" height="190" rx="26" fill="${win?'#0f2a17':'#0b0f16'}" stroke="${col}" stroke-width="${hl||win?9:5}"/><circle cx="0" cy="-50" r="30" fill="${col}"/>`+txt(0,-39,'AB'[i],34,(hl||win)?'#05070c':WHITE,900)+txt(0,18,v[0],34,'#cfd6e6',900)+txt(0,62,v[1],40,i?RED:GREEN,900)+(win?txt(w/2-34,-58,'✓',50,GREEN,900):'')+'</g>';});
+ return s+'</g>';}
+// Hochsprung: Latte + Ständer; Springer in Zeitlupe (Zyklus 2,4 s)
+function jump(cx,t,ok,col,ph0=0,barY=GY-300,lab){let s='';const T=2.4,u=((t+ph0)%T)/T;
+ // Ständer
+ s+=`<rect x="${cx-150}" y="${barY-40}" width="12" height="${GY-barY+40}" fill="#5c6b85"/><rect x="${cx+138}" y="${barY-40}" width="12" height="${GY-barY+40}" fill="#5c6b85"/>`;
+ // Matte
+ s+=`<rect x="${cx-40}" y="${GY-40}" width="230" height="40" rx="10" fill="#1d3a6b"/>`;
+ // Latte: bei Fehlversuch nach Berührung wackeln + fallen
+ let by=barY,rot=0;if(!ok&&u>0.5){const k=cl((u-0.5)/0.3);rot=18*Math.sin(k*9)*(1-k)+30*k;by=barY+k*(GY-barY-50);}
+ s+=`<g transform="translate(${cx},${by}) rotate(${rot})"><rect x="-150" y="-6" width="300" height="12" rx="6" fill="${ok?'#f2f2f2':(u>0.5?RED:'#f2f2f2')}"/></g>`;
+ // Springer: Flugbahn (Fosbury vereinfacht: Bogen über die Latte)
+ const fx=cx-220+440*u,fy=GY-(GY-barY-110+(ok?30:0))*Math.sin(Math.PI*cl(u*1.15));
+ const pose=u<0.2?(Math.floor(t*6)%2?P.walkA:P.walkB):(u<0.75?{torso:-70,lua:-150,lla:0,rua:-150,rla:0,lul:-60,lll:60,rul:-50,rll:50,headTilt:20}:P.stand);
+ s+=benAt(fx,Math.min(GY,fy+0),pose,0.5,col,u>0.2&&u<0.75?-60*Math.sin(Math.PI*(u-0.2)/0.55):0,1,true);
+ if(u>0.55&&u<0.98)s+=txt(cx,barY-80,ok?'✓':'✗',90,ok?GREEN:RED,900,1);
+ if(lab)s+=txt(cx,GY+70,lab,30,ok?GREEN:RED,900);
+ return s;}
+// ---------- Hook (bis S2)
+function partHook(t){const o=env(t,-1,S[2]+0.1,0.001,0.3);if(o<=0)return'';let s='';
+ if(HV==='B'){s+=jump(540,t,false,WHITE,0.9,GY-360,'KNAPP GESCHEITERT');}
+ else if(HV==='C'){s+=txt(540,700,'?',360,YEL,900,0.7+0.3*Math.sin(t*3));}
+ else {s+=jump(240,t,true,'#9aa6b8',0.0,GY-300,'KNAPP DRÜBER')+jump(690,t,false,WHITE,0.0,GY-300,'KNAPP DRUNTER');s+=`<line x1="465" y1="470" x2="465" y2="${GY+90}" stroke="#2a3444" stroke-width="4" stroke-dasharray="12 12"/>`;}
+ s+=cards2(t,1190,1,{hl:t<S[1]?Math.floor(t/1.0)%2:Math.floor(t/0.9)%2});
+ if(t>=S[1]+1.6){s+=`<g opacity="${cl((t-S[1]-1.6)/0.3)}" transform="translate(465,1370)">`+tag(0,0,'MERK DIR DEINE ANTWORT',WHITE,'#05070c',38)+'</g>';}
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- 778.219 Anträge (S2..S3)
+function paper(x,y,sc,col='#cfd6e6'){return `<g transform="translate(${x},${y}) scale(${sc})"><rect x="-30" y="-40" width="60" height="80" rx="6" fill="${col}"/><g stroke="#5c6b85" stroke-width="4"><line x1="-18" y1="-20" x2="18" y2="-20"/><line x1="-18" y1="-4" x2="18" y2="-4"/><line x1="-18" y1="12" x2="8" y2="12"/></g></g>`}
+function partApps(t){const o=env(t,S[2],S[3]+0.1,0.25,0.3);if(o<=0)return'';let s='';
+ const n=Math.round(778219*eo(cl((t-S[2]-0.2)/2.2)));
+ for(let i=0;i<60;i++){const q=cl((t-S[2]-0.1-i*0.03)/0.25);if(q<=0)continue;const c=i%12,r=Math.floor(i/12);s+=`<g opacity="${q}">`+paper(140+c*72+(r%2)*20,560+r*80-20*(1-q),0.75)+'</g>';}
+ s+=txt(465,1080,fmt(n),130,YEL,900)+txt(465,1150,'FÖRDERANTRÄGE · USA 1990–2005',36,'#cfd6e6',900,cl((t-S[2]-0.8)/0.3));
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- Fördergrenze (S3..S5)
+function dots(t,a,narrow){let s='';const R=(i)=>{const v=Math.sin(i*12.9898+78.233)*43758.5453;return v-Math.floor(v);};
+ for(let i=0;i<90;i++){const x=110+R(i)*740,sc=R(i+500)*2-1;const y=780-sc*230;const near=Math.abs(sc)<0.18;const q=cl((t-a-i*0.012)/0.2);if(q<=0)continue;
+  const above=sc>0;let col=above?GREEN:'#5c6b85',op=1;if(narrow&&!near)op=0.12;if(narrow&&near)col=above?GREEN:RED;
+  s+=`<circle cx="${x}" cy="${y}" r="${narrow&&near?16:12}" fill="${col}" opacity="${q*op}"/>`;}
+ return s;}
+function partLine(t){const o=env(t,S[3],S[6]+0.1,0.25,0.3);if(o<=0)return'';let s='';
+ const narrow=t>=S[4];
+ s+=dots(t,S[3]+0.2,narrow);
+ const k=eo(cl((t-S[3]-1.6)/0.6));s+=`<line x1="80" y1="780" x2="${80+800*k}" y2="780" stroke="${YEL}" stroke-width="8"/>`+txt(860,765,'FÖRDERGRENZE',28,YEL,900,k,'end');
+ if(t>=S[3]+3.4&&!narrow){s+=txt(465,520,'DRÜBER: GELD ✓',40,GREEN,900,cl((t-S[3]-3.4)/0.3))+txt(465,1060,'DRUNTER: NICHTS ✗',40,RED,900,cl((t-S[3]-4.8)/0.3));}
+ if(narrow){if(t<S[5])s+=`<rect x="80" y="700" width="800" height="160" rx="16" fill="none" stroke="${WHITE}" stroke-width="5" stroke-dasharray="14 10" opacity="${cl((t-S[4]-0.3)/0.3)}"/>`;
+  const q1=eb(cl((t-S[4]-1.0)/0.35)),q2=eb(cl((t-S[4]-1.6)/0.35));
+  s+=`<g transform="translate(260,1090) scale(${q1})">`+txt(0,0,'561',110,GREEN,900)+txt(0,50,'KNAPP DRÜBER',30,'#cfd6e6',900)+'</g>';
+  s+=`<g transform="translate(670,1090) scale(${q2})">`+txt(0,0,'623',110,RED,900)+txt(0,50,'KNAPP DRUNTER',30,'#cfd6e6',900)+'</g>';}
+ if(t>=S[5]){const q=eb(cl((t-S[5]-0.3)/0.35));s+=`<g transform="translate(465,1260) scale(${q})">`+tag(0,0,'NUR EIN PAAR PUNKTE UNTERSCHIED',WHITE,'#05070c',34)+'</g>';
+  const yr=Math.min(10,Math.floor(cl((t-S[5]-2.6)/2.0)*10));if(t>S[5]+2.6)s+=txt(465,1380,'+'+yr+' JAHRE',60,YEL,900);}
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- Zielscheiben (S6..S7)
+function target(x,y,r,hits,col,t,a){let s=`<g transform="translate(${x},${y})">`;[1,0.72,0.44,0.18].forEach((f,i)=>{s+=`<circle r="${r*f}" fill="${i%2?'#1d2533':'#2a3444'}"/>`;});s+=`<circle r="${r*0.18}" fill="${col}"/>`;
+ const R=(i)=>((i*7919+104729)%1000)/1000;hits.forEach((h,i)=>{const q=cl((t-a-i*0.12)/0.15);if(q<=0)return;const ang=R(i)*6.28,d=h?R(i+50)*r*0.16:r*(0.3+R(i+90)*0.6);s+=`<circle cx="${Math.cos(ang)*d}" cy="${Math.sin(ang)*d}" r="9" fill="${h?YEL:WHITE}" opacity="${q}"/>`;});
+ return s+'</g>';}
+function partHits(t){const o=env(t,S[6],S[8]+0.1,0.25,0.3);if(o<=0)return'';let s='';
+ const A=[0,0,1,0,0,0,0,0,1,0,0,0,0,0,0],B=[0,1,0,0,1,0,0,0,1,0,0,0,0,1,0];
+ s+=target(270,700,190,A,GREEN,t,S[6]+0.2)+target(670,700,190,B,RED,t,S[6]+0.2);
+ s+=txt(270,935,'KNAPP DRÜBER',32,GREEN,900)+txt(670,935,'KNAPP DRUNTER',32,RED,900);
+ if(t>=S[6]+1.4&&t<S[7])s+=`<g transform="translate(465,1090) scale(${eb(cl((t-S[6]-1.4)/0.35))})">`+tag(0,0,'MEHR VOLLTREFFER: DRUNTER!',YEL,'#05070c',40)+'</g>';
+ if(t>=S[7]){const k=eo(cl((t-S[7]-0.3)/0.9));
+  s+=txt(85,1070,'TOP-STUDIEN (JAHRE 1–5)',30,'#cfd6e6',900,1,'start');
+  s+=`<rect x="85" y="1090" width="760" height="62" rx="12" fill="#1d2533"/><rect x="85" y="1090" width="${760*13.3/18*k}" height="62" rx="12" fill="${GREEN}"/>`+txt(100,1133,'DRÜBER 13,3 %',32,'#05070c',900,k>0.6?1:0,'start');
+  s+=`<rect x="85" y="1172" width="760" height="62" rx="12" fill="#1d2533"/><rect x="85" y="1172" width="${760*16.1/18*k}" height="62" rx="12" fill="${RED}"/>`+txt(100,1215,'DRUNTER 16,1 %',32,WHITE,900,k>0.6?1:0,'start');
+  s+=`<g transform="translate(465,1330) scale(${eb(cl((t-S[7]-1.4)/0.35))})">`+tag(0,0,'+21 % HÄUFIGER',YEL,'#05070c',48)+'</g>';}
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- Zitate + Geld (S8..S9)
+function bag(x,y,sc,col){return `<g transform="translate(${x},${y}) scale(${sc})"><path d="M-50,-30 Q-70,60 0,60 Q70,60 50,-30Z" fill="${col}"/><rect x="-22" y="-52" width="44" height="22" rx="8" fill="${col}"/>${txt(0,30,'$',56,'#05070c',900)}</g>`}
+function partCite(t){const o=env(t,S[8],S[9]+0.1,0.25,0.3);if(o<=0)return'';let s='';
+ const k=eo(cl((t-S[8]-0.3)/1.2));
+ s+=txt(270,560,'ZITATE PRO STUDIE',28,'#cfd6e6',900)+txt(670,560,'ZITATE PRO STUDIE',28,'#cfd6e6',900);
+ s+=txt(270,690,fmt(27.0*k,1),120,GREEN,900)+txt(670,690,fmt(32.3*k,1),120,RED,900);
+ s+=txt(270,935,'KNAPP DRÜBER',32,GREEN,900)+txt(670,935,'KNAPP DRUNTER',32,RED,900);
+ const q=eb(cl((t-S[8]-1.8)/0.35));s+=`<g opacity="${cl(q)}">`+bag(270,830,1.0*q,GREEN)+bag(670,830,0.65*q,'#8a93a3')+'</g>';
+ s+=`<g transform="translate(465,1100) scale(${eb(cl((t-S[8]-0.9)/0.35))})">`+tag(0,0,'+19 % ZITATE',YEL,'#05070c',48)+'</g>';
+ s+=`<g transform="translate(465,1240) scale(${eb(cl((t-S[8]-2.0)/0.35))})">`+tag(0,0,'OBWOHL WENIGER GELD',WHITE,'#05070c',38)+'</g>';
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- Haken: Ausstieg (S9..S10)
+function partQuit(t){const o=env(t,S[9],S[10]+0.1,0.25,0.3);if(o<=0)return'';let s='';
+ s+=`<rect x="800" y="560" width="160" height="${GY-560}" rx="10" fill="#0b0f16" stroke="${RED}" stroke-width="6"/>`+txt(880,540,'AUSGANG',30,RED,900);
+ for(let i=0;i<8;i++){let x=130+i*85,pose=P.stand,col=i<5?'#9aa6b8':RED;let op=1;
+  if(i>=5){const u=cl((t-S[9]-1.4-(i-5)*0.5)/1.6);x=x+(880-x)*eio(u);pose=u>0&&u<1?(Math.floor(t*4)%2?P.walkA:P.walkB):P.stand;op=1-cl((u-0.85)/0.15);}
+  s+=benAt(x,GY,pose,0.42,col,0,op,true);}
+ s+=`<g transform="translate(465,1100) scale(${eb(cl((t-S[9]-0.6)/0.35))})">`+tag(0,0,'DEUTLICH MEHR STEIGEN AUS',RED,WHITE,42)+'</g>';
+ s+=txt(465,1190,'Figuren schematisch',24,'#8a93a3',700,cl((t-S[9]-1)/0.3));
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- Nicht das Nein … + Anlauf (S10..PAY)
+function partStop(t){const o=env(t,S[10],PAY+0.05,0.25,0.15);if(o<=0)return'';let s='';
+ const barY=GY-330;s+=`<rect x="390" y="${barY-40}" width="12" height="${GY-barY+40}" fill="#5c6b85"/><rect x="678" y="${barY-40}" width="12" height="${GY-barY+40}" fill="#5c6b85"/><rect x="396" y="${barY-6}" width="288" height="12" rx="6" fill="${WHITE}"/><rect x="500" y="${GY-40}" width="230" height="40" rx="10" fill="#1d3a6b"/>`;
+ const u=cl((t-S[10]-3.0)/(PAY-S[10]-3.0));
+ s+=benAt(150+150*eo(u),GY,u>0&&u<1?(Math.floor(t*6)%2?P.walkA:P.walkB):Object.assign({},P.stand,{headTilt:-10}),0.5,WHITE,0,1,true);
+ s+=`<g transform="translate(465,1100) scale(${eb(cl((t-S[10]-0.3)/0.35))})">`+tag(0,0,'DAS NEIN ≠ DAS ENDE',YEL,'#05070c',46)+'</g>';
+ if(t>S[10]+3.0)s+=txt(465,1230,'NOCHMAL …',56,WHITE,900,0.6+0.4*Math.sin(t*10));
+ return `<g opacity="${o}">${s}</g>`;}
+// ---------- Kipppunkt (PAY..SAVE)
+function payoff(t){const o=env(t,PAY,SAVE,0.001,0.25);if(o<=0)return'';let s='';
+ const barY=GY-380;const u=cl((t-PAY)/1.2);
+ s+=`<rect x="390" y="${barY-40}" width="12" height="${GY-barY+40}" fill="#5c6b85"/><rect x="678" y="${barY-40}" width="12" height="${GY-barY+40}" fill="#5c6b85"/><rect x="396" y="${barY-6}" width="288" height="12" rx="6" fill="${GREEN}"/><rect x="500" y="${GY-40}" width="230" height="40" rx="10" fill="#1d3a6b"/>`;
+ const fx=300+400*eo(u),fy=GY-(GY-barY-80)*Math.sin(Math.PI*cl(u*1.1));
+ const pose=u<1?{torso:-70,lua:-150,lla:0,rua:-150,rla:0,lul:-60,lll:60,rul:-50,rll:50,headTilt:20}:P.cheer;
+ s+=benAt(u<1?fx:720,u<1?Math.min(GY,fy):GY-40,pose,0.5,WHITE,u<1?-60*Math.sin(Math.PI*u):0,1,true);
+ if(u>=1)s+=txt(540,barY-90,'✓',110,GREEN,900);
+ for(let i=0;i<24;i++){const a=PAY+1.1+(i%6)*0.08;if(t<a)continue;const q=cl((t-a)/2.2);const ang=i*0.9;s+=`<rect x="${540+Math.cos(ang)*q*420}" y="${barY-60+Math.sin(ang)*q*300+q*q*260}" width="14" height="22" fill="${[GREEN,YEL,BLUE,WHITE][i%4]}" opacity="${1-q}" transform="rotate(${i*40} ${540+Math.cos(ang)*q*420} ${barY-60+Math.sin(ang)*q*300+q*q*260})"/>`;}
+ if(t<S[12])s+=`<g transform="translate(465,1130) scale(${eb(cl((t-PAY-1.3)/0.4))})">`+tag(0,0,'HÖHER ALS VORHER',GREEN,'#05070c',48)+'</g>';
+ if(t>=S[12])s+=cards2(t,1170,cl((t-S[12])/0.3),{win:1});
+ if(t>=S[13]){const q=cl((t-S[13])/0.3);s+=`<g opacity="${q}" transform="translate(465,1400)">`+tag(0,0,'SCHICK DAS JEMANDEM MIT FRISCHER ABSAGE',WHITE,'#05070c',29)+'</g>';}
+ return `<g opacity="${o}">${s}</g>`;}
+window.SFXC=()=>{const c=[[0,'whoosh'],[0.05,'boom'],[0.1,'pop']];
+ for(let k=0;k<25;k++){const T=2.4;const tt=k*T+0.5*T;if(tt<S[2])c.push([tt,'buzz']);const t2=k*T+0.2*T;if(t2<S[2])c.push([t2,'whoosh']);}
+ c.push([S[1],'whoosh'],[S[1]+1.6,'ding'],[S[2],'whoosh']);for(let k=0;k<14;k++)c.push([S[2]+0.2+k*0.15,'tick']);c.push([S[2]+2.4,'ding']);
+ c.push([S[3],'whoosh'],[S[3]+1.6,'whoosh'],[S[3]+3.4,'ding'],[S[3]+4.8,'buzz'],[S[4],'whoosh'],[S[4]+1.0,'pop'],[S[4]+1.6,'pop']);
+ c.push([S[5],'whoosh'],[S[5]+0.3,'pop']);for(let k=0;k<10;k++)c.push([S[5]+2.6+k*0.2,'tick']);
+ c.push([S[6],'boom']);for(let i=0;i<15;i++)c.push([S[6]+0.2+i*0.12,'pop']);c.push([S[6]+1.4,'ding']);
+ c.push([S[7],'whoosh'],[S[7]+0.3,'tick'],[S[7]+1.4,'ding'],[S[8],'whoosh'],[S[8]+0.9,'ding'],[S[8]+1.8,'pop'],[S[8]+2.0,'pop']);
+ c.push([S[9],'whoosh'],[S[9]+0.6,'buzz'],[S[9]+1.4,'whoosh'],[S[9]+1.9,'whoosh'],[S[9]+2.4,'whoosh']);
+ c.push([S[10],'whoosh'],[S[10]+0.3,'pop']);for(let k=0;k<14;k++)c.push([S[10]+3.0+k*((PAY-S[10]-3.0)/14),'tick']);
+ c.push([PAY,'whoosh'],[PAY+1.1,'boom'],[PAY+1.15,'ding'],[PAY+1.3,'pop']);
+ c.push([S[12],'whoosh'],[S[12]+0.3,'pop'],[S[13],'whoosh'],[SAVE,'whoosh'],[SAVE+0.2,'pop'],[SAVE+0.42,'pop'],[SAVE+0.64,'pop'],[SAVE+0.8,'ding']);
+ return c;};
+window.render=function(t){let s=bg(t<0.6?0.5*(1-t/0.6)+0.15:(t>S[9]&&t<S[10]?0.35:0),t>=PAY+1.1&&t<SAVE?0.6:0);
+ s+=head();
+ const fl0=t<S[6]||t>=S[10];if(t<S[2]||t>=S[10])s+=`<rect x="0" y="${GY}" width="1080" height="14" fill="#2a3444"/>`;
+ s+=partHook(t)+partApps(t)+partLine(t)+partHits(t)+partCite(t)+partQuit(t)+partStop(t)+payoff(t);
+ if(t>=S[9]&&t<S[10])s+=`<rect x="0" y="${GY}" width="1080" height="14" fill="#2a3444"/>`;
+ s+=LH(t,-1,S[1],300,'WER IST 10 JAHRE SPÄTER',70,WHITE)+LH(t,-1,S[2],378,'ERFOLGREICHER?',66,YEL);
+ s+=L(t,S[1],S[2],300,'KNAPP DRÜBER ODER DRUNTER?',62,WHITE);
+ s+=L(t,S[2],S[3],300,'FAST 800.000 ANTRÄGE.',74,WHITE)+L(t,S[2]+0.8,S[3],378,'AUSGEWERTET.',58,YEL);
+ s+=L(t,S[3],S[4],300,'JUNGE FORSCHER.',86,WHITE)+L(t,S[3]+1.6,S[4],378,'UND EINE HARTE GRENZE.',56,YEL);
+ s+=L(t,S[4],S[5],300,'NUR DIE KNAPPEN FÄLLE:',70,WHITE)+L(t,S[4]+1.0,S[5],378,'JE RUND 600.',58,YEL);
+ s+=L(t,S[5],S[6],300,'FAST GLEICH GUT.',86,WHITE)+L(t,S[5]+2.6,S[6],378,'UND 10 JAHRE SPÄTER?',58,YEL);
+ s+=L(t,S[6],S[7],300,'DIE ABGELEHNTEN',86,WHITE)+L(t,S[6]+0.3,S[7],378,'HATTEN MEHR VOLLTREFFER.',56,GREEN);
+ s+=L(t,S[7],S[8],300,'+21 % TOP-STUDIEN.',86,GREEN)+L(t,S[7]+0.8,S[8],378,'BEI DEN KNAPP ABGELEHNTEN.',52,WHITE);
+ s+=L(t,S[8],S[9],300,'ÖFTER ZITIERT.',90,WHITE)+L(t,S[8]+1.8,S[9],378,'MIT WENIGER GELD.',58,YEL);
+ s+=L(t,S[9],S[10],300,'ABER: DER HAKEN.',86,RED)+L(t,S[9]+1.4,S[10],378,'MEHR VON IHNEN HÖRTEN AUF.',52,WHITE);
+ s+=L(t,S[10],PAY,300,'NICHT DAS NEIN STOPPT DICH.',60,WHITE)+L(t,S[10]+1.4,PAY,378,'SONDERN DAS AUFHÖREN.',58,RED);
+ if(t>=PAY&&t<S[12]){const o=env(t,PAY,S[12],0.001,0.25),sc=1.5-0.5*eb((t-PAY)/0.35);s+=`<g opacity="${o}" transform="translate(540,300) scale(${sc})">${txt(0,0,'WER WEITERMACHT,',76,GREEN,900,1,'middle',1)}</g>`+L(t,PAY+0.9,S[12],378,'KOMMT OFT STÄRKER ZURÜCK.',54,WHITE);}
+ s+=L(t,S[12],SAVE,300,'WAS HATTEST DU GETIPPT?',68,WHITE)+L(t,S[12]+0.5,SAVE,378,'SCHREIB’S IN DIE KOMMENTARE.',50,YEL);
+ s+=cpill(t,20.6,25.4,'WORAN BIST DU SCHON MAL KNAPP GESCHEITERT?');
+ if(t<S[7])s+=SRC(t,S[2],S[7],'Wang, Jones & Wang (2019), Nature Communications 10, 4331','NIH-Anträge 1990–2005 · 623 knapp abgelehnt vs. 561 knapp gefördert');
+ else if(t<S[9])s+=SRC(t,S[7],S[9],'Wang, Jones & Wang (2019), Nature Communications 10, 4331','Top-5-%-Studien J. 1–5: 16,1 vs. 13,3 % · Zitate 32,3 vs. 27,0');
+ else s+=SRC(t,S[9],PAY,'Wang, Jones & Wang (2019): Ausstieg aus dem NIH-System','bei knapp Abgelehnten rund 11–13 % höher · Effekt gilt für die, die blieben');
+ s+=saveCard(t,SAVE,'NACH DEM KNAPPEN NEIN:',['WAS HAT GEFEHLT?','1 DING VERBESSERN','NOCHMAL VERSUCHEN']);
+ s+=brand();
+ document.getElementById('stage').innerHTML=s;
+ const fl=document.getElementById('flash');const g=env(t,PAY+1.1,PAY+1.8,0.001,0.6);
+ fl.style.background=GREEN;fl.style.opacity=0.38*g;
+};
+render(0);
+</script></body></html>
